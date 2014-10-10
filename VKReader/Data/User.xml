@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.Data.User">
+<Super>%Persistent</Super>
+<TimeCreated>63470,55253.859944</TimeCreated>
+
+<Property name="ID">
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Index name="IDKey">
+<IdKey>1</IdKey>
+<PrimaryKey>1</PrimaryKey>
+<Properties>ID</Properties>
+<Unique>1</Unique>
+</Index>
+
+<Property name="FirstName">
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="LastName">
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="Deactivated">
+<Type>%String</Type>
+<Parameter name="VALUELIST" value="-existing-deleted-banned"/>
+</Property>
+
+<Property name="Hidden">
+<Type>%Boolean</Type>
+<InitialExpression>0</InitialExpression>
+</Property>
+
+<Property name="Sex">
+<Type>%String</Type>
+<Parameter name="DISPLAYLIST" value="-N/A-Female-Male"/>
+<Parameter name="VALUELIST" value="-0-1-2"/>
+</Property>
+
+<Property name="DOB">
+<Type>%Date</Type>
+</Property>
+
+<Property name="City">
+<Type>%String</Type>
+</Property>
+
+<Property name="Country">
+<Type>%String</Type>
+</Property>
+
+<Property name="HomeTown">
+<Type>%String</Type>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if (oProxy '= "") {
+		set ..ID = oProxy."id"
+		set ..FirstName = oProxy."first_name"
+		set ..LastName = oProxy."last_name"
+		set ..Deactivated = oProxy."deactivated"
+		if (..Deactivated = "") {
+			set ..Deactivated = "existing"
+		}
+		if (oProxy."hidden" '= "") {
+			set ..Hidden = oProxy."hidden"
+		}
+		set ..Sex = oProxy."sex"
+		if (oProxy."bdate" '= "") {
+			set ..DOB = ##class(VKReader.Data.Utils).ConvertVKDateToHorolog(oProxy.bdate)
+		}
+		
+	} 
+	set status = ..%ValidateObject()
+	quit status
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^VKReader.Data.UserD</DataLocation>
+<DefaultData>UserDefaultData</DefaultData>
+<IdLocation>^VKReader.Data.UserD</IdLocation>
+<IndexLocation>^VKReader.Data.UserI</IndexLocation>
+<StreamLocation>^VKReader.Data.UserS</StreamLocation>
+<Data name="UserDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>FirstName</Value>
+</Value>
+<Value name="3">
+<Value>LastName</Value>
+</Value>
+<Value name="4">
+<Value>Deactivated</Value>
+</Value>
+<Value name="5">
+<Value>Hidden</Value>
+</Value>
+<Value name="6">
+<Value>Sex</Value>
+</Value>
+<Value name="7">
+<Value>DOB</Value>
+</Value>
+<Value name="8">
+<Value>City</Value>
+</Value>
+<Value name="9">
+<Value>Country</Value>
+</Value>
+<Value name="10">
+<Value>HomeTown</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

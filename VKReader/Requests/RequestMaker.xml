@@ -18,14 +18,18 @@
 ]]></Content>
 </UDLText>
 
+<Parameter name="APIVersion">
+<Type>%String</Type>
+<Default>5.25</Default>
+</Parameter>
+
 <Method name="RequestArrayToQueryString">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>action:%String,scheme:%String,host:%String,page:%String,parameters:%ArrayOfDataTypes</FormalSpec>
+<FormalSpec>location:%String,parameters:%ArrayOfDataTypes</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	#dim queryString as %String = ""
-	set queryString = queryString _ $zconvert(action, "U") _ " " _ scheme _ "://" _ ##class(Utils).UrlEncode(host) _ "/"
-	_ page _ ..ArrayToEncodedParameterString(parameters)
+	set queryString = location _ ..ArrayToEncodedParameterString(parameters)
 	quit queryString
 ]]></Implementation>
 </Method>
@@ -38,6 +42,7 @@
 	#dim parameterString as %String = ""
 	#dim k as %String = ""
 	// Build the parameter string, of the form: [?a[=b][&c[=d]...]]
+	do ..AddParameter(a, "v", ..#APIVersion)
 	set k = ""
 	while (1)
 	{

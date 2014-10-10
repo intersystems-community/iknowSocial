@@ -7,8 +7,8 @@
 <Method name="TestEmptyParametersList">
 <Implementation><![CDATA[
 	set a = ##class(%ArrayOfDataTypes).%New()
-	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("get", "https", "api.vk.com", "users.get", a)
-	do $$$AssertEquals(request, "GET https://api.vk.com/users.get", "In case of empty parameters' list method should quit with no '?' sign at all.")
+	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("users.get", a)
+	do $$$AssertEquals(request, "users.get", "In case of empty parameters' list method should quit with no '?' sign at all.")
 ]]></Implementation>
 </Method>
 
@@ -17,12 +17,12 @@
 	set a = ##class(%ArrayOfDataTypes).%New()
 	
 	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key", "val", "val")
-	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("get", "https", "api.vk.com", "users.get", a)
-	do $$$AssertEquals(request, "GET https://api.vk.com/users.get", "In case of default parameter's value (not in specified case) method should not append any key=value statement.")
+	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("users.get", a)
+	do $$$AssertEquals(request, "users.get", "In case of default parameter's value (not in specified case) method should not append any key=value statement.")
 	
 	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key", "val", "val", 1)
-	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("get", "https", "api.vk.com", "users.get", a)
-	do $$$AssertEquals(request, "GET https://api.vk.com/users.get?key=val", "Here we provide that specified case.")
+	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("users.get", a)
+	do $$$AssertEquals(request, "users.get?key=val", "Here we provide that specified case.")
 ]]></Implementation>
 </Method>
 
@@ -33,8 +33,8 @@
 	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key1", "val1")
 	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key2")
 	
-	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("get", "https", "api.vk.com", "users.get", a)
-	do $$$AssertEquals(request, "GET https://api.vk.com/users.get?key1=val1&key2", "Testing usual behavior...")
+	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("users.get", a)
+	do $$$AssertEquals(request, "users.get?key1=val1&key2", "Testing usual behavior...")
 ]]></Implementation>
 </Method>
 </Class>

@@ -8,10 +8,18 @@
 <Default>VKAPI</Default>
 </Parameter>
 
+<Parameter name="RequestTest">
+<Default>0</Default>
+</Parameter>
+
 <Method name="SendHttpRequest">
-<FormalSpec><![CDATA[server:%String,location:%String,parameters:%ArrayOfDataTypes,&responseText:%String(MAXLEN=1000000)]]></FormalSpec>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[server:%String="api.vk.com",location:%String,parameters:%ArrayOfDataTypes,&responseText:%String(MAXLEN=1000000),requestType:%Integer=""]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	if (requestType = "") {
+		set requestType = ..#RequestTest
+	}
 	#dim req as %Net.HttpRequest = ##class(%Net.HttpRequest).%New()
 	set req.Server = server
 	set req.Https = 1
@@ -19,55 +27,22 @@
 	
 	#dim k as %String = ""
 	#dim v as %String = ""
-	if (parameters '= "")
-	{
-		set k = ""
-		while (1)
-		{
-			set v = parameters.GetNext(.k)
-			quit:k=""
-			do req.InsertParam(k, v)
-		}
-	}
-	#dim test as %Integer = ..#RequestTest	// 0 => request made, no request printout, 1 => request printout, no request, 2 => request printout and request made
-	if (test '= 0)
-	{
+	// 0 => request made, no request printout, 1 => request printout, no request, 2 => request printout and request made
+	if (requestType '= 0) {
 		write "Request:",!
 		write "Server: ", req.Server, ", Location: ", req.Location, !
 	}
 	#dim status as %Status = $$$OK
-	#dim asPost as %Boolean = 0
-	if (postArray '= "")
-	{
-		set asPost = 1
-		set k = ""
-		while (1)
-		{
-			set v = postArray.GetNext(.k)
-			quit:k=""
-			do req.InsertFormData(k, v)
-		}
-	}
-	if (asPost)
-	{
-		set status = req.Post(location, test)
-	}
-	else
-	{
-		set status = req.Get(location, test)
-	}
-	if ($$$ISOK(status))
-	{
+	set status = req.Get(##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString(location, parameters), requestType)
+	
+	if ($$$ISOK(status)) {
 		#dim response as %String = ""
-		if (test '= 1)
-		{
+		if (requestType '= 1) {
 			#dim res as %Net.HttpResponse = req.HttpResponse
-			if ($data(res))
-			{
+			if ($data(res)) {
 				write "Response: ", res.StatusCode, ", ", res.StatusLine, ", ", res.ReasonPhrase, !
 			}
-			if ($$$ISOK(status))
-			{
+			if ($$$ISOK(status)) {
 				#dim responseLength as %Integer = 1000000
 				set response = res.Data.Read(.responseLength)
 				write "Response type: ", $classname(res.Data), !
@@ -75,9 +50,7 @@
 			}
 		}
 		set responseText = response
-	}
-	else
-	{
+	} else {
 		set responseText = ""
 	}
 	quit status

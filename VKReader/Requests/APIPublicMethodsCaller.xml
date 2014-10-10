@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.Requests.APIPublicMethodsCaller">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63470,45984.335131</TimeCreated>
+
+<Method name="UsersGet">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*response:%ArrayOfObjects,userIds:%String,fields:%String="",nameCase:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if ($length(userIds, ",") < 1 || $length(userIds, ",") > 1000) {
+		set status = $system.Status.Error(83, "Number of user_ids must be positive integer not exceeding 1000.")
+		quit status
+	}
+	set parameters = ##class(%ArrayOfDataTypes).%New()
+	do parameters.SetAt(userIds, "user_ids")
+	if (fields '= "") {
+		do parameters.SetAt(fields, "fields")
+	}
+	if (nameCase '= "") {
+		do parameters.SetAt(nameCase, "name_case")
+	}
+	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/users.get", parameters, .responseData)
+	#dim responseUsers As %ZEN.proxyObject
+	set status = status * ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseUsers)
+	set responseUsers = responseUsers.response
+	set response = ##class(%ArrayOfObjects).%New()
+	for i = 1 : 1 : responseUsers.Count() {
+		set userZenProxy = responseUsers.GetAt(i)
+		set user = ##class(VKReader.Data.User).%New(userZenProxy)
+		set localStatus = response.SetAt(user, user.ID)
+		set status = status * localStatus
+	}
+	if ($$$ISERR(status)) {
+		set response = ""
+	}
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="DatabaseGetCitiesById">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*response:%ArrayOfDataTypes,cityIds:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if ($length(cityIds, ",") < 1 || $length(cityIds, ",") > 1000) {
+		set status = $system.Status.Error(83, "Number of city_ids must be positive integer not exceeding 1000.")
+		quit status
+	}
+	set parameters = ##class(%ArrayOfDataTypes).%New()
+	do parameters.SetAt(cityIds, "city_ids")
+	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/database.getCitiesById", parameters, .responseData)
+	#dim responseCities As %ZEN.proxyObject
+	set status = status * ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseCities)
+	set responseCities = responseCities.response
+	set response = ##class(%ArrayOfDataTypes).%New()
+	for i = 1 : 1 : responseCities.Count() {
+		set city = responseCities.GetAt(i)
+		set localStatus = response.SetAt(city.title, city.id)
+		set status = status * localStatus
+	}
+	if ($$$ISERR(status)) {
+		set response = ""
+	}
+	quit status
+]]></Implementation>
+</Method>
+</Class>
+</Export>
