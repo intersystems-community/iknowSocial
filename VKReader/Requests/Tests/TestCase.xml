@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.Requests.Tests.TestCase">
+<Super>%UnitTest.TestCase</Super>
+<TimeCreated>63466,53073.194933</TimeCreated>
+
+<Method name="Run">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+        set testSuite = "Requests"
+        
+        if '$data(^UnitTestRoot) {
+            set mainFolder = "c:\Tests\VKReader\" 
+            set st = ##class(%File).CreateDirectoryChain(mainFolder _ testSuite)
+            if $$$ISOK(st) { set ^UnitTestRoot = mainFolder }
+            else { write !, "UnitTestRoot folder could not be created. Consult with instructor." }
+        }
+        
+        set testCase = ..%ClassName(1) // this test case
+        set test = testSuite _ ":" _ testCase
+        set quals = "/noload/norecursive/nodelete"
+        do ##class(%UnitTest.Manager).RunTest(test, quals)
+        quit
+]]></Implementation>
+</Method>
+</Class>
+</Export>

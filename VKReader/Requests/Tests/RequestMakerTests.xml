@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.Requests.Tests.RequestMakerTests">
+<Super>VKReader.Requests.Tests.TestCase</Super>
+<TimeCreated>63466,53054.39617</TimeCreated>
+
+<Method name="TestEmptyParametersList">
+<Implementation><![CDATA[
+	set a = ##class(%ArrayOfDataTypes).%New()
+	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("get", "https", "api.vk.com", "users.get", a)
+	do $$$AssertEquals(request, "GET https://api.vk.com/users.get", "In case of empty parameters' list method should quit with no '?' sign at all.")
+]]></Implementation>
+</Method>
+
+<Method name="TestDefaultParameter">
+<Implementation><![CDATA[
+	set a = ##class(%ArrayOfDataTypes).%New()
+	
+	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key", "val", "val")
+	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("get", "https", "api.vk.com", "users.get", a)
+	do $$$AssertEquals(request, "GET https://api.vk.com/users.get", "In case of default parameter's value (not in specified case) method should not append any key=value statement.")
+	
+	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key", "val", "val", 1)
+	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("get", "https", "api.vk.com", "users.get", a)
+	do $$$AssertEquals(request, "GET https://api.vk.com/users.get?key=val", "Here we provide that specified case.")
+]]></Implementation>
+</Method>
+
+<Method name="TestUsualBehavior">
+<Implementation><![CDATA[
+	set a = ##class(%ArrayOfDataTypes).%New()
+	
+	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key1", "val1")
+	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key2")
+	
+	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("get", "https", "api.vk.com", "users.get", a)
+	do $$$AssertEquals(request, "GET https://api.vk.com/users.get?key1=val1&key2", "Testing usual behavior...")
+]]></Implementation>
+</Method>
+</Class>
+</Export>
