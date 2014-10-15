@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="VKReader.Data.Utils">
+<Description>
+Utility class for VKReader.Data package.</Description>
 <Super>%RegisteredObject</Super>
 <TimeCreated>63470,70959.652856</TimeCreated>
 
 <Method name="ConvertVKDateToHorolog">
+<Description>
+Covert date in d[d].m[m].yyyy format to horolog.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>VKDate:%String</FormalSpec>
 <ReturnType>%Date</ReturnType>

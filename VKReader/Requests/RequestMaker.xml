@@ -1,29 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="VKReader.Requests.RequestMaker">
+<Description>
+ This class provides ability to form http-requests</Description>
 <Super>%RegisteredObject</Super>
 <TimeCreated>63466,52744.38293</TimeCreated>
 
-<UDLText name="T">
-<Content><![CDATA[
-/* This class provides ability to make calls to open (no auth key demanded) vk api methods */
-
-]]></Content>
-</UDLText>
-
-<UDLText name="T">
-<Content><![CDATA[
-//TODO: tests for request forming methods
-
-]]></Content>
-</UDLText>
-
 <Parameter name="APIVersion">
+<Description>
+ Hold API version for VK API. </Description>
 <Type>%String</Type>
-<Default>5.25</Default>
+<Default>5.8</Default>
 </Parameter>
 
 <Method name="RequestArrayToQueryString">
+<Description><![CDATA[
+ Build the query string, of the form "location[?a[=b][&c[=d]...]]", where parameters for query are taken from parameters argument and url-encoded.]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>location:%String,parameters:%ArrayOfDataTypes</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -35,14 +27,15 @@
 </Method>
 
 <Method name="ArrayToEncodedParameterString">
+<Description><![CDATA[
+ Build the parameter string, of the form "[?a[=b][&c[=d]...]]", where parameters for query are taken from parameters argument and url-encoded.]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>a:%ArrayOfDataTypes</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	#dim parameterString as %String = ""
 	#dim k as %String = ""
-	// Build the parameter string, of the form: [?a[=b][&c[=d]...]]
-	do ..AddParameter(a, "v", ..#APIVersion)
+	do a.SetAt(..#APIVersion, "v")
 	set k = ""
 	while (1)
 	{
@@ -55,67 +48,23 @@
 </Method>
 
 <Method name="AppendEncodedParameterToParameterString">
+<Description>
+ Given parameter string (actually arbitrary string) append parameter specified by key from k and value from v to parameter string.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec><![CDATA[&parameterString:%String,k:%String,v:%String=""]]></FormalSpec>
 <Implementation><![CDATA[
-	if (k '= "")
-	{
-		if ($length(parameterString) > 0)
-		{
+	if (k '= "") {
+		if ($length(parameterString) > 0) {
 			set parameterString = parameterString _ "&"
 		} else {
 			set parameterString = "?"
 		}
-		if (v = "")
-		{
+		if (v = "") {
 			set parameterString = parameterString _ ##class(Utils).UrlEncode(k)
-		}
-		else
-		{
+		} else {
 			set parameterString = parameterString _ ##class(Utils).UrlEncode(k) _ "=" _ ##class(Utils).UrlEncode(v)
 		}
 	}
-]]></Implementation>
-</Method>
-
-<Method name="CreateSignature">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>text:%String,key:%String</FormalSpec>
-<Private>1</Private>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	quit $system.Encryption.HMACSHA1(text, key)
-]]></Implementation>
-</Method>
-
-<Method name="AppendArray">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>a:%ArrayOfDataTypes,b:%ArrayOfDataTypes</FormalSpec>
-<Implementation><![CDATA[
-	if (b '= "")
-	{
-		#dim k as %String = ""
-		set k = ""
-		while (1)
-		{
-			#dim v as %String = b.GetNext(.k)
-			quit:k=""
-			do a.SetAt(v, k)
-		}
-	}
-]]></Implementation>
-</Method>
-
-<Method name="AddParameter">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>a:%ArrayOfDataTypes,k:%String,v:%String="",defaultV:%String="UNFEASIBLE STRING",addIfDefault:%Boolean=0</FormalSpec>
-<ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[
-	#dim add as %Boolean = addIfDefault || (v '= defaultV)
-	if (add)
-	{
-		do a.SetAt(v, k )
-	}
-	quit add
 ]]></Implementation>
 </Method>
 </Class>

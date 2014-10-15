@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="VKReader.Data.User">
+<Description>
+This class mirrors (with some properties disabled) functionality of vk user class.</Description>
 <Super>%Persistent</Super>
 <TimeCreated>63470,55253.859944</TimeCreated>
 
 <Property name="ID">
+<Description>
+Hold user's vk id. This property is unique, has IdKey and PrimaryKey on it.</Description>
 <Type>%String</Type>
 <Required>1</Required>
 </Property>
@@ -27,22 +31,37 @@
 </Property>
 
 <Property name="Deactivated">
+<Description><![CDATA[
+Hold user's state in vk system.<br>
+'existing' - everything is just fine.<br>
+'deleted' - user has his account deleted.<br>
+'banned' - user has his account banned.<br>]]></Description>
 <Type>%String</Type>
 <Parameter name="VALUELIST" value="-existing-deleted-banned"/>
 </Property>
 
 <Property name="Hidden">
+<Description><![CDATA[
+Hold 1 iff user set his account up as hidden.<br>
+Hold 0 otherwise.<br>]]></Description>
 <Type>%Boolean</Type>
 <InitialExpression>0</InitialExpression>
 </Property>
 
 <Property name="Sex">
+<Description><![CDATA[
+Hold value corresponding to user's sex.<br>
+'0' - user hasn't set this setting yet.
+'1' - female.
+'2' - male.]]></Description>
 <Type>%String</Type>
 <Parameter name="DISPLAYLIST" value="-N/A-Female-Male"/>
 <Parameter name="VALUELIST" value="-0-1-2"/>
 </Property>
 
 <Property name="DOB">
+<Description>
+Hold user's date of birth in horolog format.</Description>
 <Type>%Date</Type>
 </Property>
 
@@ -54,11 +73,9 @@
 <Type>%String</Type>
 </Property>
 
-<Property name="HomeTown">
-<Type>%String</Type>
-</Property>
-
 <Method name="%OnNew">
+<Description>
+Given %Zen.proxyObject with corresponding fields, initialize the object.</Description>
 <FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
@@ -72,10 +89,19 @@
 		}
 		if (oProxy."hidden" '= "") {
 			set ..Hidden = oProxy."hidden"
+			if (..Hidden = 1) {
+				quit $$$OK
+			}
 		}
 		set ..Sex = oProxy."sex"
 		if (oProxy."bdate" '= "") {
 			set ..DOB = ##class(VKReader.Data.Utils).ConvertVKDateToHorolog(oProxy.bdate)
+		}
+		if (oProxy."city" '= "") {
+			set ..City = oProxy.city.title
+		}
+		if (oProxy."country" '= "") {
+			set ..Country = oProxy.country.title
 		}
 		
 	} 
