@@ -26,5 +26,22 @@ Covert date in d[d].m[m].yyyy format to horolog.</Description>
 	quit date
 ]]></Implementation>
 </Method>
+
+<Method name="ConvertUnixTimeToHorolog">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>unixTime:%Integer,*date:%Integer,*time:%Numeric</FormalSpec>
+<Implementation><![CDATA[
+	set date = $normalize(unixTime / 86400, -1) + 47117	// get integer days part and adjust to Cache time
+	set time = unixTime - ..ConvertHorologToUnixTime(date, 0)	// get remaining time in day in seconds
+]]></Implementation>
+</Method>
+
+<Method name="ConvertHorologToUnixTime">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>date:%Integer,time:%Integer</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[	quit (date - 47117) * 86400 + time
+]]></Implementation>
+</Method>
 </Class>
 </Export>

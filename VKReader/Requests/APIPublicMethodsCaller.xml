@@ -121,5 +121,71 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 	quit status
 ]]></Implementation>
 </Method>
+
+<Method name="WallGet">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*response:%ListOfObjects,ownerId:%String="",domain:%String="",offset:%String=0,filter:%String="",count:%Integer=1</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if ($length(domain) > 0 && $length(ownerId) > 0) {
+		set status = $system.Status.Error(5001, "'ownerId' and 'domain' can not be specified simultaneously.")
+		quit status
+	}
+	if (ownerId = "" && domain = "") {
+		set status = $system.Status.Error(5001, "At least one of 'onwerId' and 'domain' arguments must be specified")
+		quit status
+	}
+	set parameters = ##class(%ArrayOfDataTypes).%New()
+	if (ownerId '= "") {
+		set status = ##class(%Integer).IsValid(ownerId)
+		if ($$$ISERR(status)) {
+			set status = $system.Status.Error(5001, "'ownerId' has non-integer value.")
+			quit status
+		}
+		do parameters.SetAt(ownerId, "owner_id")
+	} else {
+		do parameters.SetAt(domain, "domain")
+	} 
+	if (offset '= 0) {
+		do parameters.SetAt(offset, "offset")
+	}
+	if (filter '= "") {
+		do parameters.SetAt(filter, "filter")
+	}
+	if (count > 0) {
+		do parameters.SetAt(count, "count")
+	} else {
+		set status = $system.Status.Error(5001, "'count' value must be positive integer")
+		quit status
+	}
+	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/wall.get", parameters, .responseData)
+	if ($$$ISERR(status)) {
+		quit status
+	}
+	#dim responseObject As %ZEN.proxyObject
+	set status = status * ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseObject)
+	if ($$$ISERR(status)) {
+		quit status
+	}
+	if (responseObject.error '= "") {
+		set errorMessage = responseObject.error."error_msg"
+		set errorCode = responseObject.error."error_code"
+		set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
+		quit status
+	}
+	set responseObject = responseObject.response.items
+	set response = ##class(%ListOfObjects).%New()
+	for i = 1:1:responseObject.Count() {
+		set postZenProxy = responseObject.GetAt(i)
+		set post = ##class(VKReader.Data.Post).%New(postZenProxy)
+		set localStatus = response.Insert(post)
+		set status = status * localStatus
+	}
+	if ($$$ISERR(status)) {
+		set response = ""
+	}
+	quit status
+]]></Implementation>
+</Method>
 </Class>
 </Export>

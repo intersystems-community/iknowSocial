@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="VKReader.Data.User">
-<Description>
-This class mirrors (with some properties disabled) functionality of vk user class.</Description>
+<Description><![CDATA[
+This class mirrors (with some properties disabled) functionality of vk user class.<br>
+For more information see: http://vk.com/dev/fields]]></Description>
 <Super>%Persistent</Super>
 <TimeCreated>63470,55253.859944</TimeCreated>
 
