@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="VKReader.Requests.Tests.TestCase">
+<Class name="VKReader.TestCase">
 <Super>%UnitTest.TestCase</Super>
-<TimeCreated>63466,53073.194933</TimeCreated>
+<TimeCreated>63477,54012.003294</TimeCreated>
 
 <Method name="Run">
 <ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
         set testSuite = "Requests"
         
@@ -19,8 +20,8 @@
         set testCase = ..%ClassName(1) // this test case
         set test = testSuite _ ":" _ testCase
         set quals = "/noload/norecursive/nodelete"
-        do ##class(%UnitTest.Manager).RunTest(test, quals)
-        quit
+        set status = ##class(%UnitTest.Manager).RunTest(test, quals)
+        quit status
 ]]></Implementation>
 </Method>
 </Class>

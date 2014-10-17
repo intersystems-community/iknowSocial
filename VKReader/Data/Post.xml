@@ -144,7 +144,7 @@ class then this oref will be the one returned to the caller of %New method.]]></
 		set ..LikesCount = oProxy."likes"."count"
 		set ..RepostsCount = oProxy."reposts"."count"
 		set ..CommentsCount = oProxy."comments"."count"
-		do ##class(VKReader.Data.Utils).ConvertUnixTimeToHorolog(oProxy."date", .horologDate, .horologTime)
+		do ##class(VKReader.Utils).ConvertUnixTimeToHorolog(oProxy."date", .horologDate, .horologTime)
 		set ..Date = horologDate
 		set ..Time = horologTime
 	} 

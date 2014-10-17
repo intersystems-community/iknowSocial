@@ -60,9 +60,9 @@
 			set parameterString = "?"
 		}
 		if (v = "") {
-			set parameterString = parameterString _ ##class(Utils).UrlEncode(k)
+			set parameterString = parameterString _ ##class(VKReader.Utils).UrlEncode(k)
 		} else {
-			set parameterString = parameterString _ ##class(Utils).UrlEncode(k) _ "=" _ ##class(Utils).UrlEncode(v)
+			set parameterString = parameterString _ ##class(VKReader.Utils).UrlEncode(k) _ "=" _ ##class(VKReader.Utils).UrlEncode(v)
 		}
 	}
 ]]></Implementation>

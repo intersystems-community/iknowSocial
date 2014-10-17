@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.Requests.Tests.APIPublicMethodsCallerTests">
+<Super>VKReader.TestCase</Super>
+<TimeCreated>63477,39606.937848</TimeCreated>
+
+<Method name="TestPassingNoIdsToUsersGet">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).UsersGet(.response, "")
+	do $$$AssertStatusNotOK(status, "At least one id must be passed.")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingTooManyIdsToUsersGet">
+<Implementation><![CDATA[
+	set ids = "1"
+	for i = 2:1:1005 {
+		set ids = ids _ "," _ i
+	}
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).UsersGet(.response, ids)
+	do $$$AssertStatusNotOK(status, "Number of ids passed must be no greater than 1000.")
+]]></Implementation>
+</Method>
+
+<Method name="TestInvokingVKAPIErrorFromUsersGet">
+<Implementation><![CDATA[
+	set ids = "asdadfasfasfadsf"
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).UsersGet(.response, ids)
+	do $$$AssertStatusNotOK(status, "Successful processing of invalid id.")
+]]></Implementation>
+</Method>
+
+<Method name="TestGeneralFunctionalityOfUsersGet">
+<Implementation><![CDATA[
+	set ids = "1,deadpadre"
+	do ##class(VKReader.Requests.APIPublicMethodsCaller).UsersGet(.response, ids, "sex,city")
+	set Alice = response.GetAt(1)
+	set Bob = response.GetAt(7353822)
+	if (Alice.City = "Санкт-Петербург" && Bob.LastName = "Ткаченко" && Alice.Sex = 2) {
+		set status = $$$OK
+	} else {
+		set status = $system.Status.Error(5001, "Test not passed.")
+	}
+	do $$$AssertStatusNotOK(status, "General test done.")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingOwnerIdAndDomainSimultaneouslyToWallGet">
+<Implementation><![CDATA[
+	set id = "7353822"
+	set domain = "deadpadre"
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallGet(.response, id, domain)
+	do $$$AssertStatusNotOK(status, "Can't pass this two args at the same time.")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingNoUserToWallGet">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallGet(.response)
+	do $$$AssertStatusNotOK(status, "Must pass user to wall.get (otherwise it makes no sense).")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingNonIntegerValueToWallGet">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallGet(.response, "b123")
+	do $$$AssertStatusNotOK(status, "Non-integer value passed as owner_id.")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingInvalidFilterValueToWallGet">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallGet(.response, "1",,,"sda")
+	do $$$AssertStatusNotOK(status, "Invalid value passed as filter.")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingNegativeCountToWallGet">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallGet(.response, "1",,,,-4)
+	do $$$AssertStatusNotOK(status, "count must be positive.")
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallGet(.response, "1",,,,1.25)
+	do $$$AssertStatusNotOK(status, "count must be integer.")
+]]></Implementation>
+</Method>
+
+<Method name="TestInvokingVKAPIErrorFromWallGet">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallGet(.response, ,"sexbob")
+	do $$$AssertStatusNotOK(status, "Successful processing of invalid id.")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingOnlyDomainToWallGet">
+<Implementation><![CDATA[
+	set domain = "apiclub"
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallGet(.response,,domain)
+	do $$$AssertStatusOK(status, "Passed domain without owner_id ok.")
+]]></Implementation>
+</Method>
+
+<Method name="TestGeneralFunctionalityOfWallGet">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallGet(.response, "1", ,4, "owner", 10)
+	if (response.Count() = 10) {
+		set status = $$$OK
+	} else {
+		set status = $system.Status.Error(5001, "Something bad happened while making request.")
+	}
+	do $$$AssertStatusOK(status, "Functioning is okay.")
+]]></Implementation>
+</Method>
+</Class>
+</Export>

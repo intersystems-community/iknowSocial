@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.Data.Tests.UserTests">
+<Super>VKReader.TestCase</Super>
+<TimeCreated>63477,54293.08926</TimeCreated>
+</Class>
+</Export>

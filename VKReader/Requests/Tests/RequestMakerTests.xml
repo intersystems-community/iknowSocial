@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="VKReader.Requests.Tests.RequestMakerTests">
-<Super>VKReader.Requests.Tests.TestCase</Super>
+<Super>VKReader.TestCase</Super>
 <TimeCreated>63466,53054.39617</TimeCreated>
 
 <Method name="TestEmptyParametersList">
 <Implementation><![CDATA[
 	set a = ##class(%ArrayOfDataTypes).%New()
 	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("users.get", a)
-	do $$$AssertEquals(request, "users.get", "In case of empty parameters' list method should quit with no '?' sign at all.")
-]]></Implementation>
-</Method>
-
-<Method name="TestDefaultParameter">
-<Implementation><![CDATA[
-	set a = ##class(%ArrayOfDataTypes).%New()
-	
-	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key", "val", "val")
-	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("users.get", a)
-	do $$$AssertEquals(request, "users.get", "In case of default parameter's value (not in specified case) method should not append any key=value statement.")
-	
-	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key", "val", "val", 1)
-	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("users.get", a)
-	do $$$AssertEquals(request, "users.get?key=val", "Here we provide that specified case.")
+	set result = "users.get?v=" _ ##class(VKReader.Requests.RequestMaker).%GetParameter("APIVersion")
+	do $$$AssertEquals(request, result, "In case of empty parameters' list method should quit with only api version parameter.")
 ]]></Implementation>
 </Method>
 
@@ -30,11 +17,12 @@
 <Implementation><![CDATA[
 	set a = ##class(%ArrayOfDataTypes).%New()
 	
-	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key1", "val1")
-	do ##class(VKReader.Requests.RequestMaker).AddParameter(a, "key2")
+	do a.SetAt("val1", "key1")
+	do a.SetAt("val2", "key2")
 	
+	set result = "users.get?" _ "key1=val1&key2=val2&" _ "v=" _ ##class(VKReader.Requests.RequestMaker).%GetParameter("APIVersion")
 	set request = ##class(VKReader.Requests.RequestMaker).RequestArrayToQueryString("users.get", a)
-	do $$$AssertEquals(request, "users.get?key1=val1&key2", "Testing usual behavior...")
+	do $$$AssertEquals(request, result, "Testing usual behavior...")
 ]]></Implementation>
 </Method>
 </Class>

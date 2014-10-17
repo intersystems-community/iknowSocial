@@ -17,8 +17,8 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 <FormalSpec>*response:%ArrayOfObjects,userIds:%String,fields:%String="",nameCase:%String=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if ($length(userIds, ",") < 1 || $length(userIds, ",") > 1000) {
-		set status = $system.Status.Error(83, "Number of user_ids must be positive integer not exceeding 1000.")
+	if ($length(userIds) < 1)  || ($length(userIds, ",") > 1000) {
+		set status = $system.Status.Error(5001, "Number of user_ids must be positive integer not exceeding 1000.")
 		quit status
 	}
 	set parameters = ##class(%ArrayOfDataTypes).%New()
@@ -64,7 +64,7 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 <FormalSpec>*response:%ArrayOfDataTypes,cityIds:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if ($length(cityIds, ",") < 1 || $length(cityIds, ",") > 1000) {
+	if (($length(cityIds) < 1) || ($length(cityIds, ",") > 1000)) {
 		set status = $system.Status.Error(83, "Number of city_ids must be positive integer not exceeding 1000.")
 		quit status
 	}
@@ -127,12 +127,16 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 <FormalSpec>*response:%ListOfObjects,ownerId:%String="",domain:%String="",offset:%String=0,filter:%String="",count:%Integer=1</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if ($length(domain) > 0 && $length(ownerId) > 0) {
+	if (($length(domain) > 0) && ($length(ownerId) > 0)) {
 		set status = $system.Status.Error(5001, "'ownerId' and 'domain' can not be specified simultaneously.")
 		quit status
 	}
-	if (ownerId = "" && domain = "") {
+	if ((ownerId = "") && (domain = "")) {
 		set status = $system.Status.Error(5001, "At least one of 'onwerId' and 'domain' arguments must be specified")
+		quit status
+	}
+	if (($length(filter) > 0) && (filter '= "all") && (filter '= "others") && (filter '= "owner") && (filter '= "postponed") && (filter '= "suggests")) {
+		set status = $system.Status.Error(5001, "Invalid value passed as filter.")
 		quit status
 	}
 	set parameters = ##class(%ArrayOfDataTypes).%New()
@@ -149,10 +153,10 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 	if (offset '= 0) {
 		do parameters.SetAt(offset, "offset")
 	}
-	if (filter '= "") {
+	if ($length(filter) > 0) {
 		do parameters.SetAt(filter, "filter")
 	}
-	if (count > 0) {
+	if (##class(VKReader.Utils).IsInteger(count) && (count > 0)) {
 		do parameters.SetAt(count, "count")
 	} else {
 		set status = $system.Status.Error(5001, "'count' value must be positive integer")

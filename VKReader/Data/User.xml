@@ -9,7 +9,7 @@ For more information see: http://vk.com/dev/fields]]></Description>
 
 <Property name="ID">
 <Description>
-Hold user's vk id. This property is unique, has IdKey and PrimaryKey on it.</Description>
+Holds user's vk id. This property is unique, has IdKey and PrimaryKey on it.</Description>
 <Type>%String</Type>
 <Required>1</Required>
 </Property>
@@ -33,7 +33,7 @@ Hold user's vk id. This property is unique, has IdKey and PrimaryKey on it.</Des
 
 <Property name="Deactivated">
 <Description><![CDATA[
-Hold user's state in vk system.<br>
+Holds user's state in vk system.<br>
 'existing' - everything is just fine.<br>
 'deleted' - user has his account deleted.<br>
 'banned' - user has his account banned.<br>]]></Description>
@@ -43,15 +43,15 @@ Hold user's state in vk system.<br>
 
 <Property name="Hidden">
 <Description><![CDATA[
-Hold 1 iff user set his account up as hidden.<br>
-Hold 0 otherwise.<br>]]></Description>
+Holds 1 iff user set his account up as hidden.<br>
+Holds 0 otherwise.<br>]]></Description>
 <Type>%Boolean</Type>
 <InitialExpression>0</InitialExpression>
 </Property>
 
 <Property name="Sex">
 <Description><![CDATA[
-Hold value corresponding to user's sex.<br>
+Holds value corresponding to user's sex.<br>
 '0' - user hasn't set this setting yet.
 '1' - female.
 '2' - male.]]></Description>
@@ -62,7 +62,7 @@ Hold value corresponding to user's sex.<br>
 
 <Property name="DOB">
 <Description>
-Hold user's date of birth in horolog format.</Description>
+Holds user's date of birth in horolog format.</Description>
 <Type>%Date</Type>
 </Property>
 
@@ -76,7 +76,7 @@ Hold user's date of birth in horolog format.</Description>
 
 <Method name="%OnNew">
 <Description>
-Given %Zen.proxyObject with corresponding fields, initialize the object.</Description>
+Given %Zen.proxyObject with corresponding fields, initializes the object.</Description>
 <FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
