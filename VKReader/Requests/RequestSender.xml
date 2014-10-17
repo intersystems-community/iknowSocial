@@ -18,7 +18,7 @@ Hold name of SSL configuration to use with https-request (set it to the one from
 1 => request printout, no request. 
 2 => request printout and request made.
 3 => request made, no printout at all.]]></Description>
-<Default>0</Default>
+<Default>3</Default>
 </Parameter>
 
 <Method name="SendHttpRequest">

@@ -69,6 +69,7 @@ Convert date in d[d].m[m].yyyy format to horolog.</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	do ##class(VKReader.Requests.Tests.RequestMakerTests).Run()
+	r !, "Press Enter to continue...", x
 	do ##class(VKReader.Requests.Tests.APIPublicMethodsCallerTests).Run()
 	quit $$$OK
 ]]></Implementation>

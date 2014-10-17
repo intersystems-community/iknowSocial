@@ -45,6 +45,13 @@
 ]]></Implementation>
 </Method>
 
+<UDLText name="T">
+<Content><![CDATA[
+//----------------------------------------------------------------------------------------------------------
+
+]]></Content>
+</UDLText>
+
 <Method name="TestPassingOwnerIdAndDomainSimultaneouslyToWallGet">
 <Implementation><![CDATA[
 	set id = "7353822"
@@ -108,6 +115,71 @@
 		set status = $system.Status.Error(5001, "Something bad happened while making request.")
 	}
 	do $$$AssertStatusOK(status, "Functioning is okay.")
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+//----------------------------------------------------------------------------------------------------------
+
+]]></Content>
+</UDLText>
+
+<Method name="TestPassingOwnerIdAndDomainSimultaneouslyToWallSearch">
+<Implementation><![CDATA[
+	set id = "7353822"
+	set domain = "deadpadre"
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallSearch(.response, "pizza", id, domain)
+	do $$$AssertStatusNotOK(status, "Can't pass this two args at the same time.")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingNoUserToWallSearch">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallSearch(.response, "pizza")
+	do $$$AssertStatusNotOK(status, "Must pass user to wall.get (otherwise it makes no sense).")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingNonIntegerValueToWallSearch">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallSearch(.response, "pizza", "b123")
+	do $$$AssertStatusNotOK(status, "Non-integer value passed as owner_id.")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingNegativeCountToWallSearch">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallSearch(.response, "pizza", "1",,,,-4)
+	do $$$AssertStatusNotOK(status, "count must be positive.")
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallSearch(.response, "pizza", "1",,,,1.25)
+	do $$$AssertStatusNotOK(status, "count must be integer.")
+]]></Implementation>
+</Method>
+
+<Method name="TestInvokingVKAPIErrorFromWallSearch">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallSearch(.response, "pizza",,"sexbob")
+	do $$$AssertStatusNotOK(status, "Successful processing of invalid id.")
+]]></Implementation>
+</Method>
+
+<Method name="TestGeneralFunctionalityOfWallSearch">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallSearch(.response, "пицца",,"vkusnajeda",,1,10)
+	if (response.Count() = 10) {
+		set status = $$$OK
+	} else {
+		set status = $system.Status.Error(5001, "Something bad happened while making request.")
+	}
+	do $$$AssertStatusOK(status, "Functioning is okay.")
+]]></Implementation>
+</Method>
+
+<Method name="TestPassingNonBooleanOwnersOnlyToWallSearch">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallSearch(.response, "пицца",,"vkusnajeda",,"asd",10)
+	do $$$AssertStatusNotOK(status, "Successful processing of invalid owners_only.")
 ]]></Implementation>
 </Method>
 </Class>

@@ -221,7 +221,8 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 	do parameters.SetAt(query, "query")
 	if (ownersOnly '= 0) {
 		if (ownersOnly '= 1) {
-			set status = $system.Status.Error(5001, "ownersOnly has boolean value.")
+			set status = $system.Status.Error(5001, "ownersOnly must have boolean value.")
+			quit status
 		}
 		do parameters.SetAt(ownersOnly, "owners_only")
 	}
