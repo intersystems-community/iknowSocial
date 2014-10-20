@@ -64,6 +64,14 @@ Convert date in d[d].m[m].yyyy format to horolog.</Description>
 ]]></Implementation>
 </Method>
 
+<Method name="IsValidDateAndTime">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>date:%Date,time:%Time</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[	quit (##class(VKReader.Utils).IsInteger(date) && (date >= 0) && ##class(VKReader.Utils).IsInteger(time) && (time >= 0) && (time <= 86399))
+]]></Implementation>
+</Method>
+
 <Method name="RunAllTests">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
@@ -72,6 +80,18 @@ Convert date in d[d].m[m].yyyy format to horolog.</Description>
 	r !, "Press Enter to continue...", x
 	do ##class(VKReader.Requests.Tests.APIPublicMethodsCallerTests).Run()
 	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="TestFunc">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "самоубийство", 10,,,$zdateh("17/04/2014", 4),$ztimeh("00:00:01"),$zdateh("17/04/2014", 4),$ztimeh("23:59:59"))
+	for i = 1:1:response.Count() {
+		set ob = response.GetAt(i)
+		zw ob
+	}
 ]]></Implementation>
 </Method>
 </Class>

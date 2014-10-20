@@ -195,6 +195,7 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 <Method name="WallSearch">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*response:%ListOfObjects,query:%String,ownerId:%String="",domain:%String="",offset:%String=0,ownersOnly:%String=0,count:%Integer=1</FormalSpec>
+<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if (($length(domain) > 0) && ($length(ownerId) > 0)) {
 		set status = $system.Status.Error(5001, "'ownerId' and 'domain' can not be specified simultaneously.")
@@ -233,6 +234,80 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 		quit status
 	}
 	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/wall.search", parameters, .responseData)
+	if ($$$ISERR(status)) {
+		quit status
+	}
+	#dim responseObject As %ZEN.proxyObject
+	set status = status * ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseObject)
+	if ($$$ISERR(status)) {
+		quit status
+	}
+	if (responseObject.error '= "") {
+		set errorMessage = responseObject.error."error_msg"
+		set errorCode = responseObject.error."error_code"
+		set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
+		quit status
+	}
+	set responseObject = responseObject.response.items
+	set response = ##class(%ListOfObjects).%New()
+	for i = 1:1:responseObject.Count() {
+		set postZenProxy = responseObject.GetAt(i)
+		set post = ##class(VKReader.Data.Post).%New(postZenProxy)
+		set localStatus = response.Insert(post)
+		set status = $$$ADDSC(status, localStatus)
+	}
+	if ($$$ISERR(status)) {
+		set response = ""
+	}
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="NewsfeedSearch">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*response:%ListOfObjects,query:%String,count:%Integer=1,latitude:%Numeric="",longitude:%Numeric="",startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
+<Implementation><![CDATA[
+	set parameters = ##class(%ArrayOfDataTypes).%New()
+	do parameters.SetAt(query, "q")
+	if (##class(VKReader.Utils).IsInteger(count) && (count > 0)) {
+		do parameters.SetAt(count, "count")
+	} else {
+		set status = $system.Status.Error(5001, "'count' value must be positive integer")
+		quit status
+	}
+	if ($length(latitude) > 0) {
+		if ($isvalidnum(latitude) && (latitude <= 90) && (latitude >= -90)) {
+			do parameters.SetAt(latitude, "latitude")
+		} else {
+			set status = $system.Status.Error(5001, "'latitude' value must be double from [-90; 90] segment.")
+			quit status
+		}
+	}
+	if ($length(longitude) > 0) {
+		if ($isvalidnum(longitude) && (longitude <= 180) && (longitude >= -180)) {
+			do parameters.SetAt(longitude, "longitude")
+		} else {
+			set status = $system.Status.Error(5001, "'longitude' value must be double from [-180; 180] segment.")
+			quit status
+		}
+	}
+	if (($length(startDate) > 0) && ($length(startTime) > 0)) {
+		if (##class(VKReader.Utils).IsValidDateAndTime(startDate, startTime)) {
+			do parameters.SetAt(##class(VKReader.Utils).ConvertHorologToUnixTime(startDate, startTime), "start_time")
+		} else {
+			set status = $system.Status.Error(5001, "Incorrect time value passed for <startDate, startTime>.")
+			quit status
+		}
+	}
+	if (($length(endDate) > 0) && ($length(endTime) > 0)) {
+		if (##class(VKReader.Utils).IsValidDateAndTime(endDate, endTime)) {
+			do parameters.SetAt(##class(VKReader.Utils).ConvertHorologToUnixTime(endDate, endTime), "end_time")
+		} else {
+			set status = $system.Status.Error(5001, "Incorrect time value passed for <endDate, endTime>.")
+			quit status
+		}
+	}
+	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/newsfeed.search", parameters, .responseData)
 	if ($$$ISERR(status)) {
 		quit status
 	}

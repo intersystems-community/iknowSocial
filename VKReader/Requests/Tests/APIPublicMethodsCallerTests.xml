@@ -182,5 +182,56 @@
 	do $$$AssertStatusNotOK(status, "Successful processing of invalid owners_only.")
 ]]></Implementation>
 </Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+//----------------------------------------------------------------------------------------------------------
+
+]]></Content>
+</UDLText>
+
+<Method name="TestPassingBadCountToNewsfeedSearch">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "pizza", -4)
+	do $$$AssertStatusNotOK(status, "count must be positive.")
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).WallSearch(.response, "pizza", 4.2)
+	do $$$AssertStatusNotOK(status, "count must be integer.")
+]]></Implementation>
+</Method>
+
+<Method name="TestLatitudeAndLongitudeInNewsfeedSearch">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "pizza", 1, -100, 0)
+	do $$$AssertStatusNotOK(status, "Too small value passed as latitude.")
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "pizza", 1, 100, 0)
+	do $$$AssertStatusNotOK(status, "Too big value passed as latitude.")
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "pizza", 1, 0, -200)
+	do $$$AssertStatusNotOK(status, "Too small value passed as longitude.")
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "pizza", 1, 0, 200)
+	do $$$AssertStatusNotOK(status, "Too big value passed as longitude.")
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/* This test was left empty because of my belief in twitter example implementator
+//Method TestInvalidDateAndTime()
+//{
+} */
+
+]]></Content>
+</UDLText>
+
+<Method name="TestGeneralFunctionalityOfNewsfeedSearch">
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "pizza", 10)
+	if (response.Count() = 10) {
+		set status = $$$OK
+	} else {
+		set status = $system.Status.Error(5001, "Something bad happened while making request.")
+	}
+	do $$$AssertStatusOK(status, "Functioning is okay.")
+]]></Implementation>
+</Method>
 </Class>
 </Export>
