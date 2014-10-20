@@ -81,12 +81,18 @@ Given %Zen.proxyObject with corresponding fields, initializes the object.</Descr
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if (oProxy '= "") {
-		set ..ID = oProxy."id"
-		set ..FirstName = oProxy."first_name"
-		set ..LastName = oProxy."last_name"
 		set ..Deactivated = oProxy."deactivated"
 		if (..Deactivated = "") {
 			set ..Deactivated = "existing"
+		}
+		set ..ID = oProxy."id"
+		set ..FirstName = oProxy."first_name"
+		if (..FirstName = "") {
+			set ..FirstName = "N/A"
+		}
+		set ..LastName = oProxy."last_name"
+		if (..LastName = "") {
+			set ..LastName = "N/A"
 		}
 		if (oProxy."hidden" '= "") {
 			set ..Hidden = oProxy."hidden"
@@ -96,7 +102,7 @@ Given %Zen.proxyObject with corresponding fields, initializes the object.</Descr
 		}
 		set ..Sex = oProxy."sex"
 		if (oProxy."bdate" '= "") {
-			set ..DOB = ##class(VKReader.Data.Utils).ConvertVKDateToHorolog(oProxy.bdate)
+			set ..DOB = ##class(VKReader.Utils).ConvertVKDateToHorolog(oProxy.bdate)
 		}
 		if (oProxy."city" '= "") {
 			set ..City = oProxy.city.title
