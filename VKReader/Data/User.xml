@@ -10,8 +10,9 @@ For more information see: http://vk.com/dev/fields]]></Description>
 <Property name="ID">
 <Description>
 Holds user's vk id. This property is unique, has IdKey and PrimaryKey on it.</Description>
-<Type>%String</Type>
+<Type>%Integer</Type>
 <Required>1</Required>
+<Parameter name="MINVAL" value="0"/>
 </Property>
 
 <Index name="IDKey">

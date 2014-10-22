@@ -9,17 +9,18 @@ This version ignores reposting.]]></Description>
 <TimeCreated>63475,60435.629485</TimeCreated>
 
 <Property name="ID">
-<Type>%String</Type>
+<Type>%Integer</Type>
 <Required>1</Required>
+<Parameter name="MINVAL" value="0"/>
 </Property>
 
 <Property name="OwnerID">
-<Type>%String</Type>
+<Type>%Integer</Type>
 <Required>1</Required>
 </Property>
 
 <Property name="FromID">
-<Type>%String</Type>
+<Type>%Integer</Type>
 <Required>1</Required>
 </Property>
 
@@ -149,6 +150,30 @@ class then this oref will be the one returned to the caller of %New method.]]></
 	} 
 	set status = ..%ValidateObject()
 	quit status
+]]></Implementation>
+</Method>
+
+<Method name="HasValidIntegerFields">
+<Description><![CDATA[
+This callback method is invoked by the <METHOD>%ValidateObject</METHOD> method to 
+provide notification that the current object is being validated.
+
+<P>If this method returns an error then <METHOD>%ValidateObject</METHOD> will fail.]]></Description>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+	quit (##class(VKReader.Utils).IsInteger(..ID) && ##class(VKReader.Utils).IsInteger(..OwnerID) && ##class(VKReader.Utils).IsInteger(..FromID)
+	&& ##class(VKReader.Utils).IsInteger(..CommentsCount) && ##class(VKReader.Utils).IsInteger(..LikesCount) && ##class(VKReader.Utils).IsInteger(..RepostsCount))
+]]></Implementation>
+</Method>
+
+<Method name="%OnValidateObject">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if ('..HasValidIntegerFields()) {
+		set status = $system.Status.Error(5001, "Invalid integers values.")
+		quit status
+	}
+	quit $$$OK
 ]]></Implementation>
 </Method>
 </Class>

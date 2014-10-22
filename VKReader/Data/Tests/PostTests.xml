@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.Data.Tests.PostTests">
+<Super>VKReader.TestCase</Super>
+<TimeCreated>63482,64511.847516</TimeCreated>
+
+<Method name="OnBeforeAllTests">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Data.Post).%DeleteExtent()
+	read !, "DB cleared. Press enter to continue...", x
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="OnAfterAllTests">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Data.Post).%DeleteExtent()
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="TestValues">
+<Implementation><![CDATA[
+	
+	kill response
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "pizza")
+	#dim post As VKReader.Data.Post
+	set post = response.GetAt(1)
+	do $$$AssertStatusOK(status, "Get some post from vk.")
+	
+	set post.ID = ""
+	set status = post.%Save()
+	do $$$AssertStatusNotOK(status, "All id-fields are required.")
+	
+	set post.ID = "-1234"
+	set post.OwnerID = "1b2"
+	set post.FromID = "1bb2"
+	set post.PostType = "posst"
+	set status = post.%Save()
+	do $$$AssertStatusNotOK(status, "Required fields are defined, but all of them have invalid values.")
+	
+	set post.ID = "-1"
+	set post.OwnerID = "1"
+	set post.FromID = "1"
+	set post.PostType = "post"
+	set status = post.%Save()
+	do $$$AssertStatusNotOK(status, "ID must be positive.")
+	
+	set post.ID = "1.2"
+	set status = post.%Save()
+	do $$$AssertStatusNotOK(status, "ID must be integer.")
+	
+	set post.ID = "1"
+	set post.OwnerID = "1.2"
+	set status = post.%Save()
+	do $$$AssertStatusNotOK(status, "OwnerId must be integer.")
+	
+	set post.OwnerID = "1"
+	set post.FromID = "1.2"
+	set status = post.%Save()
+	do $$$AssertStatusNotOK(status, "FromId must be integer.")
+	
+	set post.FromID = "1"
+	set post.PostType = "posst"
+	set status = post.%Save()
+	do $$$AssertStatusNotOK(status, "PostType has incorrect value.")
+	
+	set post.PostType = "post"
+	set status = post.%Save()
+	do $$$AssertStatusOK(status, "Saved successfully.")
+	
+	set id = post.%Id()
+	set status = ##class(VKReader.Data.Post).%DeleteId(id)
+	do $$$AssertStatusOK(status, "Deleted successfully.")
+]]></Implementation>
+</Method>
+
+<Method name="TestLoad">
+<Implementation><![CDATA[
+	kill response
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "pizza", 200)
+	do $$$AssertStatusOK(status, "Get some post from vk.")
+	
+	for i = 1: 1: response.Count() {
+		set post = response.GetAt(i)
+		set status = post.%Save()
+		do $$$AssertStatusOK(status, "Post number #" _ i _ " saved successfully.")
+	}
+	
+	read !, "Pause for tester to browse data. Press enter to continue...", x
+]]></Implementation>
+</Method>
+</Class>
+</Export>
