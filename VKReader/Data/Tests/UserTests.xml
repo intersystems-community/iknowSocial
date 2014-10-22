@@ -3,5 +3,86 @@
 <Class name="VKReader.Data.Tests.UserTests">
 <Super>VKReader.TestCase</Super>
 <TimeCreated>63477,54293.08926</TimeCreated>
+
+<Method name="OnBeforeAllTests">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Data.User).%DeleteExtent()
+	read !, "DB cleared. Press enter to continue...", x
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="OnAfterAllTests">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Data.User).%DeleteExtent()
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="TestValues">
+<Implementation><![CDATA[
+	#dim user As VKReader.Data.User
+	set user = ##class(VKReader.Data.User).%OpenId(1)
+	
+	set user.ID = ""
+	set status = user.%Save()
+	do $$$AssertStatusNotOK(status, "Id is required field.")
+	
+	set user.ID = "1"
+	set user.FirstName = ""
+	set status = user.%Save()
+	do $$$AssertStatusNotOK(status, "First Name is required field.")
+	
+	set user.FirstName = "Павел"
+	set user.LastName = ""
+	set status = user.%Save()
+	do $$$AssertStatusNotOK(status, "Last Name is required field.")
+	
+	set user.LastName = "Дуров"
+	set user.ID = 1.2
+	set status = user.%Save()
+	do $$$AssertStatusNotOK(status, "ID must be integer.")
+	
+	set user.ID = 1
+	set user.Sex = -1
+	set status = user.%Save()
+	do $$$AssertStatusNotOK(status, "Sex field has invalid value.")
+	
+	set user.Sex = 2
+	set user.Deactivated = "dasd"
+	set status = user.%Save()
+	do $$$AssertStatusNotOK(status, "Deactivated field has invalid value.")
+	
+	set user.Deactivated = "existing"
+	set status = user.%Save()
+	do $$$AssertStatusOK(status, "User successfully saved.")
+	
+	set id = user.%Id()
+	set status = ##class(VKReader.Data.User).%DeleteId(id)
+	do $$$AssertStatusOK(status, "User successfully deleted.")
+]]></Implementation>
+</Method>
+
+<Method name="TestLoad">
+<Implementation><![CDATA[
+	kill response
+	set str = "1"
+	for i = 2: 1: 200 {
+		set str = str _ "," _ i
+	}
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).UsersGet(.response, str, "sex, city, country, bdate")
+	do $$$AssertStatusOK(status, "Get some users from vk.")
+	
+	for i = 1: 1: response.Count() {
+		set user = response.GetAt(i)
+		set status = user.%Save()
+		do $$$AssertStatusOK(status, "User number #" _ i _ " saved successfully.")
+	}
+	
+	read !, "Pause for tester to browse data. Press enter to continue...", x
+]]></Implementation>
+</Method>
 </Class>
 </Export>

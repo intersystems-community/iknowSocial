@@ -160,5 +160,27 @@ Given %Zen.proxyObject with corresponding fields, initializes the object.</Descr
 </Value>
 </Data>
 </Storage>
+
+<Method name="HasValidIntegerFields">
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[	quit (##class(VKReader.Utils).IsInteger(..ID))
+]]></Implementation>
+</Method>
+
+<Method name="%OnValidateObject">
+<Description><![CDATA[
+This callback method is invoked by the <METHOD>%ValidateObject</METHOD> method to 
+provide notification that the current object is being validated.
+
+<P>If this method returns an error then <METHOD>%ValidateObject</METHOD> will fail.]]></Description>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if ('..HasValidIntegerFields()) {
+		set status = $system.Status.Error(5001, "Invalid integers values.")
+		quit status
+	}
+	quit $$$OK
+]]></Implementation>
+</Method>
 </Class>
 </Export>

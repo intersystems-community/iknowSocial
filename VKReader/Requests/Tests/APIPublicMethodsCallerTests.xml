@@ -18,7 +18,7 @@
 		set ids = ids _ "," _ i
 	}
 	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).UsersGet(.response, ids)
-	do $$$AssertStatusNotOK(status, "Number of ids passed must be no greater than 1000.")
+	do $$$AssertStatusNotOK(status, "Number of ids passed must be no greater than 200.")
 ]]></Implementation>
 </Method>
 

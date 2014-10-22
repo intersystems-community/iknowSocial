@@ -154,11 +154,6 @@ class then this oref will be the one returned to the caller of %New method.]]></
 </Method>
 
 <Method name="HasValidIntegerFields">
-<Description><![CDATA[
-This callback method is invoked by the <METHOD>%ValidateObject</METHOD> method to 
-provide notification that the current object is being validated.
-
-<P>If this method returns an error then <METHOD>%ValidateObject</METHOD> will fail.]]></Description>
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[
 	quit (##class(VKReader.Utils).IsInteger(..ID) && ##class(VKReader.Utils).IsInteger(..OwnerID) && ##class(VKReader.Utils).IsInteger(..FromID)
@@ -167,6 +162,11 @@ provide notification that the current object is being validated.
 </Method>
 
 <Method name="%OnValidateObject">
+<Description><![CDATA[
+This callback method is invoked by the <METHOD>%ValidateObject</METHOD> method to 
+provide notification that the current object is being validated.
+
+<P>If this method returns an error then <METHOD>%ValidateObject</METHOD> will fail.]]></Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if ('..HasValidIntegerFields()) {

@@ -17,8 +17,8 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 <FormalSpec>*response:%ArrayOfObjects,userIds:%String,fields:%String="",nameCase:%String=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if ($length(userIds) < 1)  || ($length(userIds, ",") >= 1000) {
-		set status = $system.Status.Error(5001, "Number of user_ids must be positive integer not exceeding 1000.")
+	if ($length(userIds) < 1)  || ($length(userIds, ",") > 200) {
+		set status = $system.Status.Error(5001, "Number of user_ids must be positive integer not exceeding 200.")
 		quit status
 	}
 	set parameters = ##class(%ArrayOfDataTypes).%New()
@@ -34,7 +34,7 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 		quit status
 	}
 	#dim responseObject As %ZEN.proxyObject
-	set status = status * ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseObject)
+	set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseObject)
 	if ($$$ISERR(status)) {
 		quit status
 	}

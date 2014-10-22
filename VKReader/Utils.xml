@@ -81,6 +81,8 @@ Convert date in d[d].m[m].yyyy format to horolog.</Description>
 	do ##class(VKReader.Requests.Tests.APIPublicMethodsCallerTests).Run()
 	r !, "Press Enter to continue...", x
 	do ##class(VKReader.Data.Tests.PostTests).Run()
+	r !, "Press Enter to continue...", x
+	do ##class(VKReader.Data.Tests.UserTests).Run()
 	quit $$$OK
 ]]></Implementation>
 </Method>
