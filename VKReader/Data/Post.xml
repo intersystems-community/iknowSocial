@@ -32,8 +32,7 @@ This version ignores reposting.]]></Description>
 </Property>
 
 <Property name="Text">
-<Type>%String</Type>
-<Parameter name="MAXLEN"/>
+<Type>%GlobalCharacterStream</Type>
 </Property>
 
 <Property name="FriendsOnly">
@@ -136,7 +135,7 @@ class then this oref will be the one returned to the caller of %New method.]]></
 		set ..ID = oProxy."id"
 		set ..OwnerID = oProxy."owner_id"
 		set ..FromID = oProxy."from_id"
-		set ..Text = oProxy."text"
+		do ..Text.Write(oProxy."text")
 		set ..PostType = oProxy."post_type"
 		if (oProxy."friends_only" '= "") {
 			set ..FriendsOnly = oProxy."friends_only"
