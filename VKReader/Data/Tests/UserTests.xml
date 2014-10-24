@@ -8,7 +8,6 @@
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set status = ##class(VKReader.Data.User).%DeleteExtent()
-	read !, "DB cleared. Press enter to continue...", x
 	quit status
 ]]></Implementation>
 </Method>
@@ -80,8 +79,6 @@
 		set status = user.%Save()
 		do $$$AssertStatusOK(status, "User number #" _ i _ " saved successfully.")
 	}
-	
-	read !, "Pause for tester to browse data. Press enter to continue...", x
 ]]></Implementation>
 </Method>
 
