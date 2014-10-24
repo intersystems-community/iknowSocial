@@ -23,11 +23,15 @@ Holds user's vk id. This property is unique, has IdKey and PrimaryKey on it.</De
 </Index>
 
 <Property name="FirstName">
+<Description>
+ Holds user's first name.</Description>
 <Type>%String</Type>
 <Required>1</Required>
 </Property>
 
 <Property name="LastName">
+<Description>
+ Holds user's last name.</Description>
 <Type>%String</Type>
 <Required>1</Required>
 </Property>
@@ -68,10 +72,14 @@ Holds user's date of birth in horolog format.</Description>
 </Property>
 
 <Property name="City">
+<Description>
+ Holds city specified on his page as city user lives in right now </Description>
 <Type>%String</Type>
 </Property>
 
 <Property name="Country">
+<Description>
+ Holds country defined by city specified on his page where user lives in right now </Description>
 <Type>%String</Type>
 </Property>
 
@@ -79,6 +87,7 @@ Holds user's date of birth in horolog format.</Description>
 <Description>
 Given %Zen.proxyObject with corresponding fields, initializes the object.</Description>
 <FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if (oProxy '= "") {
@@ -162,6 +171,7 @@ Given %Zen.proxyObject with corresponding fields, initializes the object.</Descr
 </Storage>
 
 <Method name="HasValidIntegerFields">
+<Private>1</Private>
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[	quit (##class(VKReader.Utils).IsInteger(..ID))
 ]]></Implementation>
@@ -173,6 +183,7 @@ This callback method is invoked by the <METHOD>%ValidateObject</METHOD> method t
 provide notification that the current object is being validated.
 
 <P>If this method returns an error then <METHOD>%ValidateObject</METHOD> will fail.]]></Description>
+<Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if ('..HasValidIntegerFields()) {

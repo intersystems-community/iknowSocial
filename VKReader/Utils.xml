@@ -6,7 +6,7 @@
 
 <Method name="ConvertVKDateToHorolog">
 <Description>
-Convert date in d[d].m[m].yyyy format to horolog.</Description>
+Converts date in d[d].m[m].yyyy format to horolog.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>VKDate:%String</FormalSpec>
 <ReturnType>%Date</ReturnType>
@@ -26,6 +26,8 @@ Convert date in d[d].m[m].yyyy format to horolog.</Description>
 </Method>
 
 <Method name="ConvertUnixTimeToHorolog">
+<Description>
+Given 'unixTime' in UNIX-time format saves corresponding value in horolog format to 'date' and 'time' variables. </Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>unixTime:%Integer,*date:%Integer,*time:%Numeric</FormalSpec>
 <Implementation><![CDATA[
@@ -35,6 +37,8 @@ Convert date in d[d].m[m].yyyy format to horolog.</Description>
 </Method>
 
 <Method name="ConvertHorologToUnixTime">
+<Description>
+Given 'date' and 'time' in horolog format returns corresponding UNIX-time value.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>date:%Integer,time:%Integer</FormalSpec>
 <ReturnType>%Integer</ReturnType>
@@ -43,6 +47,8 @@ Convert date in d[d].m[m].yyyy format to horolog.</Description>
 </Method>
 
 <Method name="UrlEncode">
+<Description>
+Performs url-escaping.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>text:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -51,12 +57,13 @@ Convert date in d[d].m[m].yyyy format to horolog.</Description>
 	set text = $zconvert(text, "O", "UTF8")
 	// Encode using URL encoding:
 	set text = $zconvert(text, "O", "URL")
-	// Because $zconvert("URL") doesn't encode "/" characters, we do it by replacing "/" by "%2F".
 	quit text
 ]]></Implementation>
 </Method>
 
 <Method name="IsInteger">
+<Description>
+Checks whereas passed string represents an integer.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>str:%String</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
@@ -65,6 +72,8 @@ Convert date in d[d].m[m].yyyy format to horolog.</Description>
 </Method>
 
 <Method name="IsValidDateAndTime">
+<Description>
+Checks whereas passed combination of 'date' and 'time' can actually represent some timestamp.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>date:%Date,time:%Time</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
@@ -73,6 +82,8 @@ Convert date in d[d].m[m].yyyy format to horolog.</Description>
 </Method>
 
 <Method name="RunAllTests">
+<Description>
+Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[

@@ -8,14 +8,14 @@
 
 <Parameter name="APIVersion">
 <Description>
- Hold API version for VK API. </Description>
+ Holds API version for VK API. </Description>
 <Type>%String</Type>
 <Default>5.8</Default>
 </Parameter>
 
 <Method name="RequestArrayToQueryString">
 <Description><![CDATA[
- Build the query string, of the form "location[?a[=b][&c[=d]...]]", where parameters for query are taken from parameters argument and url-encoded.]]></Description>
+ Builds the query string, of the form "location[?a[=b][&c[=d]...]]", where parameters for query are taken from parameters argument and url-encoded.]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>location:%String,parameters:%ArrayOfDataTypes</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -28,7 +28,7 @@
 
 <Method name="ArrayToEncodedParameterString">
 <Description><![CDATA[
- Build the parameter string, of the form "[?a[=b][&c[=d]...]]", where parameters for query are taken from parameters argument and url-encoded.]]></Description>
+ Builds the parameter string, of the form "[?a[=b][&c[=d]...]]", where parameters for query are taken from parameters argument and url-encoded.]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>a:%ArrayOfDataTypes</FormalSpec>
 <ReturnType>%String</ReturnType>
@@ -49,7 +49,7 @@
 
 <Method name="AppendEncodedParameterToParameterString">
 <Description>
- Given parameter string (actually arbitrary string) append parameter specified by key from k and value from v to parameter string.</Description>
+ Given parameter string (actually arbitrary string) appends parameter specified by key from k and value from v to parameter string.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec><![CDATA[&parameterString:%String,k:%String,v:%String=""]]></FormalSpec>
 <Implementation><![CDATA[

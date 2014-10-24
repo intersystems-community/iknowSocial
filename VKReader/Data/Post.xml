@@ -9,54 +9,76 @@ This version ignores reposting.]]></Description>
 <TimeCreated>63475,60435.629485</TimeCreated>
 
 <Property name="ID">
+<Description>
+ Holds post id in context of author (user or commuinty). </Description>
 <Type>%Integer</Type>
 <Required>1</Required>
 <Parameter name="MINVAL" value="0"/>
 </Property>
 
 <Property name="OwnerID">
+<Description>
+ Holds id of the owner of the wall, where post was published (positive or negative number for user or community accordingly.)</Description>
 <Type>%Integer</Type>
 <Required>1</Required>
 </Property>
 
 <Property name="FromID">
+<Description>
+ Holds id of the author of the post (positive or negative number for user or community accordingly.)</Description>
 <Type>%Integer</Type>
 <Required>1</Required>
 </Property>
 
 <Property name="Date">
+<Description>
+ Holds date when this post was published in horolog format (UTC)</Description>
 <Type>%Date</Type>
 </Property>
 
 <Property name="Time">
+<Description>
+ Holds time when this post was published in horolog format (UTC)</Description>
 <Type>%Time</Type>
 </Property>
 
 <Property name="Text">
+<Description>
+ Holds text contained in this post.</Description>
 <Type>%GlobalCharacterStream</Type>
 </Property>
 
 <Property name="FriendsOnly">
+<Description>
+ Holds whether or not this post was marked as friends-only post.</Description>
 <Type>%Boolean</Type>
 <InitialExpression>0</InitialExpression>
 </Property>
 
 <Property name="CommentsCount">
+<Description>
+ Holds current number of comments.</Description>
 <Type>%Integer</Type>
 <Parameter name="MINVAL" value="0"/>
 </Property>
 
 <Property name="LikesCount">
+<Description>
+ Holds current number of likes.</Description>
 <Type>%Integer</Type>
 <Parameter name="MINVAL" value="0"/>
 </Property>
 
 <Property name="RepostsCount">
+<Description>
+ Holds current number of reposts.</Description>
 <Type>%Integer</Type>
 <Parameter name="MINVAL" value="0"/>
 </Property>
 
 <Property name="PostType">
+<Description>
+ Holds type of this post in context of vk posting system.</Description>
 <Type>%String</Type>
 <Required>1</Required>
 <Parameter name="VALUELIST" value="-post-copy-reply-postpone-suggest"/>
@@ -124,12 +146,12 @@ provide notification that a new instance of an object is being created.
 
 <P>If this method returns an error then the object will not be created.
 <p>It is passed the arguments provided in the %New call.
-When customizing this method, override the arguments with whatever variables and types you expect to receive from %New().
-For example, if you're going to call %New, passing 2 arguments, %OnNew's signature could be:
-<p>Method %OnNew(dob as %Date = "", name as %Name = "") as %Status
+<p>For this particular class it accepts only one argument: %ZEN.proxyObject in special format - it must have vk-post-like fields.
+<br>For further information see https:/vk.com/dev/post
 If instead of returning a %Status code this returns an oref and this oref is a subclass of the current
 class then this oref will be the one returned to the caller of %New method.]]></Description>
 <FormalSpec>oProxy:%ZEN.proxyObject</FormalSpec>
+<Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if (oProxy '= "") {
@@ -154,6 +176,7 @@ class then this oref will be the one returned to the caller of %New method.]]></
 </Method>
 
 <Method name="HasValidIntegerFields">
+<Private>1</Private>
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[
 	quit (##class(VKReader.Utils).IsInteger(..ID) && ##class(VKReader.Utils).IsInteger(..OwnerID) && ##class(VKReader.Utils).IsInteger(..FromID)
@@ -167,6 +190,7 @@ This callback method is invoked by the <METHOD>%ValidateObject</METHOD> method t
 provide notification that the current object is being validated.
 
 <P>If this method returns an error then <METHOD>%ValidateObject</METHOD> will fail.]]></Description>
+<Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if ('..HasValidIntegerFields()) {

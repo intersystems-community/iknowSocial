@@ -8,7 +8,7 @@ This class provides ability to send http-requests (actually https) to vk api ser
 
 <Parameter name="SSLConfigurationName">
 <Description>
-Hold name of SSL configuration to use with https-request (set it to the one from your management portal).</Description>
+Holds name of SSL configuration to use with https-request (set it to the one from your management portal).</Description>
 <Default>VKAPI</Default>
 </Parameter>
 
@@ -23,7 +23,7 @@ Hold name of SSL configuration to use with https-request (set it to the one from
 
 <Method name="SendHttpRequest">
 <Description>
-Send 'GET https://server/location?parametersString' request. Response is saved into responseText.</Description>
+Sends 'GET https://server/location?parametersString' request. Response is saved into responseText.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec><![CDATA[server:%String="api.vk.com",location:%String,parameters:%ArrayOfDataTypes,&responseText:%String(MAXLEN=1000000),requestType:%Integer=""]]></FormalSpec>
 <ReturnType>%Status</ReturnType>

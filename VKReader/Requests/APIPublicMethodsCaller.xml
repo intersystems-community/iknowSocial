@@ -60,6 +60,10 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 </Method>
 
 <Method name="DatabaseGetCitiesById">
+<Description><![CDATA[
+Returns 'response' array with city vk id as key and city name as value, given:<br>
+'cityIds' - comma separated list of city vk ids<br>
+For more information see: http://vk.com/dev/database.getCitiesById]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*response:%ArrayOfDataTypes,cityIds:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -97,6 +101,9 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 </Method>
 
 <Method name="UtilsResolveScreenName">
+<Description><![CDATA[
+Returns type (user or community) and id of user or community with passed screenname:<br>
+For more information see: http://vk.com/dev/utils.resolveScreenName]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*type:%String,*objectId:%String,screenName:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -123,6 +130,14 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 </Method>
 
 <Method name="WallGet">
+<Description><![CDATA[
+Returns list of posts represented by class VKReader.Data.Post from specified wall, given:<br>
+'ownerId' - wall owner id.<br>
+'domain' - wall owner screenname.<br>
+'offset' - number of posts to skip at the beginning<br>
+'filter' - setting for filtering (possible values are : 'all', 'others', 'owner', 'postponed', 'suggests')<br>
+'count' - number of posts to return<br>
+For more information see: http://vk.com/dev/wall.get]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*response:%ListOfObjects,ownerId:%String="",domain:%String="",offset:%String=0,filter:%String="",count:%Integer=1</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -193,6 +208,15 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 </Method>
 
 <Method name="WallSearch">
+<Description><![CDATA[
+Returns list of posts represented by class VKReader.Data.Post from (un)specified wall searched by query, given:<br>
+'query' - phrase to search with<br>
+'ownerId' - wall owner id.<br>
+'domain' - wall owner screenname.<br>
+'offset' - number of posts to skip at the beginning<br>
+'ownersOnly' - mark this as true to search only posts authored by wall's owner<br>
+'count' - number of posts to return<br>
+For more information see: http://vk.com/dev/wall.search]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*response:%ListOfObjects,query:%String,ownerId:%String="",domain:%String="",offset:%String=0,ownersOnly:%String=0,count:%Integer=1</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -264,6 +288,13 @@ For more information see: http://vk.com/dev/users.get]]></Description>
 </Method>
 
 <Method name="NewsfeedSearch">
+<Description><![CDATA[
+Returns list of posts represented by class VKReader.Data.Post from the whole vk newsfeed searched by query, given:<br>
+'query' - phrase to search with<br>
+'count' - number of posts to return<br>
+'latitude' and 'longitude' - geographical ccordinates of the point to search nearby (numeric values in ranges [-90;90] and [-180;180] accordingly)<br>
+'startDate', 'startTime', 'endDate' and 'endTime' - horolog values to specify time range of search.
+For more information see: http://vk.com/dev/newsfeed.search]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*response:%ListOfObjects,query:%String,count:%Integer=1,latitude:%Numeric="",longitude:%Numeric="",startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
 <Implementation><![CDATA[
