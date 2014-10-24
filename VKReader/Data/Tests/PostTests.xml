@@ -92,5 +92,29 @@
 	read !, "Pause for tester to browse data. Press enter to continue...", x
 ]]></Implementation>
 </Method>
+
+<Method name="TestUnique">
+<Implementation><![CDATA[
+	kill response
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "golf")
+	do $$$AssertStatusOK(status, "Get another post from vk")
+	
+	#dim newPost as VKReader.Data.Post = response.GetAt(1)
+	set oldPost = ##class(VKReader.Data.Post).%OpenId(1)
+	set tempID = newPost.ID
+	set newPost.ID = oldPost.ID
+	set newPost.OwnerID = oldPost.OwnerID
+	set newPost.FromID = oldPost.FromID
+	set status = newPost.%Save()
+	do $$$AssertStatusNotOK(status, "Not unique combination detected.")
+	
+	set newPost.ID = tempID
+	set status = newPost.%Save()
+	do $$$AssertStatusOK(status, "Saved successfully.")
+	
+	set status = ##class(VKReader.Data.Post).%DeleteId(newPost.%Id())
+	do $$$AssertStatusOK(status, "Deleted successfully.")
+]]></Implementation>
+</Method>
 </Class>
 </Export>

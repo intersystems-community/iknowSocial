@@ -30,6 +30,11 @@ This version ignores reposting.]]></Description>
 <Required>1</Required>
 </Property>
 
+<Index name="PostIndex">
+<Properties>ID,OwnerID,FromID</Properties>
+<Unique>1</Unique>
+</Index>
+
 <Property name="Date">
 <Description>
  Holds date when this post was published in horolog format (UTC)</Description>

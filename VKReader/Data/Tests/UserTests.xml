@@ -84,5 +84,18 @@
 	read !, "Pause for tester to browse data. Press enter to continue...", x
 ]]></Implementation>
 </Method>
+
+<Method name="TestUnique">
+<Implementation><![CDATA[
+	kill response
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).UsersGet(.response, "1", "sex, city, country")
+	do $$$AssertStatusOK(status, "Get user with vk id 1 again, now 'm gonna try to save.")
+	
+	#dim user as VKReader.Data.User
+	set user = response.GetAt(1)
+	set status = user.%Save()
+	do $$$AssertStatusNotOK(status, "User with such id already exists.")
+]]></Implementation>
+</Method>
 </Class>
 </Export>
