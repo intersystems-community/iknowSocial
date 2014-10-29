@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.Data.Context">
+<Super>%Persistent</Super>
+<TimeCreated>63489,67555.308498</TimeCreated>
+
+<Property name="RelatedQuery">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="MINLEN" value="2"/>
+</Property>
+
+<Property name="StartDate">
+<Type>%Date</Type>
+</Property>
+
+<Property name="StartTime">
+<Type>%Time</Type>
+</Property>
+
+<Property name="EndDate">
+<Type>%Date</Type>
+</Property>
+
+<Property name="EndTime">
+<Type>%Time</Type>
+</Property>
+
+<Property name="ListOfRelatedPosts">
+<Type>%ListOfObjects</Type>
+</Property>
+
+<Method name="Init">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ..GetPosts()
+	if ($$$ISERR(status)) {
+		quit status
+	}
+	for i = 1: 1: ..ListOfRelatedPosts.Count() {
+		set relatedPost = ..ListOfRelatedPosts.GetAt(i)
+		set localStatus = relatedPost.%Save()
+		set status = $$$ADDSC(status, localStatus)
+	}
+	if ($$$ISERR(status)) {
+		do ..ClearContext()
+		quit status
+	}
+	set status = ..%Save()
+	if ($$$ISERR(status)) {
+		do ..ClearContext()
+	}
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="GetPosts">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, ..RelatedQuery, 100,,, ..StartDate, ..StartTime, ..EndDate, ..EndTime)
+	quit:$$$ISERR(status) status
+	set ..ListOfRelatedPosts = response
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="ClearContext">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	for i = 1: 1: ..ListOfRelatedPosts.Count() {
+		set relatedPost = ..ListOfRelatedPosts.GetAt(i)
+		if (relatedPost.%Id '= "") {
+			set localStatus = ##class(VKReader.Data.Post).%DeleteId(relatedPost.%Id)
+			set status = $$$ADDSC(status, localStatus)
+		}
+	}
+	quit status
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^VKReader.Data.ContextD</DataLocation>
+<DefaultData>ContextDefaultData</DefaultData>
+<IdLocation>^VKReader.Data.ContextD</IdLocation>
+<IndexLocation>^VKReader.Data.ContextI</IndexLocation>
+<StreamLocation>^VKReader.Data.ContextS</StreamLocation>
+<Data name="ContextDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>RelatedQuery</Value>
+</Value>
+<Value name="3">
+<Value>StartDate</Value>
+</Value>
+<Value name="4">
+<Value>StartTime</Value>
+</Value>
+<Value name="5">
+<Value>EndDate</Value>
+</Value>
+<Value name="6">
+<Value>EndTime</Value>
+</Value>
+<Value name="7">
+<Value>ListOfRelatedPosts</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

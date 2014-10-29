@@ -99,11 +99,11 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "самоубийство", 10,,,$zdateh("17/04/2014", 4),$ztimeh("00:00:01"),$zdateh("17/04/2014", 4),$ztimeh("23:59:59"))
-	for i = 1:1:response.Count() {
-		set ob = response.GetAt(i)
-		zw ob
-	}
+	set context = ##class(VKReader.Data.Context).%New()
+	set context.RelatedQuery = "pizza"
+	set status = context.Init()
+	do $system.Status.DisplayError(status)
+	quit status
 ]]></Implementation>
 </Method>
 </Class>
