@@ -99,11 +99,23 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, "самоубийство", 10,,,$zdateh("17/04/2014", 4),$ztimeh("00:00:01"),$zdateh("17/04/2014", 4),$ztimeh("23:59:59"))
-	for i = 1:1:response.Count() {
-		set ob = response.GetAt(i)
-		zw ob
-	}
+	set domId = ##class(%iKnow.Domain).GetOrCreateId("VKAPIDomain")
+	if ##class(%iKnow.Configuration).Exists("VKAPIConfiguration") {
+    	set cfg = ##class(%iKnow.Configuration).Open("VKAPIConfiguration") 
+    } else {
+		set cfg = ##class(%iKnow.Configuration).%New("VKAPIConfiguration", 1, $LB("ru"))
+        do cfg.%Save() 
+    }
+	set lister = ##class(VKReader.Lister).%New(domId)
+	do lister.SetConfig("VKAPIConfiguration")
+	//set loader = ##class(%iKnow.Source.Loader).%New(domId)
+	
+	set status = lister.ProcessList("pizza", 100, 1)
+	w "The lister status is ", $system.Status.DisplayError(status), !
+	//set status = loader.ProcessBatch()
+	//w "The loader status is ", $system.Status.DisplayError(status), !
+	do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, domId,,100)
+	zw result
 ]]></Implementation>
 </Method>
 </Class>

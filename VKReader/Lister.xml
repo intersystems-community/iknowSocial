@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.Lister">
+<Description><![CDATA[
+<p>This is a very simple Lister implementation to retrieve VK posts' texts. The Lister will download posts
+through a API request and store the set of items retrieved as separate Sources.</p>
+
+<p><b>Lister Parameters</b> to be supplied to <method>AddListToBatch</method> and
+	<method>ProcessList</method> calls:</p>
+<ol>
+    <li><b>query</b> As <class>%String</class> - The query to search through vk newsfeed. fe: "pizza"</li>
+	<li><b>count</b> As <class>%Integer</class> - The positive integer number of posts (from 1 to 100) to add.</li>
+	<li><b>checkExists</b> As <class>%Boolean</class> - Whether or not to check whether an post item already exists before attempting to store it (skipping if it exists),  default 1</li>
+</ol>
+
+<p><b>External ID structure:</b> [GroupName]:::[LocalRef]</p>
+<ul>
+	<li>GroupName = query</li>
+	<li>LocalRef = OwnerID#FromID#PostID</li>
+</ul>
+
+<p><b>Extracted metadata:</b> these metadata fields will be populated with corresponding
+values for each post item, where present.</p>
+<ul>
+	<li>Date</li>
+	<li>Time</li>
+	<li>OwnerID</li>
+	<li>FromID</li>
+</ul>
+
+<p><b>Lister alias:</b> "VKAPI"</p>
+<p><b>Default Processor:</b> <class>%iKnow.Source.Temp.Processor</class></p>]]></Description>
+<Super>%iKnow.Source.Lister</Super>
+<TimeCreated>63492,10251.170023</TimeCreated>
+
+<Method name="ExpandList">
+<Description><![CDATA[
+<p>Fires an API request to retrieve the list of VKReader.Data.Post objects and then finds the Text items therein, 
+storing them locally through <method>StoreTemp</method> calls. If they exist in the domain, 
+this Lister will also retrieve and populate the "Date", "Time", "OwnerID" and "FromID" metadata fields.</p>
+<p>See also <method class="%iKnow.Source.Lister">ExpandList</method> in <class>%iKnow.Source.Lister</class>.</p>]]></Description>
+<FormalSpec>listparams:%List</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set query = $li(listparams, 1)
+	set count = $li(listparams, 2)
+	set checkExists = +$lg(listparams, 3, 1)
+	
+	#dim response As %ListOfObjects
+	set tSC = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, query, count)
+	quit:$$$ISERR(tSC) tSC
+	
+	do ..RegisterMetadataKeys($lb("Date", "Time", "OwnerID", "FromID"))
+	
+	for i = 1: 1: response.Count() {
+		set tDate = response.GetAt(i).Date
+		set tTime = response.GetAt(i).Time
+		set tOwnerID = response.GetAt(i).OwnerID
+		set tFromID = response.GetAt(i).FromID
+		set tID = response.GetAt(i).ID
+		#dim tTextStream as %GlobalCharacterStream
+		set tTextStream = response.GetAt(i).Text
+				
+		set tLocalRef = tOwnerID _ "#" _ tFromID _ "#" _ tID
+		
+		if (checkExists) {
+			continue:..RefExists(query, tLocalRef, checkExists - 1)
+		}
+		
+		set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
+		do tTextStream.Rewind()
+		if (tTextStream.Size = 0) {
+			continue
+		}
+		
+		do ..StoreTemp(tRef, tTextStream.Read(.len))
+		do ..SetMetadataValues(tRef, $lb(tDate, tTime, tOwnerID, tFromID))
+	}
+	
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetAlias">
+<Description><![CDATA[
+<p>Lister alias: "VKAPI"</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    Quit "VKAPI"
+]]></Implementation>
+</Method>
+
+<Method name="SplitFullRef">
+<Description><![CDATA[
+<p>Identifies the ":::" separator and takes whatever comes before as the group name and
+the second part as local reference.</p>
+<p>See also <method class="%iKnow.Source.Lister">SplitFullRef</method> in <class>%iKnow.Source.Lister</class>.</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%Integer,fullRef:%String,*groupName:%String,*localRef:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set delim = ":::"
+	set localRef = $piece(fullRef, delim, $l(fullRef, delim))
+	set groupName = $e(fullRef, 1, *-$l(localRef)-$l(delim))
+    Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="BuildFullRef">
+<Description><![CDATA[
+<p>Builds the full ref by appending the group name and local reference, adding a triple colon in between.</p>
+<p>See also <method class="%iKnow.Source.Lister">BuildFullRef</method> in <class>%iKnow.Source.Lister</class>.</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%Integer,groupName:%String,localRef:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    quit groupName_":::"_localRef
+]]></Implementation>
+</Method>
+
+<Method name="DefaultProcessor">
+<Description><![CDATA[
+<p>This Lister uses <class>%iKnow.Source.Temp.Processor</class>, as all VK API content here won't be saved
+to database, but will be saved locally through <method>StoreTemp</method> calls.</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    Quit "%iKnow.Source.Temp.Processor"
+]]></Implementation>
+</Method>
+</Class>
+</Export>
