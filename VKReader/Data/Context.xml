@@ -1,65 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="VKReader.Data.Context">
-<Super>%Persistent</Super>
+<IncludeCode>%IKPublic</IncludeCode>
+<Super>%RegisteredObject</Super>
 <TimeCreated>63489,67555.308498</TimeCreated>
 
 <Property name="RelatedQuery">
 <Type>%String</Type>
-<Required>1</Required>
 <Parameter name="MINLEN" value="2"/>
 </Property>
 
-<Index name="RQIndex">
-<IdKey>1</IdKey>
-<PrimaryKey>1</PrimaryKey>
-<Properties>RelatedQuery</Properties>
-<Unique>1</Unique>
-</Index>
+<Property name="DomainID">
+<Type>%Integer</Type>
+</Property>
 
-<UDLText name="T">
-<Content><![CDATA[
-//TODO 
+<Property name="Domain">
+<Type>%iKnow.Domain</Type>
+</Property>
 
-]]></Content>
-</UDLText>
+<Parameter name="ConfigurationName">
+<Type>%String</Type>
+<Default>VKAPIConfiguration</Default>
+</Parameter>
 
-<Method name="AddMorePosts">
-<FormalSpec>listparams</FormalSpec>
+<Parameter name="DomainName">
+<Type>%String</Type>
+<Default>VKAPIConfiguration</Default>
+</Parameter>
+
+<Method name="SetDomain">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ..DomainID = ##class(%iKnow.Domain).GetOrCreateId(..#DomainName)
+	set ..Domain = ##class(%iKnow.Domain).OpenId(..DomainID)
+	if ##class(%iKnow.Configuration).Exists(..#ConfigurationName) {
+    	set cfg = ##class(%iKnow.Configuration).Open(..#ConfigurationName) 
+    }else {
+		set cfg = ##class(%iKnow.Configuration).%New(..#ConfigurationName, 1, $LB("ru"))
+        do cfg.%Save() 
+    }
+    set status = ..Domain.SetParameter($$$IKPDEFAULTCONFIG, ..#ConfigurationName)
+    quit status
+]]></Implementation>
 </Method>
 
-<Storage name="Default">
-<Type>%Library.CacheStorage</Type>
-<DataLocation>^VKReader.Data.ContextD</DataLocation>
-<DefaultData>ContextDefaultData</DefaultData>
-<IdLocation>^VKReader.Data.ContextD</IdLocation>
-<IndexLocation>^VKReader.Data.ContextI</IndexLocation>
-<StreamLocation>^VKReader.Data.ContextS</StreamLocation>
-<Data name="ContextDefaultData">
-<Structure>listnode</Structure>
-<Subscript/>
-<Value name="1">
-<Value>%%CLASSNAME</Value>
-</Value>
-<Value name="2">
-<Value>RelatedQuery</Value>
-</Value>
-<Value name="3">
-<Value>StartDate</Value>
-</Value>
-<Value name="4">
-<Value>StartTime</Value>
-</Value>
-<Value name="5">
-<Value>EndDate</Value>
-</Value>
-<Value name="6">
-<Value>EndTime</Value>
-</Value>
-<Value name="7">
-<Value>ListOfRelatedPosts</Value>
-</Value>
-</Data>
-</Storage>
+<Method name="ClearDomain">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ..Domain.DropData()
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="AddMorePosts">
+<FormalSpec>count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set lister = ##class(VKReader.Lister).%New(..DomainID)
+	set status = lister.ProcessList(..RelatedQuery, count, checkExists, startDate, startTime, endDate, endTime)
+	quit:$$$ISERR(status) status
+]]></Implementation>
+</Method>
+
+<Method name="%OnNew">
+<FormalSpec>query:%String,clearDomain:%Boolean=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ..RelatedQuery = query
+	set status = ..SetDomain()
+	if (clearDomain = 1) {
+		set status = $$$ADDSC(status, ..ClearDomain())
+	}
+	Quit status
+]]></Implementation>
+</Method>
 </Class>
 </Export>
