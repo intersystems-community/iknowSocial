@@ -11,6 +11,10 @@ through a API request and store the set of items retrieved as separate Sources.<
     <li><b>query</b> As <class>%String</class> - The query to search through vk newsfeed. fe: "pizza"</li>
 	<li><b>count</b> As <class>%Integer</class> - The positive integer number of posts (from 1 to 100) to add.</li>
 	<li><b>checkExists</b> As <class>%Boolean</class> - Whether or not to check whether an post item already exists before attempting to store it (skipping if it exists),  default 1</li>
+	<li><b>startDate</b> As <class>%Date</class> - The starting date value to search posts from.</li>
+	<li><b>startTime</b> As <class>%Time</class> - The starting time value to search posts from.</li>
+	<li><b>endDate</b> As <class>%Date</class> - The ending date value to search posts to.</li>
+	<li><b>endTime</b> As <class>%Time</class> - The ending time value to search posts to.</li>
 </ol>
 
 <p><b>External ID structure:</b> [GroupName]:::[LocalRef]</p>
@@ -45,9 +49,13 @@ this Lister will also retrieve and populate the "Date", "Time", "OwnerID" and "F
 	set query = $li(listparams, 1)
 	set count = $li(listparams, 2)
 	set checkExists = +$lg(listparams, 3, 1)
+	set startDate = $lg(listparams, 4)
+	set startTime = $lg(listparams, 5)
+	set endDate = $lg(listparams, 6)
+	set endTime = $lg(listparams, 7)
 	
 	#dim response As %ListOfObjects
-	set tSC = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, query, count)
+	set tSC = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, query, count,,,startDate, startTime, endDate, endTime)
 	quit:$$$ISERR(tSC) tSC
 	
 	do ..RegisterMetadataKeys($lb("Date", "Time", "OwnerID", "FromID"))
@@ -73,7 +81,9 @@ this Lister will also retrieve and populate the "Date", "Time", "OwnerID" and "F
 			continue
 		}
 		
+		set len = 32000
 		do ..StoreTemp(tRef, tTextStream.Read(.len))
+		
 		do ..SetMetadataValues(tRef, $lb(tDate, tTime, tOwnerID, tFromID))
 	}
 	

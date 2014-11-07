@@ -10,72 +10,22 @@
 <Parameter name="MINLEN" value="2"/>
 </Property>
 
-<Property name="StartDate">
-<Type>%Date</Type>
-</Property>
+<Index name="RQIndex">
+<IdKey>1</IdKey>
+<PrimaryKey>1</PrimaryKey>
+<Properties>RelatedQuery</Properties>
+<Unique>1</Unique>
+</Index>
 
-<Property name="StartTime">
-<Type>%Time</Type>
-</Property>
+<UDLText name="T">
+<Content><![CDATA[
+//TODO 
 
-<Property name="EndDate">
-<Type>%Date</Type>
-</Property>
+]]></Content>
+</UDLText>
 
-<Property name="EndTime">
-<Type>%Time</Type>
-</Property>
-
-<Property name="ListOfRelatedPosts">
-<Type>%ListOfObjects</Type>
-</Property>
-
-<Method name="Init">
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set status = ..GetPosts()
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	for i = 1: 1: ..ListOfRelatedPosts.Count() {
-		set relatedPost = ..ListOfRelatedPosts.GetAt(i)
-		set localStatus = relatedPost.%Save()
-		set status = $$$ADDSC(status, localStatus)
-	}
-	if ($$$ISERR(status)) {
-		do ..ClearContext()
-		quit status
-	}
-	set status = ..%Save()
-	if ($$$ISERR(status)) {
-		do ..ClearContext()
-	}
-	quit status
-]]></Implementation>
-</Method>
-
-<Method name="GetPosts">
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set status = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, ..RelatedQuery, 100,,, ..StartDate, ..StartTime, ..EndDate, ..EndTime)
-	quit:$$$ISERR(status) status
-	set ..ListOfRelatedPosts = response
-	quit $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="ClearContext">
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	for i = 1: 1: ..ListOfRelatedPosts.Count() {
-		set relatedPost = ..ListOfRelatedPosts.GetAt(i)
-		if (relatedPost.%Id '= "") {
-			set localStatus = ##class(VKReader.Data.Post).%DeleteId(relatedPost.%Id)
-			set status = $$$ADDSC(status, localStatus)
-		}
-	}
-	quit status
-]]></Implementation>
+<Method name="AddMorePosts">
+<FormalSpec>listparams</FormalSpec>
 </Method>
 
 <Storage name="Default">

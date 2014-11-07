@@ -106,6 +106,8 @@ Runs all tests across the project.</Description>
 		set cfg = ##class(%iKnow.Configuration).%New("VKAPIConfiguration", 1, $LB("ru"))
         do cfg.%Save() 
     }
+    //set dom = ##class(%iKnow.Domain).OpenId(domId)
+    //do dom.DropData()
 	set lister = ##class(VKReader.Lister).%New(domId)
 	do lister.SetConfig("VKAPIConfiguration")
 	//set loader = ##class(%iKnow.Source.Loader).%New(domId)
