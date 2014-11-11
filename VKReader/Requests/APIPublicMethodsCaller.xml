@@ -365,5 +365,41 @@ For more information see: <a href="http://vk.com/dev/newsfeed.search">newsfeed.s
 	quit status
 ]]></Implementation>
 </Method>
+
+<Method name="GroupsGetById">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*response:%ArrayOfObjects,groupIds:%String,fields:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if ($length(groupIds) < 1)  || ($length(groupIds, ",") > 200) {
+		set status = $system.Status.Error(5001, "Number of group_ids must be positive integer not exceeding 200.")
+		quit status
+	}
+	set parameters = ##class(%ArrayOfDataTypes).%New()
+	do parameters.SetAt(groupIds, "group_ids")
+	if (fields '= "") {
+		do parameters.SetAt(fields, "fields")
+	}
+	
+	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "groups.getById", parameters)
+	quit:$$$ISERR(status) status
+	
+	set status = ..CheckAPIError(responseObject)
+	quit:$$$ISERR(status) status
+	
+	set responseObject = responseObject.response
+	set response = ##class(%ArrayOfObjects).%New()
+	for i = 1:1:responseObject.Count() {
+		set groupZenProxy = responseObject.GetAt(i)
+		set group = ##class(VKReader.Data.Group).%New(groupZenProxy)
+		set localStatus = response.SetAt(group, group.ID)
+		set status = $$$ADDSC(status, localStatus)
+	}
+	if ($$$ISERR(status)) {
+		set response = ""
+	}
+	quit status
+]]></Implementation>
+</Method>
 </Class>
 </Export>

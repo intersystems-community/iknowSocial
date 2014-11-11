@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.Data.Group">
+<Description><![CDATA[
+This class mirrors (with some properties disabled) functionality of vk user class.<br>
+For more information see: http://vk.com/dev/fields]]></Description>
+<Super>%Persistent</Super>
+<TimeCreated>63502,71505.832623</TimeCreated>
+
+<Property name="ID">
+<Description>
+Holds group's vk id. This property is unique, has IdKey and PrimaryKey on it.</Description>
+<Type>%Integer</Type>
+<Required>1</Required>
+<Parameter name="MINVAL" value="0"/>
+</Property>
+
+<Index name="IDKey">
+<IdKey>1</IdKey>
+<PrimaryKey>1</PrimaryKey>
+<Properties>ID</Properties>
+<Unique>1</Unique>
+</Index>
+
+<Property name="Name">
+<Description>
+ Holds group's name.</Description>
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="ScreenName">
+<Description>
+Holds group's screen name.</Description>
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="Deactivated">
+<Description><![CDATA[
+Holds group's state in vk system.<br>
+<ul>
+<li><b>existing</b> - everything is just fine.<br></li>
+<li><b>deleted</b> - group is deleted.<br></li>
+<li><b>banned</b> - group is banned.<br></li>
+</ul>]]></Description>
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="VALUELIST" value="-existing-deleted-banned"/>
+</Property>
+
+<Property name="Closed">
+<Description><![CDATA[
+Holds group's privacy level.<br>
+<ul>
+<li><b>0</b> - open group<br></li>
+<li><b>1</b> - closed group<br></li>
+<li><b>2</b> - private group<br></li>
+</ul>]]></Description>
+<Type>%Boolean</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="Type">
+<Description><![CDATA[
+Holds group's type.<br>
+<ul>
+<li><b>group</b> - community is group<br></li>
+<li><b>page</b> - community is public page<br></li>
+<li><b>event</b> - community is event page<br></li>
+</ul>]]></Description>
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="VALUELIST" value="-group-page-event"/>
+</Property>
+
+<Property name="City">
+<Description>
+ Holds city specified on group's page </Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="Country">
+<Description>
+ Holds country defined by city specified on group's page </Description>
+<Type>%String</Type>
+</Property>
+
+<Method name="%OnNew">
+<Description>
+Given %Zen.proxyObject with corresponding fields, initializes the object.</Description>
+<FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if (oProxy '= "") {
+		set ..Deactivated = oProxy."deactivated"
+		if (..Deactivated = "") {
+			set ..Deactivated = "existing"
+		}
+		set ..ID = oProxy."id"
+		set ..Name = oProxy."name"
+		if (..Name = "") {
+			set ..Name = "N/A"
+		}
+		set ..ScreenName = oProxy."screen_name"
+		if (..ScreenName = "") {
+			set ..ScreenName = "N/A"
+		}
+		if (oProxy."is_closed" '= "") {
+			set ..Closed = oProxy."is_closed"
+			if (..Closed '= 0) {
+				quit $$$OK
+			}
+		}
+		if (..Closed = "") {
+			set ..Closed = 0
+		}
+		set ..Type = oProxy.Type
+		if (..Type = "") {
+			set ..Type = "group"
+		}
+		if (oProxy."city" '= "") {
+			set ..City = oProxy.city.title
+		}
+		if (oProxy."country" '= "") {
+			set ..Country = oProxy.country.title
+		}
+		
+	} 
+	set status = ..%ValidateObject()
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="HasValidIntegerFields">
+<Private>1</Private>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[	quit (##class(VKReader.Utils).IsInteger(..ID))
+]]></Implementation>
+</Method>
+
+<Method name="%OnValidateObject">
+<Description><![CDATA[
+This callback method is invoked by the <METHOD>%ValidateObject</METHOD> method to 
+provide notification that the current object is being validated.
+
+<P>If this method returns an error then <METHOD>%ValidateObject</METHOD> will fail.]]></Description>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if ('..HasValidIntegerFields()) {
+		set status = $system.Status.Error(5001, "Invalid integers values.")
+		quit status
+	}
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^VKReader.Data.GroupD</DataLocation>
+<DefaultData>GroupDefaultData</DefaultData>
+<IdLocation>^VKReader.Data.GroupD</IdLocation>
+<IndexLocation>^VKReader.Data.GroupI</IndexLocation>
+<StreamLocation>^VKReader.Data.GroupS</StreamLocation>
+<Data name="GroupDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Name</Value>
+</Value>
+<Value name="3">
+<Value>ScreenName</Value>
+</Value>
+<Value name="4">
+<Value>Deactivated</Value>
+</Value>
+<Value name="5">
+<Value>Closed</Value>
+</Value>
+<Value name="6">
+<Value>Type</Value>
+</Value>
+<Value name="7">
+<Value>City</Value>
+</Value>
+<Value name="8">
+<Value>Country</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
