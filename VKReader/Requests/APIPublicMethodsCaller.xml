@@ -6,6 +6,36 @@ This class is actually API wrapper (with some properties disabled) for VK API.</
 <Super>%RegisteredObject</Super>
 <TimeCreated>63470,45984.335131</TimeCreated>
 
+<Method name="RetrieveProxyObjectFromAPIRequest">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*response:%ZEN.proxyObject,method:%String,parameters:%ArrayOfDataTypes</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/" _ method, parameters, .responseData)
+	quit:$$$ISERR(status) status
+	
+	set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="CheckAPIError">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>object:%ZEN.proxyObject</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if (object.error '= "") {
+		set errorMessage = object.error."error_msg"
+		set errorCode = object.error."error_code"
+		set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
+		quit status
+	}
+	quit $$$OK
+]]></Implementation>
+</Method>
+
 <Method name="UsersGet">
 <Description><![CDATA[
 Returns extended users' information to array <b>response</b> of class <class>VKReader.Data.User</class>, given:<br>
@@ -31,21 +61,13 @@ For more information see: <a href="http://vk.com/dev/users.get">users.get<a>]]><
 	if (nameCase '= "") {
 		do parameters.SetAt(nameCase, "name_case")
 	}
-	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/users.get", parameters, .responseData)
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	#dim responseObject As %ZEN.proxyObject
-	set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseObject)
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	if (responseObject.error '= "") {
-		set errorMessage = responseObject.error."error_msg"
-		set errorCode = responseObject.error."error_code"
-		set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
-		quit status
-	}
+	
+	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "users.get", parameters)
+	quit:$$$ISERR(status) status
+	
+	set status = ..CheckAPIError(responseObject)
+	quit:$$$ISERR(status) status
+	
 	set responseObject = responseObject.response
 	set response = ##class(%ArrayOfObjects).%New()
 	for i = 1:1:responseObject.Count() {
@@ -78,18 +100,13 @@ For more information see: <a href="http://vk.com/dev/database.getCitiesById">dat
 	}
 	set parameters = ##class(%ArrayOfDataTypes).%New()
 	do parameters.SetAt(cityIds, "city_ids")
-	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/database.getCitiesById", parameters, .responseData)
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	#dim responseObject As %ZEN.proxyObject
-	set status = status * ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseObject)
-	if (responseObject.error '= "") {
-		set errorMessage = responseObject.error."error_msg"
-		set errorCode = responseObject.error."error_code"
-		set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
-		quit status
-	}
+	
+	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "database.getCitiesById", parameters)
+	quit:$$$ISERR(status) status
+	
+	set status = ..CheckAPIError(responseObject)
+	quit:$$$ISERR(status) status
+	
 	set responseObject = responseObject.response
 	set response = ##class(%ArrayOfDataTypes).%New()
 	for i = 1:1:responseObject.Count() {
@@ -114,18 +131,13 @@ For more information see: <a href="http://vk.com/dev/utils.resolveScreenName">ut
 <Implementation><![CDATA[
 	set parameters = ##class(%ArrayOfDataTypes).%New()
 	do parameters.SetAt(screenName, "screen_name")
-	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(, "method/utils.resolveScreenName", parameters, .responseData)
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	#dim responseObject As %ZEN.proxyObject
-	set status = status * ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseObject)
-	if (responseObject.error '= "") {
-		set errorMessage = responseObject.error."error_msg"
-		set errorCode = responseObject.error."error_code"
-		set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
-		quit status
-	}
+	
+	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "utils.resolveScreenName", parameters)
+	quit:$$$ISERR(status) status
+	
+	set status = ..CheckAPIError(responseObject)
+	quit:$$$ISERR(status) status
+	
 	set responseObject = responseObject.response
 	set type = responseObject.type
 	set objectId = responseObject."object_id"
@@ -183,21 +195,13 @@ For more information see: <a href="http://vk.com/dev/wall.get">wall.get</a>]]></
 		set status = $system.Status.Error(5001, "'count' value must be positive integer")
 		quit status
 	}
-	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/wall.get", parameters, .responseData)
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	#dim responseObject As %ZEN.proxyObject
-	set status = status * ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseObject)
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	if (responseObject.error '= "") {
-		set errorMessage = responseObject.error."error_msg"
-		set errorCode = responseObject.error."error_code"
-		set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
-		quit status
-	}
+	
+	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "wall.get", parameters)
+	quit:$$$ISERR(status) status
+	
+	set status = ..CheckAPIError(responseObject)
+	quit:$$$ISERR(status) status
+	
 	set responseObject = responseObject.response.items
 	set response = ##class(%ListOfObjects).%New()
 	for i = 1:1:responseObject.Count() {
@@ -265,21 +269,13 @@ For more information see: <a href="http://vk.com/dev/wall.search">wall.search</a
 		set status = $system.Status.Error(5001, "'count' value must be positive integer")
 		quit status
 	}
-	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/wall.search", parameters, .responseData)
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	#dim responseObject As %ZEN.proxyObject
-	set status = status * ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseObject)
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	if (responseObject.error '= "") {
-		set errorMessage = responseObject.error."error_msg"
-		set errorCode = responseObject.error."error_code"
-		set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
-		quit status
-	}
+	
+	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "wall.search", parameters)
+	quit:$$$ISERR(status) status
+	
+	set status = ..CheckAPIError(responseObject)
+	quit:$$$ISERR(status) status
+	
 	set responseObject = responseObject.response.items
 	set response = ##class(%ListOfObjects).%New()
 	for i = 1:1:responseObject.Count() {
@@ -348,21 +344,13 @@ For more information see: <a href="http://vk.com/dev/newsfeed.search">newsfeed.s
 			quit status
 		}
 	}
-	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/newsfeed.search", parameters, .responseData)
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	#dim responseObject As %ZEN.proxyObject
-	set status = status * ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseObject)
-	if ($$$ISERR(status)) {
-		quit status
-	}
-	if (responseObject.error '= "") {
-		set errorMessage = responseObject.error."error_msg"
-		set errorCode = responseObject.error."error_code"
-		set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
-		quit status
-	}
+	
+	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "newsfeed.search", parameters)
+	quit:$$$ISERR(status) status
+	
+	set status = ..CheckAPIError(responseObject)
+	quit:$$$ISERR(status) status
+	
 	set responseObject = responseObject.response.items
 	set response = ##class(%ListOfObjects).%New()
 	for i = 1:1:responseObject.Count() {

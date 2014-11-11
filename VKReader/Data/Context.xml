@@ -5,11 +5,6 @@
 <Super>%RegisteredObject</Super>
 <TimeCreated>63489,67555.308498</TimeCreated>
 
-<Property name="RelatedQuery">
-<Type>%String</Type>
-<Parameter name="MINLEN" value="2"/>
-</Property>
-
 <Property name="DomainID">
 <Type>%Integer</Type>
 </Property>
@@ -28,18 +23,41 @@
 <Default>VKAPIDomain</Default>
 </Parameter>
 
-<Method name="SetDomain">
+<Method name="DebugTest">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	set context = ##class(VKReader.Data.Context).%New(1)
+	w context.Domain.GetParameter($$$IKPSTEMMING), !
+	set status = context.AddMorePosts("pizza", 100)
+	w context.Domain.GetParameter($$$IKPSTEMMING)
+]]></Implementation>
+</Method>
+
+<Method name="Set">
+<FormalSpec>clearDomain:%Boolean=0</FormalSpec>
+<Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set ..DomainID = ##class(%iKnow.Domain).GetOrCreateId(..#DomainName)
 	set ..Domain = ##class(%iKnow.Domain).OpenId(..DomainID)
+	
+	if (clearDomain = 1) {
+		set status = ..ClearDomain()
+		quit:$$$ISERR(status) status
+	}
+	
+	#dim cfd as %iKnow.Configuration
 	if ##class(%iKnow.Configuration).Exists(..#ConfigurationName) {
     	set cfg = ##class(%iKnow.Configuration).Open(..#ConfigurationName) 
     }else {
 		set cfg = ##class(%iKnow.Configuration).%New(..#ConfigurationName, 1, $LB("ru"))
         do cfg.%Save() 
     }
-    set status = ..Domain.SetParameter($$$IKPDEFAULTCONFIG, ..#ConfigurationName)
+    set status = $$$ADDSC(..Domain.SetParameter($$$IKPDEFAULTCONFIG, ..#ConfigurationName), status)
+    set status = $$$ADDSC(..Domain.SetParameter($$$IKPSTEMMING, 1), status)
+    set status = $$$ADDSC(..Domain.%Save(), status)
+    set cfg.StemmingConfig = "DEFAULT"
+    set status =$$$ADDSC(cfg.%Save(), status)
     quit status
 ]]></Implementation>
 </Method>
@@ -53,24 +71,20 @@
 </Method>
 
 <Method name="AddMorePosts">
-<FormalSpec>count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
+<FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set lister = ##class(VKReader.Lister).%New(..DomainID)
-	set status = lister.ProcessList(..RelatedQuery, count, checkExists, startDate, startTime, endDate, endTime)
+	set status = lister.ProcessList(query, count, checkExists, startDate, startTime, endDate, endTime)
 	quit status
 ]]></Implementation>
 </Method>
 
 <Method name="%OnNew">
-<FormalSpec>query:%String,clearDomain:%Boolean=0</FormalSpec>
+<FormalSpec>clearDomain:%Boolean=0</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set ..RelatedQuery = query
-	set status = ..SetDomain()
-	if (clearDomain = 1) {
-		set status = $$$ADDSC(status, ..ClearDomain())
-	}
+	set status = ..Set(clearDomain)
 	Quit status
 ]]></Implementation>
 </Method>
