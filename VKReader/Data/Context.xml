@@ -25,7 +25,7 @@
 
 <Parameter name="DomainName">
 <Type>%String</Type>
-<Default>VKAPIConfiguration</Default>
+<Default>VKAPIDomain</Default>
 </Parameter>
 
 <Method name="SetDomain">
@@ -58,7 +58,7 @@
 <Implementation><![CDATA[
 	set lister = ##class(VKReader.Lister).%New(..DomainID)
 	set status = lister.ProcessList(..RelatedQuery, count, checkExists, startDate, startTime, endDate, endTime)
-	quit:$$$ISERR(status) status
+	quit status
 ]]></Implementation>
 </Method>
 
