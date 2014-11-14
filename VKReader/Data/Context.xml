@@ -33,6 +33,18 @@
 ]]></Implementation>
 </Method>
 
+<Method name="AddMetadataFieldIfNotExists">
+<FormalSpec>fieldName:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if (##class(%iKnow.Queries.MetadataAPI).GetFieldId(..DomainID, fieldName) = "") {
+		do ##class(%iKnow.Queries.MetadataAPI).AddField(..DomainID, fieldName, $$$MDALLOPERATORS)
+	}
+	quit $$$OK
+]]></Implementation>
+</Method>
+
 <Method name="Set">
 <FormalSpec>clearDomain:%Boolean=0</FormalSpec>
 <Private>1</Private>
@@ -46,7 +58,15 @@
 		quit:$$$ISERR(status) status
 	}
 	
-	#dim cfd as %iKnow.Configuration
+	do ..AddMetadataFieldIfNotExists("PostDate")
+	do ..AddMetadataFieldIfNotExists("PostTime")
+	do ..AddMetadataFieldIfNotExists("AuthorID")
+	do ..AddMetadataFieldIfNotExists("AuthorCity")
+	do ..AddMetadataFieldIfNotExists("AuthorCountry")
+	do ..AddMetadataFieldIfNotExists("AuthorDOB")
+	do ..AddMetadataFieldIfNotExists("AuthorSex")
+	
+	#dim cfg as %iKnow.Configuration
 	if ##class(%iKnow.Configuration).Exists(..#ConfigurationName) {
     	set cfg = ##class(%iKnow.Configuration).Open(..#ConfigurationName) 
     }else {

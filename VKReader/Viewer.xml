@@ -34,12 +34,6 @@ Source ID as selected by the user when clicking on an action</Description>
 <Type>%Integer</Type>
 </Property>
 
-<Property name="Agency">
-<Description>
-Agency filter, if selected by the user (Module 3, exercise 4)</Description>
-<Type>%String</Type>
-</Property>
-
 <Property name="SummaryLength">
 <Description>
 Length of the summary to be displayed in the article reading pane (Module 3, exercise 6)</Description>
@@ -79,8 +73,13 @@ sql="SELECT SourceId, ExternalId FROM iknowAV_view.Sources" width="100%">
 <column colName="ID" hidden="true" />
 <column colName="ExternalId" hidden="true" />
 <column header="Title" OnDrawCell="DrawSource" style="padding:5px; white-space:normal;"   />
-<column header="Date" OnDrawCell="DrawSourceMetaDate" seed="Date" />
-<column header="Time" OnDrawCell="DrawSourceMetaTime" seed="Time" />
+<column header="Date" OnDrawCell="DrawSourceMetaDate" seed="PostDate" />
+<column header="Time" OnDrawCell="DrawSourceMetaTime" seed="PostTime" />
+<column header="City" OnDrawCell="DrawSourceMeta" seed="AuthorCity"/>
+<column header="Country" OnDrawCell="DrawSourceMeta" seed="AuthorCountry"/>
+<column header="DOB" OnDrawCell="DrawSourceMetaDate" seed="AuthorDOB"/>
+<column header="Sex" OnDrawCell="DrawSourceMetaSex" seed="AuthorSex"/>
+<column header="Link" OnDrawCell="DrawSourceMetaLinkToProfile" seed="AuthorID"/>
 <column header="Actions" OnDrawCell="DrawSourceActions" style="text-align:center;" />
 </tablePane>
 <hgroup width="100%" cellAlign="right" id="pageControls">
@@ -244,7 +243,9 @@ Draws a metadata date field (passed in through <var>pSeed</var>) for a source in
 	set tExtId = %query("ExternalId")	
 	
 	set date = ##class(%iKnow.Queries.MetadataAPI).GetValue(..Domain, pSeed, tExtId)
-	write $ZDATE(date, 1)
+	if ($length(date) > 0) {
+		write $ZDATE(date, 1)
+	}
 	
 	quit $$$OK
 ]]></Implementation>
@@ -260,6 +261,39 @@ Draws a metadata time field (passed in through <var>pSeed</var>) for a source in
 	
 	set time = ##class(%iKnow.Queries.MetadataAPI).GetValue(..Domain, pSeed, tExtId)
 	write $ZTIME(time, 1)
+	
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="DrawSourceMetaSex">
+<Description>
+Draws a letter for sex instead of digit from VK API representation</Description>
+<FormalSpec>pTable:%ZEN.Component.tablePane,pName:%String,pSeed:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set tExtId = %query("ExternalId")
+	
+	set sex = ##class(%iKnow.Queries.MetadataAPI).GetValue(..Domain, pSeed, tExtId)
+	if (sex = "1") {
+		write "F"
+	} elseif (sex = "2") {
+		write "M"
+	}
+	
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="DrawSourceMetaLinkToProfile">
+<FormalSpec>pTable:%ZEN.Component.tablePane,pName:%String,pSeed:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set tExtId = %query("ExternalId")
+	
+	set id = ##class(%iKnow.Queries.MetadataAPI).GetValue(..Domain, pSeed, tExtId)
+	
+	write "<a href=""http://vk.com/" _ $select(id < 0: "club", 1: "id") _ $select(id < 0: -id, 1: id) _ """>" _ id _ "</a>" 
 	
 	quit $$$OK
 ]]></Implementation>
