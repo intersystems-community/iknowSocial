@@ -92,7 +92,7 @@ labelStyle="font-size: 20px;" />
 </hgroup>
 <spacer height="20" />
 <tablePane id="tblSources" caption="Articles" rowSelect="false" showRowSelector="false" nowrap="0"
-sql="SELECT SourceId, ExternalId FROM iknowAV_view.Sources" width="100%">
+sql="SELECT SourceId, ExternalId FROM VKReader.ViewerSources" width="100%">
 <column colName="ID" hidden="true" />
 <column colName="ExternalId" hidden="true" />
 <column header="Title" OnDrawCell="DrawSource" style="padding:5px; white-space:normal;"   />
