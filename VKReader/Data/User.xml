@@ -107,7 +107,7 @@ Given %Zen.proxyObject with corresponding fields, initializes the object.</Descr
 		if (oProxy."hidden" '= "") {
 			set ..Hidden = oProxy."hidden"
 			if (..Hidden = 1) {
-				quit $$$OK
+				//quit $$$OK // Got strange behaviour here: it returns as 1, but still delivers other fields.
 			}
 		}
 		set ..Sex = oProxy."sex"

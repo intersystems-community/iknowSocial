@@ -19,7 +19,7 @@ Current page of results</Description>
 
 <Property name="PageSize">
 <Type>%Integer</Type>
-<InitialExpression>15</InitialExpression>
+<InitialExpression>100</InitialExpression>
 </Property>
 
 <Property name="CurrentAction">
@@ -32,6 +32,26 @@ Current action, as selected by the user</Description>
 <Description>
 Source ID as selected by the user when clicking on an action</Description>
 <Type>%Integer</Type>
+</Property>
+
+<Property name="SelectedQuery">
+<Description>
+Selected Query as selected by the user when clicking on an action</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="SelectedNumberOfSources">
+<Description>
+Selected number of sources as selected by the user when clicking on an action</Description>
+<Type>%Integer</Type>
+<InitialExpression>10</InitialExpression>
+</Property>
+
+<Property name="SelectedClearDomain">
+<Description>
+Selected if user checked the option to clear the domain on before adding more posts</Description>
+<Type>%Integer</Type>
+<InitialExpression>0</InitialExpression>
 </Property>
 
 <Property name="SummaryLength">
@@ -66,6 +86,9 @@ labelStyle="font-size: 20px;" />
 <image src="deepsee/ds2_bookmarks_44.png" enclosingStyle="padding-top:5px;"
   onclick ="zen('showArticle').show();"
    height="40" />
+<image src="deepsee/ds2_plus_44.png" enclosingStyle="padding-top:5px;"
+  onclick ="zen('addMoreSources').show();"
+   height="40" />
 </hgroup>
 <spacer height="20" />
 <tablePane id="tblSources" caption="Articles" rowSelect="false" showRowSelector="false" nowrap="0"
@@ -87,7 +110,7 @@ sql="SELECT SourceId, ExternalId FROM iknowAV_view.Sources" width="100%">
 <spacer width="5" />
 <button caption="&gt;&gt;" onclick="zenPage.nextPage(+1);" />
 <spacer width="5" />
-<text id="PageSize" value="15" name="PageSize"/>
+<text id="PageSize" value="100" name="PageSize"/>
 <spacer width="5" />
 <button caption="Update Pagesize" name="Submit" onclick="zenPage.refreshAll()"/>
 <spacer width="5" />
@@ -95,14 +118,14 @@ sql="SELECT SourceId, ExternalId FROM iknowAV_view.Sources" width="100%">
 
 <modalGroup id="modArticle" >
 <titleBox id="titArticle" />
-<vgroup enclosingClass="articleText">
+<vgroup>
 <html id="htmlArticle" OnDrawContent="DrawArticle" />
 </vgroup>
 </modalGroup>
 
 <modalGroup id="showArticle" >
 <titleBox id="titShowArticle" />
-<vgroup enclosingClass="articleText">
+<vgroup>
 <html id="htmlShowArticle" OnDrawContent="DrawArticle" />
 <hgroup cellAlign="right" width="100%" labelPosition="left">
 <text title="Summary length" size="2" id="txtArticleId" />
@@ -112,6 +135,15 @@ sql="SELECT SourceId, ExternalId FROM iknowAV_view.Sources" width="100%">
 </vgroup>
 </modalGroup>
 
+<modalGroup id="addMoreSources">
+<titleBox id="titAddMoreSources"/>
+<hgroup cellAlign="center" width="100%" labelPosition="left">
+<checkbox caption="clear domain" id="chkClear"/>
+<text title="Number of posts" size="5" id="numPosts" label="number of posts"/>
+<text title="Tag to query" size="10" id="txtQuery" label="query tag"/>
+<button caption="add posts" onclick="zenPage.addMorePosts();" />
+</hgroup>
+</modalGroup>
 </page>
 ]]></Data>
 </XData>
@@ -373,10 +405,30 @@ Display the article contents in the article reading popup</Description>
 Ensure the main table is refreshed when opening the page a first time</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set ..Domain = ##class(%iKnow.Domain).GetOrCreateId("VKAPIDomain")
+	set context = ##class(VKReader.Data.Context).%New()
+	set ..Domain = context.DomainID
 	
 	do ..RefreshTables()
 	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="LoadDataToDomain">
+<ReturnType>%Status</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	set ..SelectedClearDomain = $select(..SelectedClearDomain = "true": 1, 1: 0)
+	if (##class(VKReader.Utils).IsInteger(..SelectedNumberOfSources)) {
+		if (..SelectedNumberOfSources > ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
+			set ..SelectedNumberOfSources = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
+		}
+		set context = ##class(VKReader.Data.Context).%New(..SelectedClearDomain)
+		set status = context.AddMorePosts(..SelectedQuery, ..SelectedNumberOfSources)
+		quit status
+	} else {
+		&js<console.log("Incorrect value for number of posts.")>
+		quit $$$OK
+	}
 ]]></Implementation>
 </Method>
 
@@ -509,13 +561,28 @@ In the article reading pane, refresh the article to display a summary of the sel
 ]]></Implementation>
 </Method>
 
+<Method name="addMorePosts">
+<Description>
+Adds more posts on selected query.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var sc = zenPage.setProperty('SelectedQuery', zen('txtQuery').getValue());
+	var sc = zenPage.setProperty('SelectedClearDomain', zen('chkClear').getValue());
+	var sc = zenPage.setProperty('SelectedNumberOfSources', zen('numPosts').getValue());
+	zenPage.endModal();
+	var sc = zenPage.LoadDataToDomain();
+	zenPage.refreshAll();
+]]></Implementation>
+</Method>
+
 <Method name="refreshAll">
 <Description>
 Utility method: refresh the main sources table and page subtitle</Description>
 <Language>javascript</Language>
 <ClientMethod>1</ClientMethod>
 <Implementation><![CDATA[
-	var sc = zenPage.setProperty('PageSize', zen('PageSize').getValue())
+	var sc = zenPage.setProperty('PageSize', zen('PageSize').getValue());
 	var title = zenPage.RefreshTables();
 	zen('lblSubtitle').setProperty('label', title);
 	zen('tblSources').refreshContents();
@@ -558,29 +625,27 @@ body {
 }
 
 .modalGroup {
-	width: 70% !important;
+	width: 50% !important;
 	top: 200px !important;
-	left: 15% !important;
+	left: 25% !important;
 	margin-bottom: 50px !important;
 	height: auto !important;
-	
+	color: white;
+}
+
+.modalGroup .titleBoxTitle {
+	border: 0;
+}
+
+.modalGroup .button {
+	color: white;
+	background-color: rgba(12, 61, 100, 1);
+	border-radius: 5px;
+	border: 0;
 }
 
 img.action {
 	height: 22px;
-}
-
-.articleText {
-	margin-top: 10px;
-	margin-bottom: 10px;
-	padding: 10px;
-	border: 1px solid black;
-	background: #ffffff;
-}
-
-.articleText p {
-	margin-top: 10px;
-	line-height: 1.3;
 }
 
 .matchF {

@@ -6,6 +6,11 @@ This class is actually API wrapper (with some properties disabled) for VK API.</
 <Super>%RegisteredObject</Super>
 <TimeCreated>63470,45984.335131</TimeCreated>
 
+<Parameter name="MaxEntityQueryCount">
+<Type>%Integer</Type>
+<Default>100</Default>
+</Parameter>
+
 <Method name="RetrieveProxyObjectFromAPIRequest">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*response:%ZEN.proxyObject,method:%String,parameters:%ArrayOfDataTypes</FormalSpec>

@@ -53,6 +53,7 @@
 	set ..DomainID = ##class(%iKnow.Domain).GetOrCreateId(..#DomainName)
 	set ..Domain = ##class(%iKnow.Domain).OpenId(..DomainID)
 	
+	set status = $$$OK
 	if (clearDomain = 1) {
 		set status = ..ClearDomain()
 		quit:$$$ISERR(status) status
@@ -74,7 +75,9 @@
         do cfg.%Save() 
     }
     set status = $$$ADDSC(..Domain.SetParameter($$$IKPDEFAULTCONFIG, ..#ConfigurationName), status)
-    set status = $$$ADDSC(..Domain.SetParameter($$$IKPSTEMMING, 1), status)
+    if (clearDomain = 1) {
+    	set status = $$$ADDSC(..Domain.SetParameter($$$IKPSTEMMING, 1), status)
+    }
     set status = $$$ADDSC(..Domain.%Save(), status)
     set cfg.StemmingConfig = "DEFAULT"
     set status =$$$ADDSC(cfg.%Save(), status)
