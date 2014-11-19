@@ -120,5 +120,20 @@ Runs all tests across the project.</Description>
 	zw result
 ]]></Implementation>
 </Method>
+
+<Method name="Install">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	new $namespace
+	set SSLConfigurationName = ##class(VKReader.Requests.RequestSender).%GetParameter("SSLConfigurationName")
+	set $namespace = "%SYS"
+	set status = $$$OK
+	if (##class(Security.SSLConfigs).Exists(SSLConfigurationName) = 0) {
+		set status = $$$ADDSC(##class(Security.SSLConfigs).Create(SSLConfigurationName), status)
+	}
+	quit status
+]]></Implementation>
+</Method>
 </Class>
 </Export>
