@@ -87,11 +87,11 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	do ##class(VKReader.Requests.Tests.RequestMakerTests).Run()
-	do ##class(VKReader.Requests.Tests.APIPublicMethodsCallerTests).Run()
-	do ##class(VKReader.Data.Tests.PostTests).Run()
-	do ##class(VKReader.Data.Tests.UserTests).Run()
-	quit $$$OK
+	set status = ##class(VKReader.Requests.Tests.RequestMakerTests).Run()
+	set status = $$$ADDSC(status, ##class(VKReader.Requests.Tests.APIPublicMethodsCallerTests).Run())
+	set status = $$$ADDSC(status, ##class(VKReader.Data.Tests.PostTests).Run())
+	set status = $$$ADDSC(status, ##class(VKReader.Data.Tests.UserTests).Run())
+	quit status
 ]]></Implementation>
 </Method>
 
@@ -130,7 +130,7 @@ Runs all tests across the project.</Description>
 	set $namespace = "%SYS"
 	set status = $$$OK
 	if (##class(Security.SSLConfigs).Exists(SSLConfigurationName) = 0) {
-		set status = $$$ADDSC(##class(Security.SSLConfigs).Create(SSLConfigurationName), status)
+		set status = $$$ADDSC(status, ##class(Security.SSLConfigs).Create(SSLConfigurationName))
 	}
 	quit status
 ]]></Implementation>

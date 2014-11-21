@@ -74,13 +74,13 @@
 		set cfg = ##class(%iKnow.Configuration).%New(..#ConfigurationName, 1, $LB("ru"))
         do cfg.%Save() 
     }
-    set status = $$$ADDSC(..Domain.SetParameter($$$IKPDEFAULTCONFIG, ..#ConfigurationName), status)
+    set status = $$$ADDSC(status, ..Domain.SetParameter($$$IKPDEFAULTCONFIG, ..#ConfigurationName))
     if (clearDomain = 1) {
-    	set status = $$$ADDSC(..Domain.SetParameter($$$IKPSTEMMING, 1), status)
+    	set status = $$$ADDSC(status, ..Domain.SetParameter($$$IKPSTEMMING, 1))
     }
-    set status = $$$ADDSC(..Domain.%Save(), status)
+    set status = $$$ADDSC(status, ..Domain.%Save())
     set cfg.StemmingConfig = "DEFAULT"
-    set status =$$$ADDSC(cfg.%Save(), status)
+    set status =$$$ADDSC(status, cfg.%Save())
     quit status
 ]]></Implementation>
 </Method>

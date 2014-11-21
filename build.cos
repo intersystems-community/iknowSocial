@@ -1,0 +1,7 @@
+zn "IKNOWSOCIAL"
+set sc = $SYSTEM.OBJ.ImportDir("/var/lib/jenkins/workspace/iknowsocial","*.xml","ck",.err,1)
+if sc '= 1 do $SYSTEM.OBJ.DisplayError(sc)
+if sc '= 1 set file = "/var/lib/jenkins/workspace/iknowsocial/error.flag" o file:(NWS) u file do $SYSTEM.OBJ.DisplayError(sc) c file halt
+if sc = 1 set sc = ##class(VKReader.Utils).RunAllTests()
+if sc '= 1 set file = "/var/lib/jenkins/workspace/iknowsocial/error.flag" o file:(NWS) u file c file
+halt

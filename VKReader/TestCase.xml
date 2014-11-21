@@ -13,14 +13,20 @@
         if '$data(^UnitTestRoot) {
             set mainFolder = "c:\Tests\VKReader\" 
             set st = ##class(%File).CreateDirectoryChain(mainFolder _ testSuite)
-            if $$$ISOK(st) { set ^UnitTestRoot = mainFolder }
-            else { write !, "UnitTestRoot folder could not be created. Consult with instructor." }
+            if $$$ISOK(st) { 
+            	set ^UnitTestRoot = mainFolder 
+            } else { 
+            	write !, "UnitTestRoot folder could not be created." 
+            }
         }
         
         set testCase = ..%ClassName(1) // this test case
         set test = testSuite _ ":" _ testCase
         set quals = "/noload/norecursive/nodelete"
         set status = ##class(%UnitTest.Manager).RunTest(test, quals)
+        if ($$$ISOK(status)) {
+        	quit ##class(%UnitTest.Report).GetTestStatus($namespace, ^UnitTest.Result, testSuite, testCase)
+        }
         quit status
 ]]></Implementation>
 </Method>
