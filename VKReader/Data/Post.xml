@@ -97,8 +97,6 @@ This version ignores reposting.]]></Description>
 <IndexLocation>^VKReader.Data.PostI</IndexLocation>
 <StreamLocation>^VKReader.Data.PostS</StreamLocation>
 <Data name="PostDefaultData">
-<Structure>listnode</Structure>
-<Subscript/>
 <Value name="1">
 <Value>%%CLASSNAME</Value>
 </Value>
@@ -167,6 +165,13 @@ class then this oref will be the one returned to the caller of %New method.]]></
 		set ..PostType = oProxy."post_type"
 		if (oProxy."friends_only" '= "") {
 			set ..FriendsOnly = oProxy."friends_only"
+		}
+		if (oProxy."copy_history" '= "") {
+			#dim items As %ListOfObjects = oProxy."copy_history"
+			for i = 1: 1: items.Count() {
+				do ..Text.Write(" %REPOST% ")
+				do ..Text.Write(items.GetAt(i)."text")
+			}
 		}
 		set ..LikesCount = oProxy."likes"."count"
 		set ..RepostsCount = oProxy."reposts"."count"
