@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.DomainEmotionColoringCounter">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63519,54472.852505</TimeCreated>
+
+<Parameter name="DictionaryFilename">
+<Description>
+Holds filename to search for emotion markers in directory Resources</Description>
+<Type>%String</Type>
+<Default>emotions.txt</Default>
+</Parameter>
+
+<Parameter name="EmotionalColoringField">
+<Type>%String</Type>
+<Default>EmotionalColoring</Default>
+</Parameter>
+
+<Method name="AddToNumericMetadataField">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%Integer,externalId:%String,value:%Numeric</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set current = ##class(%iKnow.Queries.MetadataAPI).GetValue(domainId, ..#EmotionalColoringField, externalId, .status)
+	quit:$$$ISERR(status) status
+	set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+current) + (+value))
+	do $system.Status.DisplayError(status)
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="ProcessOneEntity">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>entity:%String,domainId:%Integer,value:%Numeric</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set similarList = ##class(%iKnow.Queries.EntityAPI).GetSimilarCounts(domainId, entity)
+	// Here we extract the number of similar concepts
+	set number = $list(similarList, 1)
+	if (number = 0) {
+		quit $$$OK
+	}
+	
+	kill similarResult
+	// 1 page with `number` results
+	set st = ##class(%iKnow.Queries.EntityAPI).GetSimilar(.similarResult, domainId, entity, 1, number)	
+	if (st '= 1) { 
+		// should think what to do here
+		quit $$$OK
+	}
+	
+	set k1 = 1
+	set p1 = ""
+	for {	// cycling through similar concepts
+		set p1 = $order(similarResult(p1))
+		quit:(p1 = "")
+		set similarEntityId = $list(similarResult(k1), 1)				
+		set numberOfArticlesWithSE = $list(similarResult(k1),3)
+
+		kill result
+		set st = ##class(%iKnow.Queries.SourceAPI).GetByEntityIds(.result, domainId, $lb(similarEntityId), 1, numberOfArticlesWithSE)
+		if ($$$ISERR(st)) {
+			continue
+		}
+		
+		set k2 = 1
+		set p2 = ""
+		for {					// cycling through entities, containing the concept
+			set p2 = $order(result(p2))	
+			quit:(p2 = "")
+			
+			set externalId = $list(result(k2), 2)
+			set status = ..AddToNumericMetadataField(domainId, externalId, value)
+			if ($$$ISERR(status)) {
+				continue
+			}
+			
+			set k2 = k2 + 1
+		}	// for
+		
+		set k1 = k1 + 1		
+	}	// for
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CalcSourcesEmotionalColoring">
+<Description>
+User MUST clear initial values by himself</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domName:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if (##class(%iKnow.Domain).Exists(domName)) {
+		set domainId = ##class(%iKnow.Domain).GetOrCreateId(domName)
+	} else {
+		set status = $system.Status.Error(5001, "No such domain.")
+		quit status
+	}	
+		
+	// Hardcoded project-wise directory name
+	set filename = ##class(%File).NormalizeFilename(..#DictionaryFilename, "Resources")
+	set stream = ##class(%Stream.FileCharacter).%New()
+	set sc = stream.LinkToFile(filename)
+	quit:$$$ISERR(sc) sc
+	
+	set i = 0
+	while 'stream.AtEnd {		
+		set line = stream.ReadLine()
+		
+		if ($extract(line, 1) = "!") {
+			continue
+		}
+		
+		set weight = $piece(line, "#", 1)
+		set i = i + 1
+		
+		set words = $listfromstring($piece(line, "#", 2), ",")
+		set j = 1
+		while ($listdata(words, j) '= 0) {
+			
+			set entityValue = $list(words, j)
+			
+			set status = ..ProcessOneEntity(entityValue, domainId, weight)
+			if ($$$ISERR(status)) {
+				continue
+			}
+			set j = j + 1
+		}
+					
+	}
+	
+	quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>

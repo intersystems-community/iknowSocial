@@ -103,6 +103,7 @@ sql="SELECT SourceId, ExternalId FROM VKReader.ViewerSources" width="100%">
 <column header="DOB" OnDrawCell="DrawSourceMetaDate" seed="AuthorDOB"/>
 <column header="Sex" OnDrawCell="DrawSourceMetaSex" seed="AuthorSex"/>
 <column header="Link" OnDrawCell="DrawSourceMetaLinkToProfile" seed="AuthorID"/>
+<column header="EC" OnDrawCell="DrawSourceMeta" seed="EmotionalColoring"/>
 <column header="Actions" OnDrawCell="DrawSourceActions" style="text-align:center;" />
 </tablePane>
 <hgroup width="100%" cellAlign="right" id="pageControls">
@@ -406,6 +407,7 @@ Ensure the main table is refreshed when opening the page a first time</Descripti
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set context = ##class(VKReader.Data.Context).%New()
+	do context.CalculateEmotionalColoring()
 	set ..Domain = context.DomainID
 	
 	do ..RefreshTables()

@@ -113,7 +113,9 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 		}
 		
 		set len = 32000
-		do ..StoreTemp(tRef, tTextStream.Read(.len))
+		while (len = 32000) {
+			do ..StoreTemp(tRef, tTextStream.Read(.len))
+		}
 		
 		do ..SetMetadataValues(tRef, $lb(tPostDate, tPostTime, tFromID, tAuthorCity, tAuthorCountry, tAuthorDOB, tAuthorSex))
 	}

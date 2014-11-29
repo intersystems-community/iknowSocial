@@ -66,7 +66,8 @@
 	do ..AddMetadataFieldIfNotExists("AuthorCountry")
 	do ..AddMetadataFieldIfNotExists("AuthorDOB")
 	do ..AddMetadataFieldIfNotExists("AuthorSex")
-	
+	do ..AddMetadataFieldIfNotExists(##class(Util.DomainEmotionColoringCounter).%GetParameter("EmotionalColoringField"))
+		
 	#dim cfg as %iKnow.Configuration
 	if ##class(%iKnow.Configuration).Exists(..#ConfigurationName) {
     	set cfg = ##class(%iKnow.Configuration).Open(..#ConfigurationName) 
@@ -103,12 +104,20 @@
 ]]></Implementation>
 </Method>
 
+<Method name="CalculateEmotionalColoring">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(Util.DomainEmotionColoringCounter).CalcSourcesEmotionalColoring(..#DomainName)
+	quit status
+]]></Implementation>
+</Method>
+
 <Method name="%OnNew">
 <FormalSpec>clearDomain:%Boolean=0</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set status = ..Set(clearDomain)
-	Quit status
+	quit status
 ]]></Implementation>
 </Method>
 </Class>

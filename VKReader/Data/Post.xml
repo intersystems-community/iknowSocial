@@ -8,6 +8,13 @@ This version ignores reposting.]]></Description>
 <Super>%Persistent</Super>
 <TimeCreated>63475,60435.629485</TimeCreated>
 
+<Parameter name="RepostDelimiter">
+<Description>
+Don't change it to have length 1</Description>
+<Type>%String</Type>
+<Default> %REPOST% </Default>
+</Parameter>
+
 <Property name="ID">
 <Description>
  Holds post id in context of author (user or commuinty). </Description>
@@ -169,7 +176,7 @@ class then this oref will be the one returned to the caller of %New method.]]></
 		if (oProxy."copy_history" '= "") {
 			#dim items As %ListOfObjects = oProxy."copy_history"
 			for i = 1: 1: items.Count() {
-				do ..Text.Write(" %REPOST% ")
+				do ..Text.Write(..#RepostDelimiter)
 				do ..Text.Write(items.GetAt(i)."text")
 			}
 		}
