@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="FBReader.Requests.APIMethodsCaller">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63524,62622.654516</TimeCreated>
+
+<Method name="Me">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&response:%String,accessToken:%String]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set parameters = ##class(%ArrayOfDataTypes).%New()
+	do parameters.SetAt(accessToken, "access_token")
+	set status = ##class(Util.Requests.RequestSender).SendHttpRequest("graph.facebook.com", "me", parameters,.response)
+	quit status
+]]></Implementation>
+</Method>
+</Class>
+</Export>

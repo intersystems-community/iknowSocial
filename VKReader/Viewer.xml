@@ -420,7 +420,7 @@ Ensure the main table is refreshed when opening the page a first time</Descripti
 <ZenMethod>1</ZenMethod>
 <Implementation><![CDATA[
 	set ..SelectedClearDomain = $select(..SelectedClearDomain = "true": 1, 1: 0)
-	if (##class(VKReader.Utils).IsInteger(..SelectedNumberOfSources)) {
+	if (##class(Util.Misc).IsInteger(..SelectedNumberOfSources)) {
 		if (..SelectedNumberOfSources > ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
 			set ..SelectedNumberOfSources = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
 		}

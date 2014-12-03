@@ -136,7 +136,7 @@ Given %Zen.proxyObject with corresponding fields, initializes the object.</Descr
 <Method name="HasValidIntegerFields">
 <Private>1</Private>
 <ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[	quit (##class(VKReader.Utils).IsInteger(..ID))
+<Implementation><![CDATA[	quit (##class(Util.Misc).IsInteger(..ID))
 ]]></Implementation>
 </Method>
 
@@ -165,8 +165,6 @@ provide notification that the current object is being validated.
 <IndexLocation>^VKReader.Data.GroupI</IndexLocation>
 <StreamLocation>^VKReader.Data.GroupS</StreamLocation>
 <Data name="GroupDefaultData">
-<Structure>listnode</Structure>
-<Subscript/>
 <Value name="1">
 <Value>%%CLASSNAME</Value>
 </Value>

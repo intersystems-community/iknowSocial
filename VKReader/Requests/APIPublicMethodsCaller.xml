@@ -6,6 +6,13 @@ This class is actually API wrapper (with some properties disabled) for VK API.</
 <Super>%RegisteredObject</Super>
 <TimeCreated>63470,45984.335131</TimeCreated>
 
+<Parameter name="APIVersion">
+<Description>
+ Holds API version for VK API. </Description>
+<Type>%String</Type>
+<Default>5.8</Default>
+</Parameter>
+
 <Parameter name="MaxEntityQueryCount">
 <Type>%Integer</Type>
 <Default>100</Default>
@@ -17,7 +24,8 @@ This class is actually API wrapper (with some properties disabled) for VK API.</
 <Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ##class(VKReader.Requests.RequestSender).SendHttpRequest(,"method/" _ method, parameters, .responseData)
+	do parameters.SetAt(..#APIVersion, "v")
+	set status = ##class(Util.Requests.RequestSender).SendHttpRequest(,"method/" _ method, parameters, .responseData)
 	quit:$$$ISERR(status) status
 	
 	set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
@@ -179,7 +187,7 @@ For more information see: <a href="http://vk.com/dev/wall.get">wall.get</a>]]></
 	}
 	set parameters = ##class(%ArrayOfDataTypes).%New()
 	if (ownerId '= "") {
-		set status = ##class(VKReader.Utils).IsInteger(ownerId)
+		set status = ##class(Util.Misc).IsInteger(ownerId)
 		if ($$$ISERR(status)) {
 			set status = $system.Status.Error(5001, "'ownerId' has non-integer value.")
 			quit status
@@ -194,7 +202,7 @@ For more information see: <a href="http://vk.com/dev/wall.get">wall.get</a>]]></
 	if ($length(filter) > 0) {
 		do parameters.SetAt(filter, "filter")
 	}
-	if (##class(VKReader.Utils).IsInteger(count) && (count > 0)) {
+	if (##class(Util.Misc).IsInteger(count) && (count > 0)) {
 		do parameters.SetAt(count, "count")
 	} else {
 		set status = $system.Status.Error(5001, "'count' value must be positive integer")
@@ -248,7 +256,7 @@ For more information see: <a href="http://vk.com/dev/wall.search">wall.search</a
 	}
 	set parameters = ##class(%ArrayOfDataTypes).%New()
 	if (ownerId '= "") {
-		set status = ##class(VKReader.Utils).IsInteger(ownerId)
+		set status = ##class(Util.Misc).IsInteger(ownerId)
 		if ($$$ISERR(status)) {
 			set status = $system.Status.Error(5001, "'ownerId' has non-integer value.")
 			quit status
@@ -268,7 +276,7 @@ For more information see: <a href="http://vk.com/dev/wall.search">wall.search</a
 		}
 		do parameters.SetAt(ownersOnly, "owners_only")
 	}
-	if (##class(VKReader.Utils).IsInteger(count) && (count > 0)) {
+	if (##class(Util.Misc).IsInteger(count) && (count > 0)) {
 		do parameters.SetAt(count, "count")
 	} else {
 		set status = $system.Status.Error(5001, "'count' value must be positive integer")
@@ -311,7 +319,7 @@ For more information see: <a href="http://vk.com/dev/newsfeed.search">newsfeed.s
 <Implementation><![CDATA[
 	set parameters = ##class(%ArrayOfDataTypes).%New()
 	do parameters.SetAt(query, "q")
-	if (##class(VKReader.Utils).IsInteger(count) && (count > 0)) {
+	if (##class(Util.Misc).IsInteger(count) && (count > 0)) {
 		do parameters.SetAt(count, "count")
 	} else {
 		set status = $system.Status.Error(5001, "'count' value must be positive integer")
@@ -334,16 +342,16 @@ For more information see: <a href="http://vk.com/dev/newsfeed.search">newsfeed.s
 		}
 	}
 	if (($length(startDate) > 0) && ($length(startTime) > 0)) {
-		if (##class(VKReader.Utils).IsValidDateAndTime(startDate, startTime)) {
-			do parameters.SetAt(##class(VKReader.Utils).ConvertHorologToUnixTime(startDate, startTime), "start_time")
+		if (##class(Util.Misc).IsValidDateAndTime(startDate, startTime)) {
+			do parameters.SetAt(##class(Util.Misc).ConvertHorologToUnixTime(startDate, startTime), "start_time")
 		} else {
 			set status = $system.Status.Error(5001, "Incorrect time value passed for <startDate, startTime>.")
 			quit status
 		}
 	}
 	if (($length(endDate) > 0) && ($length(endTime) > 0)) {
-		if (##class(VKReader.Utils).IsValidDateAndTime(endDate, endTime)) {
-			do parameters.SetAt(##class(VKReader.Utils).ConvertHorologToUnixTime(endDate, endTime), "end_time")
+		if (##class(Util.Misc).IsValidDateAndTime(endDate, endTime)) {
+			do parameters.SetAt(##class(Util.Misc).ConvertHorologToUnixTime(endDate, endTime), "end_time")
 		} else {
 			set status = $system.Status.Error(5001, "Incorrect time value passed for <endDate, endTime>.")
 			quit status

@@ -183,7 +183,7 @@ class then this oref will be the one returned to the caller of %New method.]]></
 		set ..LikesCount = oProxy."likes"."count"
 		set ..RepostsCount = oProxy."reposts"."count"
 		set ..CommentsCount = oProxy."comments"."count"
-		do ##class(VKReader.Utils).ConvertUnixTimeToHorolog(oProxy."date", .horologDate, .horologTime)
+		do ##class(Util.Misc).ConvertUnixTimeToHorolog(oProxy."date", .horologDate, .horologTime)
 		set ..Date = horologDate
 		set ..Time = horologTime
 	} 
@@ -196,8 +196,8 @@ class then this oref will be the one returned to the caller of %New method.]]></
 <Private>1</Private>
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[
-	quit (##class(VKReader.Utils).IsInteger(..ID) && ##class(VKReader.Utils).IsInteger(..OwnerID) && ##class(VKReader.Utils).IsInteger(..FromID)
-	&& ##class(VKReader.Utils).IsInteger(..CommentsCount) && ##class(VKReader.Utils).IsInteger(..LikesCount) && ##class(VKReader.Utils).IsInteger(..RepostsCount))
+	quit (##class(Util.Misc).IsInteger(..ID) && ##class(Util.Misc).IsInteger(..OwnerID) && ##class(Util.Misc).IsInteger(..FromID)
+	&& ##class(Util.Misc).IsInteger(..CommentsCount) && ##class(Util.Misc).IsInteger(..LikesCount) && ##class(Util.Misc).IsInteger(..RepostsCount))
 ]]></Implementation>
 </Method>
 

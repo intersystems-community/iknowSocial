@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="VKReader.TestCase">
+<Class name="Util.TestCase">
 <Super>%UnitTest.TestCase</Super>
-<TimeCreated>63477,54012.003294</TimeCreated>
+<TimeCreated>63524,63989.751319</TimeCreated>
 
 <Method name="Run">
 <ClassMethod>1</ClassMethod>
@@ -11,7 +11,7 @@
         set testSuite = "Requests"
         
         if '$data(^UnitTestRoot) {
-            set mainFolder = "c:\Tests\VKReader\" 
+            set mainFolder = "c:\Tests\iknowSocial\" 
             set st = ##class(%File).CreateDirectoryChain(mainFolder _ testSuite)
             if $$$ISOK(st) { 
             	set ^UnitTestRoot = mainFolder 

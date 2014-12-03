@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="Util.DomainEmotionColoringCounter">
+<Class name="Misc.DomainEmotionalColoringCounter">
 <Super>%RegisteredObject</Super>
-<TimeCreated>63519,54472.852505</TimeCreated>
+<TimeCreated>63524,66706.279868</TimeCreated>
 
 <Parameter name="DictionaryFilename">
 <Description>
@@ -24,7 +24,7 @@ Holds filename to search for emotion markers in directory Resources</Description
 	set current = ##class(%iKnow.Queries.MetadataAPI).GetValue(domainId, ..#EmotionalColoringField, externalId, .status)
 	quit:$$$ISERR(status) status
 	set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+current) + (+value))
-	do $system.Status.DisplayError(status)
+	//do $system.Status.DisplayError(status)
 	quit status
 ]]></Implementation>
 </Method>
@@ -37,6 +37,7 @@ Holds filename to search for emotion markers in directory Resources</Description
 	set similarList = ##class(%iKnow.Queries.EntityAPI).GetSimilarCounts(domainId, entity)
 	// Here we extract the number of similar concepts
 	set number = $list(similarList, 1)
+	//w number, !
 	if (number = 0) {
 		quit $$$OK
 	}
@@ -70,6 +71,7 @@ Holds filename to search for emotion markers in directory Resources</Description
 			quit:(p2 = "")
 			
 			set externalId = $list(result(k2), 2)
+			w externalId, !
 			set status = ..AddToNumericMetadataField(domainId, externalId, value)
 			if ($$$ISERR(status)) {
 				continue
@@ -120,7 +122,7 @@ User MUST clear initial values by himself</Description>
 		while ($listdata(words, j) '= 0) {
 			
 			set entityValue = $list(words, j)
-			
+			//w entityValue, weight, !
 			set status = ..ProcessOneEntity(entityValue, domainId, weight)
 			if ($$$ISERR(status)) {
 				continue

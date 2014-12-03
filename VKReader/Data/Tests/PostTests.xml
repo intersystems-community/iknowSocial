@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="VKReader.Data.Tests.PostTests">
-<Super>VKReader.TestCase</Super>
+<Super>Util.TestCase</Super>
 <TimeCreated>63482,64511.847516</TimeCreated>
 
 <Method name="OnBeforeAllTests">

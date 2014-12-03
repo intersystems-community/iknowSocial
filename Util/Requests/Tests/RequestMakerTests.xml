@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.Requests.Tests.RequestMakerTests">
+<Super>Util.TestCase</Super>
+<TimeCreated>63524,63894.700491</TimeCreated>
+
+<Method name="TestEmptyParametersList">
+<Implementation><![CDATA[
+	set a = ##class(%ArrayOfDataTypes).%New()
+	set request = ##class(Util.Requests.RequestMaker).RequestArrayToQueryString("users.get", a)
+	set result = "users.get"
+	do $$$AssertEquals(request, result, "In case of empty parameters' list method should quit without parameters.")
+]]></Implementation>
+</Method>
+
+<Method name="TestUsualBehavior">
+<Implementation><![CDATA[
+	set a = ##class(%ArrayOfDataTypes).%New()
+	
+	do a.SetAt("val1", "key1")
+	do a.SetAt("val2", "key2")
+	
+	set result = "users.get?" _ "key1=val1&key2=val2"
+	set request = ##class(Util.Requests.RequestMaker).RequestArrayToQueryString("users.get", a)
+	do $$$AssertEquals(request, result, "Testing usual behavior...")
+]]></Implementation>
+</Method>
+</Class>
+</Export>

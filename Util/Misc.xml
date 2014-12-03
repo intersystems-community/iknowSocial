@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="VKReader.Utils">
+<Class name="Util.Misc">
 <Abstract>1</Abstract>
-<TimeCreated>63477,49032.059763</TimeCreated>
+<TimeCreated>63524,64644.765551</TimeCreated>
 
 <Method name="ConvertVKDateToHorolog">
 <Description>
@@ -77,7 +77,7 @@ Checks whereas passed combination of 'date' and 'time' can actually represent so
 <ClassMethod>1</ClassMethod>
 <FormalSpec>date:%Date,time:%Time</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[	quit (##class(VKReader.Utils).IsInteger(date) && (date >= 0) && ##class(VKReader.Utils).IsInteger(time) && (time >= 0) && (time <= 86399))
+<Implementation><![CDATA[	quit (##class(Util.Misc).IsInteger(date) && (date >= 0) && ##class(VKReader.Utils).IsInteger(time) && (time >= 0) && (time <= 86399))
 ]]></Implementation>
 </Method>
 
@@ -87,7 +87,7 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ##class(VKReader.Requests.Tests.RequestMakerTests).Run()
+	set status = ##class(Util.Requests.Tests.RequestMakerTests).Run()
 	set status = $$$ADDSC(status, ##class(VKReader.Requests.Tests.APIPublicMethodsCallerTests).Run())
 	set status = $$$ADDSC(status, ##class(VKReader.Data.Tests.PostTests).Run())
 	set status = $$$ADDSC(status, ##class(VKReader.Data.Tests.UserTests).Run())

@@ -112,7 +112,7 @@ Given %Zen.proxyObject with corresponding fields, initializes the object.</Descr
 		}
 		set ..Sex = oProxy."sex"
 		if (oProxy."bdate" '= "") {
-			set ..DOB = ##class(VKReader.Utils).ConvertVKDateToHorolog(oProxy.bdate)
+			set ..DOB = ##class(Util.Misc).ConvertVKDateToHorolog(oProxy.bdate)
 		}
 		if (oProxy."city" '= "") {
 			set ..City = oProxy.city.title
@@ -135,8 +135,6 @@ Given %Zen.proxyObject with corresponding fields, initializes the object.</Descr
 <IndexLocation>^VKReader.Data.UserI</IndexLocation>
 <StreamLocation>^VKReader.Data.UserS</StreamLocation>
 <Data name="UserDefaultData">
-<Structure>listnode</Structure>
-<Subscript/>
 <Value name="1">
 <Value>%%CLASSNAME</Value>
 </Value>
@@ -173,7 +171,7 @@ Given %Zen.proxyObject with corresponding fields, initializes the object.</Descr
 <Method name="HasValidIntegerFields">
 <Private>1</Private>
 <ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[	quit (##class(VKReader.Utils).IsInteger(..ID))
+<Implementation><![CDATA[	quit (##class(Util.Misc).IsInteger(..ID))
 ]]></Implementation>
 </Method>
 

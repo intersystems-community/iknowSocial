@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="VKReader.Requests.RequestMaker">
+<Class name="Util.Requests.RequestMaker">
 <Description>
  This class provides ability to form http-requests</Description>
 <Super>%RegisteredObject</Super>
-<TimeCreated>63466,52744.38293</TimeCreated>
-
-<Parameter name="APIVersion">
-<Description>
- Holds API version for VK API. </Description>
-<Type>%String</Type>
-<Default>5.8</Default>
-</Parameter>
+<TimeCreated>63524,64324.698</TimeCreated>
 
 <Method name="RequestArrayToQueryString">
 <Description><![CDATA[
@@ -35,7 +28,6 @@
 <Implementation><![CDATA[
 	#dim parameterString as %String = ""
 	#dim k as %String = ""
-	do a.SetAt(..#APIVersion, "v")
 	set k = ""
 	while (1)
 	{
@@ -60,9 +52,9 @@
 			set parameterString = "?"
 		}
 		if (v = "") {
-			set parameterString = parameterString _ ##class(VKReader.Utils).UrlEncode(k)
+			set parameterString = parameterString _ ##class(Util.Misc).UrlEncode(k)
 		} else {
-			set parameterString = parameterString _ ##class(VKReader.Utils).UrlEncode(k) _ "=" _ ##class(VKReader.Utils).UrlEncode(v)
+			set parameterString = parameterString _ ##class(Util.Misc).UrlEncode(k) _ "=" _ ##class(Util.Misc).UrlEncode(v)
 		}
 	}
 ]]></Implementation>
