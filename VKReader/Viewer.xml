@@ -82,13 +82,16 @@ Subtitle, as derived by <method>RefreshTables</method>]]></Description>
 <hgroup width="100%" cellVAlign="middle">
 <label id="lblSubtitle" label="#(%page.Subtitle)#" width="80%"
 labelStyle="font-size: 20px;" />
-<spacer width="10" />
+<spacer width="30" />
 <image src="deepsee/ds2_bookmarks_44.png" enclosingStyle="padding-top:5px;"
   onclick ="zen('showArticle').show();"
    height="40" />
 <image src="deepsee/ds2_plus_44.png" enclosingStyle="padding-top:5px;"
   onclick ="zen('addMoreSources').show();"
    height="40" />
+ <image src="deepsee/ds2_palette_44.png" enclosingStyle="padding-top:5px;"
+  onclick ="zenPage.showEmotionalColoring()"
+   height="40"/>
 </hgroup>
 <spacer height="20" />
 <tablePane id="tblSources" caption="Articles" rowSelect="false" showRowSelector="false" nowrap="0"
@@ -407,7 +410,6 @@ Ensure the main table is refreshed when opening the page a first time</Descripti
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set context = ##class(VKReader.Data.Context).%New()
-	do context.CalculateEmotionalColoring()
 	set ..Domain = context.DomainID
 	
 	do ..RefreshTables()
@@ -447,6 +449,18 @@ Utility method: return information about the current source as a proxy object</D
 	set tObj.pubDate = ##class(%iKnow.Queries.MetadataAPI).GetValue(..Domain, "PubDate", tObj.externalId)
 	set tObj.Agency = ##class(%iKnow.Queries.MetadataAPI).GetValue(..Domain, "Agency", tObj.externalId)
 	quit tObj
+]]></Implementation>
+</Method>
+
+<Method name="CountEmotionalColoring">
+<Description>
+Provides the way to calculate emotional coloring.</Description>
+<ReturnType>%Status</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	set context = ##class(VKReader.Data.Context).%New()
+	set status = context.CalculateEmotionalColoring()
+	quit status
 ]]></Implementation>
 </Method>
 
@@ -574,6 +588,15 @@ Adds more posts on selected query.</Description>
 	var sc = zenPage.setProperty('SelectedNumberOfSources', zen('numPosts').getValue());
 	zenPage.endModal();
 	var sc = zenPage.LoadDataToDomain();
+	zenPage.refreshAll();
+]]></Implementation>
+</Method>
+
+<Method name="showEmotionalColoring">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	zenPage.CountEmotionalColoring();
 	zenPage.refreshAll();
 ]]></Implementation>
 </Method>

@@ -71,7 +71,7 @@ Holds filename to search for emotion markers in directory Resources</Description
 			quit:(p2 = "")
 			
 			set externalId = $list(result(k2), 2)
-			w externalId, !
+			//w externalId, !
 			set status = ..AddToNumericMetadataField(domainId, externalId, value)
 			if ($$$ISERR(status)) {
 				continue
