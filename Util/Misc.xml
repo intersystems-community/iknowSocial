@@ -4,6 +4,26 @@
 <Abstract>1</Abstract>
 <TimeCreated>63524,64644.765551</TimeCreated>
 
+<Method name="AddArrayToArray">
+<Description>
+Adds array A to array B</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>a:%ArrayOfDataTypes,b:%ArrayOfDataTypes</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set current = ""
+	set status = $$$OK
+	for {
+		set current = a.Next(current)
+		if (current = "") {
+			return $$$OK
+		}
+		set status =  $$$ADDSC(status, b.SetAt(a.GetAt(current), current))
+	}
+	quit status
+]]></Implementation>
+</Method>
+
 <Method name="ConvertVKDateToHorolog">
 <Description>
 Converts date in d[d].m[m].yyyy format to horolog.</Description>
