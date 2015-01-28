@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="scaffold.CSP" application="/csp/iknowsocial/" default="1"><![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+<title>Closure Builder</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<style>
+body {
+  padding-top: 70px;
+}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Emotional markers closure builder</a>
+    </div>
+  </div>
+</nav>
+<div class="container">
+  <div class="row">
+    <div class="col-md-4 col-md-offset-1">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search for...">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button">Go!</button>
+        </span>
+      </div>
+    </div>
+    <div class="col-md-4 col-md-offset-2">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search for...">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button">Go!</button>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <div class="col-md-4 col-md-offset-1">
+      <div class="panel panel-default">
+        <table class="table">
+            <caption>Approved emotional markers.</caption>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Entity</th>
+                <th>Weight</th>
+              </tr>
+            </thead>
+        </table>
+        <div  style="height:60vh;overflow-y:auto">
+          <table class="table">
+            <tbody>
+              <tr>
+                <th scope="row">1</th>
+                <td>Good</td>
+                <td>+1</td>
+              </tr>
+              <tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr>
+              <tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 col-md-offset-2">
+      <div class="panel panel-default">
+        <table class="table">
+            <caption>Proposed emotional markers.</caption>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Entity</th>
+                <th>Weight</th>
+              </tr>
+            </thead>
+        </table>
+        <div  style="height:60vh;overflow-y:auto">
+          <table class="table">
+            <tbody>
+              <tr>
+                <th scope="row">1</th>
+                <td>Good</td>
+                <td>+1</td>
+              </tr>
+              <tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr>
+              <tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr><tr>
+                <th scope="row">2</th>
+                <td>Bad</td>
+                <td>-1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 col-md-offset-1">
+      <div class="pull-right">
+        <button type="button" class="btn btn-default">Select All</button>
+        <button type="button" class="btn btn-primary" disabled="disabled">Propose Closure</button>
+      </div>
+    </div>
+    <div class="col-md-4 col-md-offset-2">
+      <div class="pull-right">
+        <button type="button" class="btn btn-default">Select All</button>
+        <button type="button" class="btn btn-primary" disabled="disabled">Approve</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+]]></CSP>
+</Export>

@@ -1,0 +1,5 @@
+<cspapp>/scaffold.CSP
+FBReader.PKG
+Misc.PKG
+Util.PKG
+VKReader.PKG
