@@ -79,8 +79,8 @@ body {
                 <td>-1</td>
               </tr><tr>
                 <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
+                <td>Good</td>
+                <td>+1</td>
               </tr><tr>
                 <th scope="row">2</th>
                 <td>Bad</td>
