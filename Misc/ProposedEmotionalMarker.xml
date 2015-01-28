@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Misc.ProposedEmotionalMarker">
+<Super>Misc.EmotionalMarker</Super>
+<TimeCreated>63580,46141.278124</TimeCreated>
+
+<Method name="Approve">
+<FormalSpec><![CDATA[&approved:Misc.ApprovedEmotionalMarker]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set entity = ..Entity
+	set weight = ..Weight
+	set status = ##class(Misc.ProposedEmotionalMarker).%DeleteId(..%Id())
+	quit $$$ADDSC(status, ##class(Misc.ProposedEmotionalMarker).DirectlyApprove(entity, weight, .approved))
+]]></Implementation>
+</Method>
+
+<Method name="DirectlyApproveMarker">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[entity:%String,weigth:%String,&approved:Misc.ApprovedEmotionalMarker]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set approved = ##class(Misc.ApprovedEmotionalMarker).%New(entity, weigth)
+	set status = approved.%Save()
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="ApproveMarkersFromFile">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>filename</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set stream = ##class(%Stream.FileCharacter).%New()
+	set sc = stream.LinkToFile(filename)
+	quit:$$$ISERR(sc) sc
+	
+	set status = $$$OK
+	
+	set i = 0
+	while 'stream.AtEnd {		
+		set line = stream.ReadLine()
+		
+		if ($extract(line, 1) = "!") {
+			continue
+		}
+		
+		set weight = $piece(line, "#", 1)
+		set i = i + 1
+		
+		set words = $listfromstring($piece(line, "#", 2), ",")
+		set j = 1
+		while ($listdata(words, j) '= 0) {
+			
+			set entity = $list(words, j)
+			//w entity, weight, !
+			set localStatus = ##class(Misc.ProposedEmotionalMarker).DirectlyApproveMarker(entity, weight)
+			if ($$$ISOK(localStatus)) {
+				w "Successfully proposed", !
+			}
+			set status = $$$ADDSC(status, localStatus)
+			set j = j + 1
+		}
+	}
+	
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="ApproveMarkersFromArray">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dictionary:%ArrayOfDataTypes</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set current = ""
+	set status = $$$OK
+	for {
+		set current = dictionary.Next(current)
+		if (current = "") {
+			return status
+		}
+		set status = $$$ADDSC(status, ##class(Misc.ProposedEmotionalMarker).DirectlyApproveMarker(current, dictionary.GetAt(current)))
+	}
+	quit status
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+</Storage>
+</Class>
+</Export>

@@ -16,7 +16,7 @@ Adds array A to array B</Description>
 	for {
 		set current = a.Next(current)
 		if (current = "") {
-			return $$$OK
+			return status
 		}
 		set status =  $$$ADDSC(status, b.SetAt(a.GetAt(current), current))
 	}
