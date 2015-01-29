@@ -6,11 +6,65 @@
 <head>
 <title>Closure Builder</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 <style>
 body {
-  padding-top: 70px;
+  	padding-top: 70px;
+}
+.highlighted-row {
+	background-color: #87B5DC;
 }
 </style>
+<script language="Javascript">
+$(document).ready(function() {
+	var leftTableRows = $("#left-table tr");
+	
+	var toggleLeftTableRow = function() {
+		$(this).toggleClass("highlighted-row");
+		$("#propose-closure").prop("disabled", leftTableRows.filter(".highlighted-row").length < 1);
+	};
+	
+	var toggleWholeLeftTable = function() {
+		leftTableRows.each(toggleLeftTableRow);
+	};
+	
+	$("#select-all-to-propose").click(toggleWholeLeftTable);
+	
+	leftTableRows.click(toggleLeftTableRow);
+	
+	$('#search-proposed').keyup(function() {
+		var text = $(this).val();
+		$('#left-table tr td:nth-child(2)').each(function() {
+			var elem = $(this);
+			if (elem.text().indexOf(text) > -1) {
+				elem.parent().css({
+					"display":"table-row"
+				});
+			} else {
+				elem.parent().css({
+					"display":"none"
+				});
+			}
+		});
+	});
+	
+	$("#propose-closure").click(function() {
+		var list = []
+		$("#left-table .highlighted-row").each(function() {
+			list.push($("th:nth-child(1)", this).text());
+		});
+		//temporarily hardcoded domainId
+		var domainId = 3;
+		var stringifiedList = list.join(",");
+		var stringifiedResponse = #server(Misc.EmotionalMarker.ProposeStringifiedJSONClosureForCSVOfMarkerIds(stringifiedList, domainId))#;
+		var response = JSON.parse(stringifiedResponse);
+		for (var key in response) {
+			$("#right-table tbody").append("<tr><td>-</td><td>" + key + "</td><td>" + response[key] + "</td></tr>")
+		}
+		toggleWholeLeftTable();
+	});
+});
+</script>
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -24,7 +78,7 @@ body {
   <div class="row">
     <div class="col-md-4 col-md-offset-1">
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search for...">
+        <input type="text" class="form-control" placeholder="Search for..." id="search-proposed">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button">Go!</button>
         </span>
@@ -32,7 +86,7 @@ body {
     </div>
     <div class="col-md-4 col-md-offset-2">
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search for...">
+        <input type="text" class="form-control" placeholder="Search for..." id="search-approved">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button">Go!</button>
         </span>
@@ -46,90 +100,28 @@ body {
             <caption>Approved emotional markers.</caption>
             <thead>
               <tr>
-                <th>#</th>
+                <th>Id</th>
                 <th>Entity</th>
                 <th>Weight</th>
               </tr>
             </thead>
         </table>
         <div  style="height:60vh;overflow-y:auto">
-          <table class="table">
+          <table class="table" id="left-table">
             <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Good</td>
-                <td>+1</td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Good</td>
-                <td>+1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr>
+              <script language="cache" runat="server">
+               	set query = "select distinct * from Misc.EmotionalMarker"
+				set statement = ##class(%SQL.Statement).%New()
+				set status = statement.%Prepare(query)
+				set result = statement.%Execute()
+				while result.%Next() {
+					w "<tr>", !
+					w "<th scope=""row"">" _ result.Id _ "</th>", !
+					w "<td>"_ result.Entity _"</td>", !
+					w "<td>"_ result.Weight _"</td>", !
+					w "</tr>", !
+				} 
+             </script>
             </tbody>
           </table>
         </div>
@@ -148,83 +140,9 @@ body {
             </thead>
         </table>
         <div  style="height:60vh;overflow-y:auto">
-          <table class="table">
+          <table class="table" id="right-table">
             <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Good</td>
-                <td>+1</td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr><tr>
-                <th scope="row">2</th>
-                <td>Bad</td>
-                <td>-1</td>
-              </tr>
+              
             </tbody>
           </table>
         </div>
@@ -234,14 +152,14 @@ body {
   <div class="row">
     <div class="col-md-4 col-md-offset-1">
       <div class="pull-right">
-        <button type="button" class="btn btn-default">Select All</button>
-        <button type="button" class="btn btn-primary" disabled="disabled">Propose Closure</button>
+        <button type="button" class="btn btn-default" id="select-all-to-propose">Select All</button>
+        <button type="button" class="btn btn-primary" id="propose-closure" disabled>Propose Closure</button>
       </div>
     </div>
     <div class="col-md-4 col-md-offset-2">
       <div class="pull-right">
         <button type="button" class="btn btn-default">Select All</button>
-        <button type="button" class="btn btn-primary" disabled="disabled">Approve</button>
+        <button type="button" class="btn btn-primary" disabled>Approve</button>
       </div>
     </div>
   </div>
