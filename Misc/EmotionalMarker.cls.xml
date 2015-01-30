@@ -87,9 +87,32 @@
 		if (current = "") {
 			return status
 		}
-		set status = $$$ADDSC(status, ##class(Misc.ProposedEmotionalMarker).DirectlyApproveMarker(current, dictionary.GetAt(current)))
+		set status = $$$ADDSC(status, ##class(Misc.EmotionalMarker).DirectlyApproveMarker(current, dictionary.GetAt(current)))
 	}
 	quit status
+]]></Implementation>
+</Method>
+
+<Method name="ApproveMarkersFromJSONAndReturnJSONWithIds">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>stringifiedDict:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(stringifiedDict, , .dict)
+	#dim dict as %ZEN.proxyObject
+	set current = ""
+	set result = ""
+	for {
+		set current = $o(dict.%data(current))
+		if (current = "") {
+			quit
+		}
+		kill marker
+		do ##class(Misc.EmotionalMarker).DirectlyApproveMarker(current, dict.%data(current), .marker)
+		set result = result _ ", """ _ current _ """: """ _ marker.%Id() _ """"
+	}
+	set result = "{" _ $extract(result, 2, $length(result)) _ "}"
+	quit result
 ]]></Implementation>
 </Method>
 

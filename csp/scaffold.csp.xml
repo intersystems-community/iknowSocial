@@ -17,38 +17,74 @@ body {
 </style>
 <script language="Javascript">
 $(document).ready(function() {
-	var leftTableRows = $("#left-table tr");
 	
-	var toggleLeftTableRow = function() {
-		$(this).toggleClass("highlighted-row");
-		$("#propose-closure").prop("disabled", leftTableRows.filter(".highlighted-row").length < 1);
+	var toggleTableRow = function(tableId, row) {
+		var tableRows = $(tableId + " tr");
+		row.toggleClass("highlighted-row");
+		$(tableId + "-main-button").prop("disabled", tableRows.filter(".highlighted-row").length < 1);
 	};
 	
-	var toggleWholeLeftTable = function() {
-		leftTableRows.each(toggleLeftTableRow);
-	};
+	var unhighlightTableRow = function(tableId, row) {
+		var tableRows = $(tableId + " tr");
+		row.removeClass("highlighted-row");
+		$(tableId + "-main-button").prop("disabled", tableRows.filter(".highlighted-row").length < 1);	
+	}
 	
-	$("#select-all-to-propose").click(toggleWholeLeftTable);
-	
-	leftTableRows.click(toggleLeftTableRow);
-	
-	$('#search-proposed').keyup(function() {
-		var text = $(this).val();
-		$('#left-table tr td:nth-child(2)').each(function() {
-			var elem = $(this);
-			if (elem.text().indexOf(text) > -1) {
-				elem.parent().css({
-					"display":"table-row"
-				});
-			} else {
-				elem.parent().css({
-					"display":"none"
-				});
-			}
+	var toggleWholeTable = function(tableId) {
+		var tableRows = $(tableId + " tr");
+		tableRows.each(function() {
+			toggleTableRow(tableId, $(this));
 		});
+	};
+	
+	var unhighlightWholeTable = function(tableId) {
+		var tableRows = $(tableId + " tr");
+		tableRows.each(function() {
+			unhighlightTableRow(tableId, $(this));
+		});
+	}
+	
+	var setTableToggling = function(tableId) {
+		console.log(tableId);
+		var tableRows = $(tableId + " tr");
+		tableRows.off("click");
+		tableRows.click(function() {
+			toggleTableRow(tableId, $(this));
+		});
+	};
+	
+	setTableToggling("#left-table");
+	
+	$("#select-all-to-propose").click(function() {
+		toggleWholeTable("#left-table")
 	});
 	
-	$("#propose-closure").click(function() {
+	$("#select-all-to-approve").click(function() {
+		toggleWholeTable("#right-table")
+	});
+	
+	var setSearch = function(tableId) {
+		$(tableId + '-search-pane').keyup(function() {
+			var text = $(this).val();
+			$(tableId + ' tr td:nth-child(2)').each(function() {
+				var elem = $(this);
+				if (elem.text().indexOf(text) > -1) {
+					elem.parent().css({
+						"display":"table-row"
+					});
+				} else {
+					elem.parent().css({
+						"display":"none"
+					});
+				}
+			});
+		});
+	}
+	
+	setSearch("#left-table");
+	setSearch("#right-table")
+	
+	$("#left-table-main-button").click(function() {
 		var list = []
 		$("#left-table .highlighted-row").each(function() {
 			list.push($("th:nth-child(1)", this).text());
@@ -59,9 +95,29 @@ $(document).ready(function() {
 		var stringifiedResponse = #server(Misc.EmotionalMarker.ProposeStringifiedJSONClosureForCSVOfMarkerIds(stringifiedList, domainId))#;
 		var response = JSON.parse(stringifiedResponse);
 		for (var key in response) {
-			$("#right-table tbody").append("<tr><td>-</td><td>" + key + "</td><td>" + response[key] + "</td></tr>")
+			$("#right-table tbody").append("<tr><th scope=\"row\">-</th><td>" + key + "</td><td>" + response[key] + "</td></tr>")
 		}
-		toggleWholeLeftTable();
+		unhighlightWholeTable("#left-table");
+		setTableToggling("#right-table");
+	});
+	
+	$("#right-table-main-button").click(function() {
+		var dict = {}
+		$("#right-table .highlighted-row").each(function() {
+			dict[$("td:nth-child(2)", this).text()] = $("td:nth-child(3)", this).text();
+		});
+		var stringifiedDict = JSON.stringify(dict);
+		var stringifiedJSON = #server(Misc.EmotionalMarker.ApproveMarkersFromJSONAndReturnJSONWithIds(stringifiedDict))#
+		dict = JSON.parse(stringifiedJSON)
+		$("#right-table .highlighted-row").prependTo("#left-table")
+		$("#left-table .highlighted-row").each(function() {
+			console.log(dict[$("td:nth-child(2)", this).text()]);
+			console.log($("th:nth-child(1)", this).text());
+			$("th:nth-child(1)", this).text(dict[$("td:nth-child(2)", this).text()]);
+		});
+		unhighlightWholeTable("#left-table")
+		$("#right-table-main-button").prop("disabled", true)
+		setTableToggling("#left-table")
 	});
 });
 </script>
@@ -78,7 +134,7 @@ $(document).ready(function() {
   <div class="row">
     <div class="col-md-4 col-md-offset-1">
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search for..." id="search-proposed">
+        <input type="text" class="form-control" placeholder="Search for..." id="left-table-search-pane">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button">Go!</button>
         </span>
@@ -86,7 +142,7 @@ $(document).ready(function() {
     </div>
     <div class="col-md-4 col-md-offset-2">
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search for..." id="search-approved">
+        <input type="text" class="form-control" placeholder="Search for..." id="right-table-search-pane">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button">Go!</button>
         </span>
@@ -153,13 +209,13 @@ $(document).ready(function() {
     <div class="col-md-4 col-md-offset-1">
       <div class="pull-right">
         <button type="button" class="btn btn-default" id="select-all-to-propose">Select All</button>
-        <button type="button" class="btn btn-primary" id="propose-closure" disabled>Propose Closure</button>
+        <button type="button" class="btn btn-primary" id="left-table-main-button" disabled>Propose Closure</button>
       </div>
     </div>
     <div class="col-md-4 col-md-offset-2">
       <div class="pull-right">
-        <button type="button" class="btn btn-default">Select All</button>
-        <button type="button" class="btn btn-primary" disabled>Approve</button>
+        <button type="button" class="btn btn-default" id="select-all-to-approve">Select All</button>
+        <button type="button" class="btn btn-primary" id="right-table-main-button"disabled>Approve</button>
       </div>
     </div>
   </div>
