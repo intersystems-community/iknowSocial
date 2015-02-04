@@ -7,6 +7,7 @@
 <title>Closure Builder</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 <style>
 body {
   	padding-top: 70px;
@@ -17,6 +18,12 @@ body {
 </style>
 <script language="Javascript">
 $(document).ready(function() {
+	
+	var getDomainId = function() {
+		var res = ($("#domain-chooser button").text()).split(" ");
+		console.log(res)
+		return res[0]
+	}
 	
 	var toggleTableRow = function(tableId, row) {
 		var tableRows = $(tableId + " tr");
@@ -53,16 +60,6 @@ $(document).ready(function() {
 		});
 	};
 	
-	setTableToggling("#left-table");
-	
-	$("#select-all-to-propose").click(function() {
-		toggleWholeTable("#left-table")
-	});
-	
-	$("#select-all-to-approve").click(function() {
-		toggleWholeTable("#right-table")
-	});
-	
 	var setSearch = function(tableId) {
 		$(tableId + '-search-pane').keyup(function() {
 			var text = $(this).val();
@@ -81,6 +78,21 @@ $(document).ready(function() {
 		});
 	}
 	
+	setTableToggling("#left-table");
+	
+	$("#select-all-to-propose").click(function() {
+		toggleWholeTable("#left-table")
+	});
+	
+	$("#select-all-to-approve").click(function() {
+		toggleWholeTable("#right-table")
+	});
+	
+	$("#domain-chooser li").click(function() {
+		$("#domain-chooser button").text($(this).text() + " ")
+		$("#domain-chooser button").append("<span class=\"caret\"></span>")
+	});
+	
 	setSearch("#left-table");
 	setSearch("#right-table")
 	
@@ -89,8 +101,7 @@ $(document).ready(function() {
 		$("#left-table .highlighted-row").each(function() {
 			list.push($("th:nth-child(1)", this).text());
 		});
-		//temporarily hardcoded domainId
-		var domainId = 3;
+		var domainId = getDomainId();
 		var stringifiedList = list.join(",");
 		var stringifiedResponse = #server(Misc.EmotionalMarker.ProposeStringifiedJSONClosureForCSVOfMarkerIds(stringifiedList, domainId))#;
 		var response = JSON.parse(stringifiedResponse);
@@ -127,6 +138,25 @@ $(document).ready(function() {
   <div class="container">
     <div class="navbar-header">
       <a class="navbar-brand" href="#">Emotional markers closure builder</a>
+    </div>
+    <div class="btn-group pull-right" id="domain-chooser">
+      <script language="cache" runat="server">
+       	set query = "select distinct * from %iKnow.""Domain"""
+		set statement = ##class(%SQL.Statement).%New()
+		set status = statement.%Prepare(query)
+		set result = statement.%Execute()
+		w "<button type=""button"" class=""btn btn-default navbar-btn dropdown-toggle"" data-toggle=""dropdown"" aria-expanded=""false"">"
+		do result.%Next()  
+		w result.Id _ " " _ result.Name _ " "
+		w "<span class=""caret""></span>"
+		w "</button>", !
+		w "<ul class=""dropdown-menu"" role=""menu"">", !
+		w "<li><a href=""#"">" _ result.Id _ " " _ result.Name _ "</a></li>", !
+		while result.%Next() {
+			w "<li><a href=""#"">" _ result.Id _ " " _ result.Name _ "</a></li>", !
+		} 
+		w "</ul>"
+     </script>
     </div>
   </div>
 </nav>
