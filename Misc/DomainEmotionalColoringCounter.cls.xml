@@ -4,19 +4,22 @@
 <Super>%RegisteredObject</Super>
 <TimeCreated>63524,66706.279868</TimeCreated>
 
-<Parameter name="DictionaryFilename">
-<Description>
-Holds filename to search for emotion markers in directory Resources</Description>
-<Type>%String</Type>
-<Default>emotions.txt</Default>
-</Parameter>
-
 <Parameter name="EmotionalColoringField">
 <Type>%String</Type>
 <Default>EmotionalColoring</Default>
 </Parameter>
 
-<Method name="AddToNumericMetadataField">
+<Method name="SetEmotionalColoringField">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%Integer,externalId:%String,value:%Numeric</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+value))
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="AddToEmotionalColoringField">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>domainId:%Integer,externalId:%String,value:%Numeric</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -72,7 +75,7 @@ Holds filename to search for emotion markers in directory Resources</Description
 			
 			set externalId = $list(result(k2), 2)
 			//w externalId, !
-			set status = ..AddToNumericMetadataField(domainId, externalId, value)
+			set status = ..AddToEmotionalColoringField(domainId, externalId, value)
 			if ($$$ISERR(status)) {
 				continue
 			}
@@ -86,9 +89,7 @@ Holds filename to search for emotion markers in directory Resources</Description
 ]]></Implementation>
 </Method>
 
-<Method name="CalcSourcesEmotionalColoring">
-<Description>
-User MUST clear initial values by himself</Description>
+<Method name="ClearSourcesEmotionalColoring">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>domName:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -98,41 +99,64 @@ User MUST clear initial values by himself</Description>
 	} else {
 		set status = $system.Status.Error(5001, "No such domain.")
 		quit status
-	}	
-		
-	// Hardcoded project-wise directory name
-	set filename = ##class(%File).NormalizeFilename(..#DictionaryFilename, "Resources")
-	set stream = ##class(%Stream.FileCharacter).%New()
-	set sc = stream.LinkToFile(filename)
-	quit:$$$ISERR(sc) sc
-	
-	set i = 0
-	while 'stream.AtEnd {		
-		set line = stream.ReadLine()
-		
-		if ($extract(line, 1) = "!") {
-			continue
-		}
-		
-		set weight = $piece(line, "#", 1)
-		set i = i + 1
-		
-		set words = $listfromstring($piece(line, "#", 2), ",")
-		set j = 1
-		while ($listdata(words, j) '= 0) {
-			
-			set entityValue = $list(words, j)
-			//w entityValue, weight, !
-			set status = ..ProcessOneEntity(entityValue, domainId, weight)
-			if ($$$ISERR(status)) {
-				continue
-			}
-			set j = j + 1
-		}
-					
 	}
+	set i = 1
+	set pageSize = 10
+	for {
+		kill result
+		set status = ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, domainId, i, pageSize)
+		if ($$$ISERR(status)) {
+			return status
+		}
+		if ($data(result) = 0) {
+			return $$$OK
+		}
+		set p = ""
+		for {
+			set p = $order(result(p))	
+			if (p '= "") {
+				set status = ..SetEmotionalColoringField(domainId, $list(result(p), 2), "0")
+				if ($$$ISERR(status)) {
+					return status
+				}
+			} else {
+				quit
+			}
+		}
+		set i = i + 1
+	}
+	return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CalcSourcesEmotionalColoring">
+<Description>
+User MUST clear initial values by himself</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domName:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ..ClearSourcesEmotionalColoring(domName)
+	quit:$$$ISERR(status) status
 	
-	quit $$$OK
+	if (##class(%iKnow.Domain).Exists(domName)) {
+		set domainId = ##class(%iKnow.Domain).GetOrCreateId(domName)
+	} else {
+		set status = $system.Status.Error(5001, "No such domain.")
+		quit status
+	}	
+	
+	set query = "select distinct * from Misc.EmotionalMarker"
+	set statement = ##class(%SQL.Statement).%New()
+	set status = statement.%Prepare(query)
+	quit:$$$ISERR(status) status
+	set result = statement.%Execute()
+	while result.%Next() {
+		set localStatus = ..ProcessOneEntity(result.Entity, domainId, result.Weight)
+		set status = $$$ADDSC(status, localStatus)
+	} 
+	
+	quit status
 ]]></Implementation>
 </Method>
 </Class>
