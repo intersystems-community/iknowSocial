@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.UI">
+<Abstract>1</Abstract>
+<TimeCreated>63593,15368.71016</TimeCreated>
+
+<Parameter name="TitleMaxLength">
+<Type>Integer</Type>
+<Default>40</Default>
+</Parameter>
+
+<Method name="PrintTableHeader">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>contents:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	quit "<th>" _ contents _ "</th>"
+]]></Implementation>
+</Method>
+
+<Method name="PrintTableData">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>contents:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	quit "<td>" _ contents _ "</td>"
+]]></Implementation>
+</Method>
+
+<Method name="PrintTableRow">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>contents:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set result = "<tr scope=""row"">"
+	set ptr = 0, i = 0
+    while $listnext(contents, ptr, value) {
+    	if (i = 0) {
+			set result = result _ ..PrintTableHeader(value)
+		} else {
+			set result = result _ ..PrintTableData(value)
+		}
+		set i = i + 1
+    }
+    set result = result _ "</tr>"
+    quit result
+]]></Implementation>
+</Method>
+
+<Method name="GetTitle">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%String,sourceId:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, domainId, sourceId, 1, 1)
+	set tTitle = $lg($g(tSentences(1)), 2)
+	if ($length(tTitle) > ..#TitleMaxLength) {
+		set tTitle = $extract(tTitle, 1, ..#TitleMaxLength) _ "..."
+	}
+	quit tTitle
+]]></Implementation>
+</Method>
+
+<Method name="GetDate">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%String,externalId:%String,seed:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set tDate = ##class(%iKnow.Queries.MetadataAPI).GetValue(domainId, seed, externalId)
+	if ($length(tDate) > 0) {
+		quit $zdate(tDate, 1)
+	}
+	quit ""
+]]></Implementation>
+</Method>
+
+<Method name="GetTime">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%String,externalId:%String,seed:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set tTime = ##class(%iKnow.Queries.MetadataAPI).GetValue(domainId, seed, externalId)
+	if ($length(tTime) > 0) {
+		quit $ztime(tTime, 1)
+	}
+	quit ""
+]]></Implementation>
+</Method>
+
+<Method name="GetSex">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%String,externalId:%String,seed:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set tSex = ##class(%iKnow.Queries.MetadataAPI).GetValue(domainId, seed, externalId)
+	if (tSex = "1") {
+		quit "F"
+	} elseif (tSex = "2") {
+		quit "M"
+	}
+	quit ""
+]]></Implementation>
+</Method>
+
+<Method name="GetLinkToProfile">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%String,externalId:%String,seed:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set tId = ##class(%iKnow.Queries.MetadataAPI).GetValue(domainId, seed, externalId)
+	
+	quit "<a href=""http://vk.com/" _ $select(tId < 0: "club", 1: "id") _ $select(tId < 0: -tId, 1: tId) _ """>" _ tId _ "</a>"
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// think out how to create exactly one Context
+
+]]></Content>
+</UDLText>
+
+<Method name="PrintTable">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set totalResult = ""
+	set context = ##class(VKReader.Data.Context).%New()
+    set i = 1
+	set pageSize = 100
+	for {
+		kill result
+		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, context.DomainID, i, pageSize)
+		if ($data(result) = 0) {
+			return totalResult
+		}
+		set p = ""
+		for {
+			set p = $order(result(p))	
+			if (p '= "") {
+				set tExternalId = $list(result(p), 2)
+				set tSourceId = ##class(%iKnow.Queries.SourceAPI).GetSourceId(context.DomainID, tExternalId)
+				set tTitle = ..GetTitle(context.DomainID, tSourceId)
+				set tDate = ..GetDate(context.DomainID, tExternalId, "PostDate")
+				set tTime = ..GetTime(context.DomainID, tExternalId, "PostTime")
+				set tCity = ##class(%iKnow.Queries.MetadataAPI).GetValue(context.DomainID, "AuthorCity", tExternalId)
+				set tCountry = ##class(%iKnow.Queries.MetadataAPI).GetValue(context.DomainID, "AuthorCountry", tExternalId)
+				set tDOB = ..GetDate(context.DomainID, tExternalId, "AuthorDOB")
+				set tSex = ..GetSex(context.DomainID, tExternalId, "AuthorSex")
+				set tLink = ..GetLinkToProfile(context.DomainID, tExternalId, "AuthorID")
+				set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(context.DomainID, ##class(Misc.DomainEmotionalColoringCounter).%GetParameter("EmotionalColoringField"), tExternalId)
+				
+				set tRow = $lb(tSourceId, tTitle, tDate, tTime, tCity, tCountry, tDOB, tSex, tLink, tEC)
+				set totalResult = totalResult _ ..PrintTableRow(tRow)
+			} else {
+				quit
+			}
+		}
+		set i = i + 1
+	}
+	quit totalResult
+]]></Implementation>
+</Method>
+</Class>
+</Export>

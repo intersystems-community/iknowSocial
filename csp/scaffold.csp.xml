@@ -6,16 +6,10 @@
 <head>
 <title>Closure Builder</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="custom.css">
 <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-<style>
-body {
-  	padding-top: 70px;
-}
-.highlighted-row {
-	background-color: #87B5DC;
-}
-</style>
+<script src="custom.js"></script>
 <script language="Javascript">
 $(document).ready(function() {
 	
@@ -23,59 +17,6 @@ $(document).ready(function() {
 		var res = ($("#domain-chooser button").text()).split(" ");
 		console.log(res)
 		return res[0]
-	}
-	
-	var toggleTableRow = function(tableId, row) {
-		var tableRows = $(tableId + " tr");
-		row.toggleClass("highlighted-row");
-		$(tableId + "-main-button").prop("disabled", tableRows.filter(".highlighted-row").length < 1);
-	};
-	
-	var unhighlightTableRow = function(tableId, row) {
-		var tableRows = $(tableId + " tr");
-		row.removeClass("highlighted-row");
-		$(tableId + "-main-button").prop("disabled", tableRows.filter(".highlighted-row").length < 1);	
-	}
-	
-	var toggleWholeTable = function(tableId) {
-		var tableRows = $(tableId + " tr");
-		tableRows.each(function() {
-			toggleTableRow(tableId, $(this));
-		});
-	};
-	
-	var unhighlightWholeTable = function(tableId) {
-		var tableRows = $(tableId + " tr");
-		tableRows.each(function() {
-			unhighlightTableRow(tableId, $(this));
-		});
-	}
-	
-	var setTableToggling = function(tableId) {
-		console.log(tableId);
-		var tableRows = $(tableId + " tr");
-		tableRows.off("click");
-		tableRows.click(function() {
-			toggleTableRow(tableId, $(this));
-		});
-	};
-	
-	var setSearch = function(tableId) {
-		$(tableId + '-search-pane').keyup(function() {
-			var text = $(this).val();
-			$(tableId + ' tr td:nth-child(2)').each(function() {
-				var elem = $(this);
-				if (elem.text().indexOf(text) > -1) {
-					elem.parent().css({
-						"display":"table-row"
-					});
-				} else {
-					elem.parent().css({
-						"display":"none"
-					});
-				}
-			});
-		});
 	}
 	
 	setTableToggling("#left-table");
@@ -192,7 +133,7 @@ $(document).ready(function() {
               </tr>
             </thead>
         </table>
-        <div  style="height:60vh;overflow-y:auto">
+        <div class="table-content small-content-wrapper">
           <table class="table" id="left-table">
             <tbody>
               <script language="cache" runat="server">
@@ -225,7 +166,7 @@ $(document).ready(function() {
               </tr>
             </thead>
         </table>
-        <div  style="height:60vh;overflow-y:auto">
+        <div class="table-content small-content-wrapper">
           <table class="table" id="right-table">
             <tbody>
               

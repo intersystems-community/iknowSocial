@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="custom.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+
+  function toggleTableRow(tableId, row) {
+    var tableRows = $(tableId + " tr");
+    row.toggleClass("highlighted-row");
+    $(tableId + "-main-button").prop("disabled", tableRows.filter(".highlighted-row").length < 1);
+  };
+
+  function unhighlightTableRow(tableId, row) {
+    var tableRows = $(tableId + " tr");
+    row.removeClass("highlighted-row");
+    $(tableId + "-main-button").prop("disabled", tableRows.filter(".highlighted-row").length < 1);
+  }
+
+  function toggleWholeTable(tableId) {
+    var tableRows = $(tableId + " tr");
+    tableRows.each(function() {
+      toggleTableRow(tableId, $(this));
+    });
+  };
+
+  function unhighlightWholeTable(tableId) {
+    var tableRows = $(tableId + " tr");
+    tableRows.each(function() {
+      unhighlightTableRow(tableId, $(this));
+    });
+  }
+
+  function setTableToggling(tableId) {
+    console.log(tableId);
+    var tableRows = $(tableId + " tr");
+    tableRows.off("click");
+    tableRows.click(function() {
+      toggleTableRow(tableId, $(this));
+    });
+  };
+
+  function setSearch(tableId) {
+    $(tableId + '-search-pane').keyup(function() {
+      var text = $(this).val();
+      $(tableId + ' tr td:nth-child(2)').each(function() {
+        var elem = $(this);
+        if (elem.text().indexOf(text) > -1) {
+          elem.parent().css({
+            "display":"table-row"
+          });
+        } else {
+          elem.parent().css({
+            "display":"none"
+          });
+        }
+      });
+    });
+  }
+]]></CSP>
+</Export>

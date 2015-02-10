@@ -1,4 +1,7 @@
+<cspapp>/custom.css
+<cspapp>/custom.js
 <cspapp>/scaffold.CSP
+<cspapp>/vkreader.CSP
 FBReader.PKG
 Misc.PKG
 Util.PKG

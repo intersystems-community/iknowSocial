@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="custom.css" application="/csp/iknowsocial/" default="1"><![CDATA[
+body {
+  	padding-top: 70px;
+}
+
+.highlighted-row {
+	background-color: #87B5DC;
+}
+
+.table-content {
+	overflow-y: auto;	
+}
+
+table {
+	table-layout: fixed;
+}
+
+.small-content-wrapper td:nth-child(3) {
+	text-align: center;
+}
+
+.big-content-wrapper td:nth-child(8), .big-content-wrapper td:nth-child(10) {
+	text-align: center;
+}
+
+.form-multiline .form-group {
+    margin-bottom: 15px;
+    margin-right: 30px;
+}
+.form-multiline label,
+.form-multiline .form-control {
+    margin-right: 15px;
+}
+
+.progress {
+	display: none;
+}
+
+.big-content-wrapper {
+	height: 73vh;
+}
+
+.small-content-wrapper {
+	height: 60vh;
+}
+
+
+
+
+
+]]></CSP>
+</Export>

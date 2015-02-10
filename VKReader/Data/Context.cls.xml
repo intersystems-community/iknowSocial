@@ -23,16 +23,6 @@
 <Default>VKAPIDomain</Default>
 </Parameter>
 
-<Method name="DebugTest">
-<ClassMethod>1</ClassMethod>
-<Implementation><![CDATA[
-	set context = ##class(VKReader.Data.Context).%New(1)
-	w context.Domain.GetParameter($$$IKPSTEMMING), !
-	set status = context.AddMorePosts("pizza", 100)
-	w context.Domain.GetParameter($$$IKPSTEMMING)
-]]></Implementation>
-</Method>
-
 <Method name="AddMetadataFieldIfNotExists">
 <FormalSpec>fieldName:%String</FormalSpec>
 <Private>1</Private>
@@ -100,6 +90,33 @@
 <Implementation><![CDATA[
 	set lister = ##class(VKReader.Lister).%New(..DomainID)
 	set status = lister.ProcessList(query, count, checkExists, startDate, startTime, endDate, endTime)
+	quit status
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// temp solution
+
+]]></Content>
+</UDLText>
+
+<Method name="AddMorePostsWithinContext">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set shouldClearDomain = $select(shouldClearDomain = "true": 1, 1: 0)
+	if (##class(Util.Misc).IsInteger(numberOfSources)) {
+		if (numberOfSources > ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
+			set numberOfSources = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
+		}
+		set context = ##class(VKReader.Data.Context).%New(shouldClearDomain)
+		set status = context.AddMorePosts(query, numberOfSources)
+	} else {
+		&js<console.log("Incorrect value for number of posts.")>
+		set status = $$$OK
+	}
 	quit status
 ]]></Implementation>
 </Method>

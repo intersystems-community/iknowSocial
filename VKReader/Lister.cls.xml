@@ -10,7 +10,7 @@ through a API request and store the set of items retrieved as separate Sources.<
 <ol>
     <li><b>query</b> As <class>%String</class> - The query to search through vk newsfeed. fe: "pizza"</li>
 	<li><b>count</b> As <class>%Integer</class> - The positive integer number of posts (from 1 to 100) to add.</li>
-	<li><b>checkExists</b> As <class>%Boolean</class> - Whether or not to check whether an post item already exists before attempting to store it (skipping if it exists),  default 1</li>
+	<li><b>checkExists</b> As <class>%Boolean</class> - Whether or not to check whether a post item already exists before attempting to store it (skipping if it exists),  default 1</li>
 	<li><b>startDate</b> As <class>%Date</class> - The starting date value to search posts from.</li>
 	<li><b>startTime</b> As <class>%Time</class> - The starting time value to search posts from.</li>
 	<li><b>endDate</b> As <class>%Date</class> - The ending date value to search posts to.</li>
