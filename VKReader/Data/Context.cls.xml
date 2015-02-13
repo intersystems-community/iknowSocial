@@ -106,7 +106,6 @@
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set shouldClearDomain = $select(shouldClearDomain = "true": 1, 1: 0)
 	if (##class(Util.Misc).IsInteger(numberOfSources)) {
 		if (numberOfSources > ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
 			set numberOfSources = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
