@@ -152,6 +152,7 @@ Runs all tests across the project.</Description>
 	if (##class(Security.SSLConfigs).Exists(SSLConfigurationName) = 0) {
 		set status = $$$ADDSC(status, ##class(Security.SSLConfigs).Create(SSLConfigurationName))
 	}
+	set context = ##class(VKReader.Data.Context).%New(1)
 	quit status
 ]]></Implementation>
 </Method>
