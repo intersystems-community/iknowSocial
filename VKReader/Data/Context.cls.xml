@@ -94,32 +94,6 @@
 ]]></Implementation>
 </Method>
 
-<UDLText name="T">
-<Content><![CDATA[
-// temp solution
-
-]]></Content>
-</UDLText>
-
-<Method name="AddMorePostsWithinContext">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	if (##class(Util.Misc).IsInteger(numberOfSources)) {
-		if (numberOfSources > ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
-			set numberOfSources = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
-		}
-		set context = ##class(VKReader.Data.Context).%New(shouldClearDomain)
-		set status = context.AddMorePosts(query, numberOfSources)
-	} else {
-		&js<console.log("Incorrect value for number of posts.")>
-		set status = $$$OK
-	}
-	quit status
-]]></Implementation>
-</Method>
-
 <Method name="CalculateEmotionalColoring">
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[

@@ -9,6 +9,14 @@
 <Default>40</Default>
 </Parameter>
 
+<Method name="PrintXMP">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>contents:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	quit "<xmp>" _ contents _ "</xmp>"
+]]></Implementation>
+</Method>
+
 <Method name="PrintTableHeader">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>contents:%String</FormalSpec>
@@ -118,9 +126,64 @@
 ]]></Content>
 </UDLText>
 
+<UDLText name="T">
+<Content><![CDATA[
+// temp solution
+
+]]></Content>
+</UDLText>
+
+<Method name="AddMorePostsWithinContext">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
+<Implementation><![CDATA[
+	if (##class(Util.Misc).IsInteger(numberOfSources)) {
+		if (numberOfSources > ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
+			set numberOfSources = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
+		}
+		set context = ##class(VKReader.Data.Context).%New(shouldClearDomain)
+		do context.AddMorePosts(query, numberOfSources)
+	} else {
+		&js<console.log("Incorrect value for number of posts.")>
+	}
+	do ..PrintTable()
+]]></Implementation>
+</Method>
+
+<Method name="ShowFullSourceById">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>sourceId:%String</FormalSpec>
+<Implementation><![CDATA[
+	set context = ##class(VKReader.Data.Context).%New()
+	do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, context.DomainID, sourceId, 0, 0)
+	
+	kill result
+	set result = "<p>"	
+	set i = ""
+	for {
+		set i = $order(tSentences(i), 1, tSentData)
+		
+		quit:(i = "")
+		set tResult = $li(tSentData, 2)
+		set result = result _ tResult _ " "
+	}
+	set result = result _ "</p>"
+	set result = ##class(%CSP.Page).QuoteJS(result)
+	
+	&js<
+		$("#show-source-id-modal .progress").hide(100);
+		$("#show-source-id-modal p").hide(400, function() {
+			$("#show-source-id-modal p").html(#(result)#);
+	    	$("#show-source-id-button").prop('disabled', false);
+			$("#show-source-id-modal p").show(400);
+		});
+		
+	>
+]]></Implementation>
+</Method>
+
 <Method name="PrintTable">
 <ClassMethod>1</ClassMethod>
-<ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	set totalResult = ""
 	set context = ##class(VKReader.Data.Context).%New()
@@ -130,7 +193,14 @@
 		kill result
 		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, context.DomainID, i, pageSize)
 		if ($data(result) = 0) {
-			return totalResult
+			set totalResult = ##class(%CSP.Page).QuoteJS(totalResult)
+			&js<
+				$("#main-table tbody").html(#(totalResult)#);
+				$("#add-sources-modal").modal('hide');
+	   			$("#add-sources-modal .progress").css("display", "none");
+	    		$("#add-sources-button").prop('disabled', false);
+	   		>
+			return
 		}
 		set p = ""
 		for {
@@ -148,7 +218,7 @@
 				set tLink = ..GetLinkToProfile(context.DomainID, tExternalId, "AuthorID")
 				set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(context.DomainID, ##class(Misc.DomainEmotionalColoringCounter).%GetParameter("EmotionalColoringField"), tExternalId)
 				
-				set tRow = $lb(tSourceId, tTitle, tDate, tTime, tCity, tCountry, tDOB, tSex, tLink, tEC)
+				set tRow = $lb(tSourceId, ##class(%CSP.Page).EscapeHTML(tTitle), tDate, tTime, tCity, tCountry, tDOB, tSex, tLink, tEC)
 				set totalResult = totalResult _ ..PrintTableRow(tRow)
 			} else {
 				quit
@@ -156,7 +226,6 @@
 		}
 		set i = i + 1
 	}
-	quit totalResult
 ]]></Implementation>
 </Method>
 </Class>
