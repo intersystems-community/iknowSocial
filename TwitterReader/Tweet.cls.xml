@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TwitterReader.Tweet">
+<Super>%Persistent</Super>
+<TimeCreated>62714,57306.19124</TimeCreated>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+	// Properties of a tweet:
+	// annotations
+	// contributors - (beta feature)
+	// coordinates
+	// created_at - date/time
+	// current_user_retweet
+	// entities - entities parsed out of the text
+	// favorited
+	// id
+	// id_str
+	// in_reply_to_screen_name
+	// in_reply_to_status_id - non-null if the tweet is a reply
+	// in_reply_to_status_id_str - non-null if the tweet is a reply
+	// in_reply_to_user_id
+	// in_reply_to_user_id_str 
+	// place
+	// possibly_sensitive
+	// scopes
+	// retweet_count
+	// retweeted
+	// source - how the tweet was posted, e.g. if posted using the Twitter website = "web"
+	// text - the tweet text, UTF-8
+	// truncated
+	// user
+	// withheld_copyright
+	// withheld_in_countries
+	// withheld_scope
+	//
+	// Probably relevant are:
+	// created_at - date/time
+	// id - to keep track of which tweets have been fetched (store highest id)
+	// in_reply_to_status_id_str - indicates whether the tweet is a reply
+	// place - geographical origin, with properties e.g. "country_code"
+	// source - may be useful
+	// text - obviously - does this need any conversion to Unicode?
+	// user - perhaps some aspects later, such as age if available
+*/
+]]></Content>
+</UDLText>
+
+<Property name="StatusId">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="CreatedAt">
+<Description>
+The date and the time of the post in the format: Wed Aug 27 13:08:45 +0000 2008</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="UserId">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="ScreenName">
+<Type>%String</Type>
+</Property>
+
+<Property name="InReplyToStatusId">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="InReplyToUserId">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="InReplyToScreenName">
+<Type>%String</Type>
+</Property>
+
+<Property name="RetweetCount">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Retweeted">
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="Source">
+<Type>%String</Type>
+</Property>
+
+<Property name="Truncated">
+<Type>%Boolean</Type>
+</Property>
+
+<UDLText name="T">
+<Content><![CDATA[
+/* In the tweet text, "\u00a0" represents a newline. Presumably the syntax "\uxxxx" represents a
+Unicode character of hex code xxxx. */
+]]></Content>
+</UDLText>
+
+<Property name="Text">
+<Type>%String</Type>
+</Property>
+
+<Property name="CreatedAtDateTime">
+<Type>%String</Type>
+<ReadOnly>1</ReadOnly>
+</Property>
+
+<Property name="CreatedAtExcelDateTime">
+<Type>%Double</Type>
+<ReadOnly>1</ReadOnly>
+</Property>
+
+<Property name="IsReply">
+<Type>%Boolean</Type>
+<Calculated>1</Calculated>
+<ReadOnly>1</ReadOnly>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>userId:%Integer="",screenName:%String="",oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	// Note: we can't pass in the object resulting from oProxy.%CopyToArray, as this throws an UNDEFINED
+	// exception. The result of %CopyToArray appears to be a multi-dimensional array with subscripts
+	// but no direct value, and can't be used as a parameter in a method call.
+	#dim status as %Status = $$$OK
+	set ..UserId = userId
+	set ..ScreenName = screenName
+	if (oProxy '= "")
+	{
+		#dim properties As %ListOfObjects
+		do oProxy.%CopyToArray(.properties)
+		if ($data(properties) = 10)
+		{
+			// TODO: use the "user" property to fetch the user ID and screen name
+			set ..StatusId = $get(properties("id"))
+			set ..CreatedAt = $get(properties("created_at"))
+			set ..InReplyToStatusId = $get(properties("in_reply_to_status_id"))
+			set ..InReplyToUserId = $get(properties("in_reply_to_user_id"))
+			set ..InReplyToScreenName = $get(properties("in_reply_to_screen_name"))
+			set ..RetweetCount = $get(properties("retweet_count"))
+			set ..Retweeted = ##class(Utils).ConvertToBool($get(properties("retweeted")))
+			set ..Source = $get(properties("source"))
+			set ..Text = $get(properties("text"))
+			set ..Truncated = ##class(Utils).ConvertToBool($get(properties("truncated")))
+		}
+	}
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="IsReplyGet">
+<Implementation><![CDATA[
+	// It is possible for a reply to have "in_reply_to_status_id" as null (very odd!), so we check the other
+	// "in reply to" properties as well. Note: even so, some replies have all these fields blank. The only solution
+	// then appears to be to check whether the text starts with "@", which suggests a reply.
+	quit (..InReplyToStatusId '= "") || (..InReplyToUserId '= "") || (..InReplyToScreenName '= "") || (($length(..Text) > 0) && ($extract(..Text, 1) = "@"))
+]]></Implementation>
+</Method>
+
+<Method name="CreatedAtSet">
+<FormalSpec>createdAt:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim status as %Status = $$$OK
+	set i%CreatedAt = createdAt
+	set i%CreatedAtDateTime = ..GetFromTwitterTime(createdAt)
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="CreatedAtExcelDateTimeGet">
+<ReturnType>%Double</ReturnType>
+<Implementation><![CDATA[
+	#dim createdAt as %String = ..CreatedAtDateTime	// get date and time in Cache internal format
+	quit ..ConvertDateTimeToExcel(createdAt)
+]]></Implementation>
+</Method>
+
+<Method name="ConvertDateTimeToExcel">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dateTime:%String</FormalSpec>
+<ReturnType>%Double</ReturnType>
+<Implementation><![CDATA[
+	#dim days as %Integer = +$piece(dateTime, ",", 1)
+	#dim seconds as %Double = +$piece(dateTime, ",", 2)
+	// Combine into one value that is the number of days plus a fractional part of the day, where day 1 = 01/01/1900.
+	// This matches Excel day numbering.
+	#dim excelDateOffset = 21548	// the difference between Excel and Cache date numbering
+	// Adjust the Cache day number by the difference between Cache day numbers and Excel day numbers, and add the fractional
+	// day from the time:
+	#dim excelDateTime as %Double = (days - excelDateOffset) + (seconds / (24 * 3600))
+	quit excelDateTime
+]]></Implementation>
+</Method>
+
+<Method name="GetFromTwitterTime">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>twitterTime:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	// Twitter created_at date/time of the form: Wed Aug 27 13:08:45 +0000 2008
+	#dim mmm as %String = $piece(twitterTime, " ", 2)
+	#dim d as %String = $piece(twitterTime, " ", 3)
+	#dim yyyy as %String = $piece(twitterTime, " ", 6)
+	#dim t as %String = $piece(twitterTime, " ", 4)
+	#dim tz as %String = $piece(twitterTime, " ", 5)
+	#dim dformat as %Integer = 6
+	#dim tformat as %Integer = 5
+	// $zdatetimeh string with date format 6 and time format 5:
+	#dim datetime as %String = mmm _ " " _ d _ " " _ yyyy _ "T" _ t _ tz
+	// Use the ODBC locale to ensure the time separator is ":" and the decimal point is ".":
+	#dim localeopt as %Boolean = 1
+	#dim h as %String = $zdatetimeh(datetime,dformat,tformat,,,,,,,,localeopt)
+	quit h
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Tests
+
+]]></Content>
+</UDLText>
+
+<Method name="TestGetFromTwitterTime">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	#dim twitterTime as %String = "Wed Aug 27 13:08:45 +0000 2008"
+	set h = ..GetFromTwitterTime(twitterTime)
+	write $zdatetime(h), ", ", $piece(h, ",", 1), ", ", $piece(h, ",", 2), !
+]]></Implementation>
+</Method>
+
+<Method name="TestConvertTwitterTimeToExcel">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	#dim twitterTime as %String = "Wed Aug 27 13:08:45 +0000 2008"
+	#dim dateTime as %String = ..GetFromTwitterTime(twitterTime)
+	#dim excelDateTime as %Double = ..ConvertDateTimeToExcel(dateTime)
+	write excelDateTime, !
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^TwitterReader.TweetD</DataLocation>
+<DefaultData>TweetDefaultData</DefaultData>
+<IdLocation>^TwitterReader.TweetD</IdLocation>
+<IndexLocation>^TwitterReader.TweetI</IndexLocation>
+<StreamLocation>^TwitterReader.TweetS</StreamLocation>
+<ExtentSize>100000</ExtentSize>
+<Data name="TweetDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>StatusId</Value>
+</Value>
+<Value name="3">
+<Value>CreatedAt</Value>
+</Value>
+<Value name="4">
+<Value>UserId</Value>
+</Value>
+<Value name="5">
+<Value>ScreenName</Value>
+</Value>
+<Value name="6">
+<Value>InReplyToStatusId</Value>
+</Value>
+<Value name="7">
+<Value>InReplyToUserId</Value>
+</Value>
+<Value name="8">
+<Value>InReplyToScreenName</Value>
+</Value>
+<Value name="9">
+<Value>RetweetCount</Value>
+</Value>
+<Value name="10">
+<Value>Retweeted</Value>
+</Value>
+<Value name="11">
+<Value>Source</Value>
+</Value>
+<Value name="12">
+<Value>Truncated</Value>
+</Value>
+<Value name="13">
+<Value>Text</Value>
+</Value>
+<Value name="14">
+<Value>CreatedAtDateTime</Value>
+</Value>
+<Value name="15">
+<Value>CreatedAtExcelDateTime</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
