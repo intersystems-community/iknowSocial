@@ -4,6 +4,7 @@
 <cspapp>/vkreader.CSP
 FBReader.PKG
 Misc.PKG
+Twitter.PKG
 TwitterReader.PKG
 Util.PKG
 VKReader.PKG
