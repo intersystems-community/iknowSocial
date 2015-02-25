@@ -141,17 +141,26 @@ Runs all tests across the project.</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="Install">
+<Method name="CreateSSLConfiguration">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	new $namespace
-	set SSLConfigurationName = ##class(VKReader.Requests.RequestSender).%GetParameter("SSLConfigurationName")
+	set SSLConfigurationName = ##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName")
 	set $namespace = "%SYS"
 	set status = $$$OK
 	if (##class(Security.SSLConfigs).Exists(SSLConfigurationName) = 0) {
 		set status = $$$ADDSC(status, ##class(Security.SSLConfigs).Create(SSLConfigurationName))
 	}
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="Install">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ..CreateSSLConfiguration()
 	set context = ##class(VKReader.Data.Context).%New(1)
 	quit status
 ]]></Implementation>
