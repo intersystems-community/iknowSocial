@@ -13,6 +13,10 @@ body {
 	overflow-y: auto;	
 }
 
+#main-table tr:hover {
+	background-color: #FAFAFA;
+}
+
 table {
 	table-layout: fixed;
 }

@@ -130,8 +130,6 @@
 </Method>
 
 <Method name="CalcSourcesEmotionalColoring">
-<Description>
-User MUST clear initial values by himself</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>domName:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>

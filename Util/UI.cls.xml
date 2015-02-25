@@ -119,6 +119,14 @@
 ]]></Implementation>
 </Method>
 
+<Method name="GetLinkedSourceId">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>contents:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	quit "<a class=""link-to-full-source"" data-toggle=""modal"" data-target=""#show-source-id-modal"">" _ contents _ "</a>"
+]]></Implementation>
+</Method>
+
 <UDLText name="T">
 <Content><![CDATA[
 // think out how to create exactly one Context
@@ -147,6 +155,11 @@
 		&js<console.log("Incorrect value for number of posts.")>
 	}
 	do ..PrintTable()
+	&js<
+		$("#add-sources-modal").modal('hide');
+	   	$("#add-sources-modal .progress").css("display", "none");
+	    $("#add-sources-button").prop('disabled', false);
+	>
 ]]></Implementation>
 </Method>
 
@@ -184,9 +197,18 @@
 
 <Method name="PrintTable">
 <ClassMethod>1</ClassMethod>
+<FormalSpec>shouldCountEC:%String=""</FormalSpec>
 <Implementation><![CDATA[
 	set totalResult = ""
 	set context = ##class(VKReader.Data.Context).%New()
+	
+	if ($length(shouldCountEC) > 0) {
+		
+	&js<
+		console.log("hi there");
+	>
+		do context.CalculateEmotionalColoring()
+	}
     set i = 1
 	set pageSize = 100
 	for {
@@ -196,9 +218,6 @@
 			set totalResult = ##class(%CSP.Page).QuoteJS(totalResult)
 			&js<
 				$("#main-table tbody").html(#(totalResult)#);
-				$("#add-sources-modal").modal('hide');
-	   			$("#add-sources-modal .progress").css("display", "none");
-	    		$("#add-sources-button").prop('disabled', false);
 	   		>
 			return
 		}
@@ -208,6 +227,7 @@
 			if (p '= "") {
 				set tExternalId = $list(result(p), 2)
 				set tSourceId = ##class(%iKnow.Queries.SourceAPI).GetSourceId(context.DomainID, tExternalId)
+				set tLinkedSourceId = ..GetLinkedSourceId(tSourceId)
 				set tTitle = ..GetTitle(context.DomainID, tSourceId)
 				set tDate = ..GetDate(context.DomainID, tExternalId, "PostDate")
 				set tTime = ..GetTime(context.DomainID, tExternalId, "PostTime")
@@ -218,7 +238,7 @@
 				set tLink = ..GetLinkToProfile(context.DomainID, tExternalId, "AuthorID")
 				set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(context.DomainID, ##class(Misc.DomainEmotionalColoringCounter).%GetParameter("EmotionalColoringField"), tExternalId)
 				
-				set tRow = $lb(tSourceId, ##class(%CSP.Page).EscapeHTML(tTitle), tDate, tTime, tCity, tCountry, tDOB, tSex, tLink, tEC)
+				set tRow = $lb(tLinkedSourceId, ##class(%CSP.Page).EscapeHTML(tTitle), tDate, tTime, tCity, tCountry, tDOB, tSex, tLink, tEC)
 				set totalResult = totalResult _ ..PrintTableRow(tRow)
 			} else {
 				quit
@@ -226,6 +246,18 @@
 		}
 		set i = i + 1
 	}
+]]></Implementation>
+</Method>
+
+<Method name="ShowEC">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	do ..PrintTable("1")
+	&js<
+		$(".ec-link").slideUp(400, function() {
+			$(this).html('<span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Calculate EC').fadeIn(400);
+		});
+	>
 ]]></Implementation>
 </Method>
 </Class>

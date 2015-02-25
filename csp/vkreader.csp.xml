@@ -9,18 +9,26 @@
   <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
   <script src="custom.js"></script>
-  <script language="Javascript">
+  <script language="JavaScript">
     $(document).ready(function() {
-      setSearch("#main-table");
+     	setSearch("#main-table");
+     	$(".ec-link").click(function() {
+	   		$(this).slideUp(400, function() {
+		    	$(this).html("Calculating...").fadeIn(200, function() {
+		    		showEC();
+		    	});
+	    	});
+    	});
     });
     
     function addSources() {
 	    var shouldClear = $("#should-clear").is(':checked')
 	    var query = $("#query-form").val()
 	    var count = $("#count-form").val()
+	    console.log([shouldClear, query, count]);
 	    $("#add-sources-modal .progress").show(400);
 	    $("#add-sources-button").prop('disabled', true);
-	    #call(Util.UI.AddMorePostsWithinContext(shouldClear, count, query))#
+	    #call(Util.UI.AddMorePostsWithinContext(shouldClear, count, query))# 
     }
     
     function showSourceId() {
@@ -29,6 +37,18 @@
 	    $("#show-source-id-button").prop('disabled', true);
 	    #call(Util.UI.ShowFullSourceById(sourceId))#
     }
+    
+    function showEC() {
+	    #call(Util.UI.ShowEC())#
+    }
+    
+    $(document).on("click", ".link-to-full-source", function () {
+     	var sourceId = $(this).text();
+     	$("#source-id-form").val(sourceId);
+     	showSourceId()
+	});
+	
+	
   </script>
 </head>
 <body>
@@ -41,7 +61,12 @@
         <ul class="nav navbar-nav navbar-right">
           <li data-toggle="modal" data-target="#add-sources-modal"><a href="#"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Sources</a></li>
           <li data-toggle="modal" data-target="#show-source-id-modal"><a href="#"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Show SourceId</a></li>
-          <li><a href="#"><span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Calculate EC</a></li>
+          <li>
+          	<a class="ec-link" href="#">
+          		<span class="glyphicon glyphicon-fire" aria-hidden="true"></span> 
+          		Calculate EC
+          	</a>
+          </li>
         </ul>
       </div>
     </div>
