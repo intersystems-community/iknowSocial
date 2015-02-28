@@ -44,13 +44,7 @@ $(document).ready(function() {
 		});
 		var domainId = getDomainId();
 		var stringifiedList = list.join(",");
-		var stringifiedResponse = #server(Misc.EmotionalMarker.ProposeStringifiedJSONClosureForCSVOfMarkerIds(stringifiedList, domainId))#;
-		var response = JSON.parse(stringifiedResponse);
-		for (var key in response) {
-			$("#right-table tbody").append("<tr><th scope=\"row\">-</th><td>" + key + "</td><td>" + response[key] + "</td></tr>")
-		}
-		unhighlightWholeTable("#left-table");
-		setTableToggling("#right-table");
+		#call(Util.UI.ProposeMarkers(stringifiedList, domainId))#
 	});
 	
 	$("#right-table-main-button").click(function() {
@@ -59,17 +53,7 @@ $(document).ready(function() {
 			dict[$("td:nth-child(2)", this).text()] = $("td:nth-child(3)", this).text();
 		});
 		var stringifiedDict = JSON.stringify(dict);
-		var stringifiedJSON = #server(Misc.EmotionalMarker.ApproveMarkersFromJSONAndReturnJSONWithIds(stringifiedDict))#
-		dict = JSON.parse(stringifiedJSON)
-		$("#right-table .highlighted-row").prependTo("#left-table")
-		$("#left-table .highlighted-row").each(function() {
-			console.log(dict[$("td:nth-child(2)", this).text()]);
-			console.log($("th:nth-child(1)", this).text());
-			$("th:nth-child(1)", this).text(dict[$("td:nth-child(2)", this).text()]);
-		});
-		unhighlightWholeTable("#left-table")
-		$("#right-table-main-button").prop("disabled", true)
-		setTableToggling("#left-table")
+		#call(Util.UI.ApproveMarkers(stringifiedDict))#
 	});
 });
 </script>
@@ -82,21 +66,7 @@ $(document).ready(function() {
     </div>
     <div class="btn-group pull-right" id="domain-chooser">
       <script language="cache" runat="server">
-       	set query = "select distinct * from %iKnow.""Domain"""
-		set statement = ##class(%SQL.Statement).%New()
-		set status = statement.%Prepare(query)
-		set result = statement.%Execute()
-		w "<button type=""button"" class=""btn btn-default navbar-btn dropdown-toggle"" data-toggle=""dropdown"" aria-expanded=""false"">"
-		do result.%Next()  
-		w result.Id _ " " _ result.Name _ " "
-		w "<span class=""caret""></span>"
-		w "</button>", !
-		w "<ul class=""dropdown-menu"" role=""menu"">", !
-		w "<li><a href=""#"">" _ result.Id _ " " _ result.Name _ "</a></li>", !
-		while result.%Next() {
-			w "<li><a href=""#"">" _ result.Id _ " " _ result.Name _ "</a></li>", !
-		} 
-		w "</ul>"
+       	do ##class(Util.UI).PrintDomainsDropdown()
      </script>
     </div>
   </div>
@@ -137,17 +107,7 @@ $(document).ready(function() {
           <table class="table" id="left-table">
             <tbody>
               <script language="cache" runat="server">
-               	set query = "select distinct * from Misc.EmotionalMarker"
-				set statement = ##class(%SQL.Statement).%New()
-				set status = statement.%Prepare(query)
-				set result = statement.%Execute()
-				while result.%Next() {
-					w "<tr>", !
-					w "<th scope=""row"">" _ result.Id _ "</th>", !
-					w "<td>"_ result.Entity _"</td>", !
-					w "<td>"_ result.Weight _"</td>", !
-					w "</tr>", !
-				} 
+               	do ##class(Util.UI).PrintEmotionalsMarkers() 
              </script>
             </tbody>
           </table>
