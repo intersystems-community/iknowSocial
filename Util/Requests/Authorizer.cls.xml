@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.Requests.Authorizer">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63615,48357.07077</TimeCreated>
+
+<Parameter name="ConsumerKey">
+<Type>%String</Type>
+<Default>8bgOxI4bW8DbgU3wEM3081MZ7</Default>
+</Parameter>
+
+<Parameter name="ConsumerSecret">
+<Type>%String</Type>
+<Default>eQQRbMm6B26cfWDBVfHQYN6P1VDfzBBr1QNlFhIcmVl0Rhth2Y</Default>
+</Parameter>
+
+<Parameter name="AccessToken">
+<Type>%String</Type>
+<Default>347842808-yYHGlhCrTn54THgwA3CHr2hCQHp84SWYEjFeWAJJ</Default>
+</Parameter>
+
+<Parameter name="AccessTokenSecret">
+<Type>%String</Type>
+<Default>OJUr5KF28uKinuy5FbFXIPUnZ1yJuBgpvDoh6QLQda5Oo</Default>
+</Parameter>
+
+<Parameter name="RandomStringSize">
+<Type>%Integer</Type>
+<Default>200</Default>
+</Parameter>
+
+<Parameter name="SignatureMethod">
+<Type>%String</Type>
+<Default>HMAC-SHA1</Default>
+</Parameter>
+
+<Parameter name="OauthVersion">
+<Type>%String</Type>
+<Default>1.0</Default>
+</Parameter>
+
+<Method name="IsAlphanumeric">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>asciiCode:%Integer</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+	if ((asciiCode >= $ascii("0")) && (asciiCode <= $ascii("9"))) {
+		quit 1
+	}
+	if ((asciiCode >= $ascii("A")) && (asciiCode <= $ascii("90"))) {
+		quit 1
+	}
+	if ((asciiCode >= $ascii("a")) && (asciiCode <= $ascii("z"))) {
+		quit 1
+	}
+	quit 0
+]]></Implementation>
+</Method>
+
+<Method name="GetNonce">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set untruncatedNonce = $system.Encryption.GenCryptRand(..#RandomStringSize)
+	set nonce = ""
+	for i = 1: 1 {
+		set asciiCode = $ascii(untruncatedNonce, i)
+		quit:(asciiCode = -1)
+		if (..IsAlphanumeric(asciiCode)) {
+			set nonce = nonce _ $char(asciiCode)
+		}
+	}
+	quit nonce
+]]></Implementation>
+</Method>
+</Class>
+</Export>

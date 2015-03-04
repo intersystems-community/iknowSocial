@@ -44,6 +44,7 @@
  Given parameter string (actually arbitrary string) appends parameter specified by key from k and value from v to parameter string.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec><![CDATA[&parameterString:%String,k:%String,v:%String=""]]></FormalSpec>
+<Private>1</Private>
 <Implementation><![CDATA[
 	if (k '= "") {
 		if ($length(parameterString) > 0) {
@@ -57,6 +58,47 @@
 			set parameterString = parameterString _ ##class(Util.Misc).UrlEncode(k) _ "=" _ ##class(Util.Misc).UrlEncode(v)
 		}
 	}
+]]></Implementation>
+</Method>
+
+<Method name="AppendHeaderParameter">
+<Description>
+Appends auth header parameter (encoding included) to provided string.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&headerString:%String,k:%String,v:%String=""]]></FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	if ($length(headerString) > 0) {
+		// Authorisation header parameters are separated by a comma and a space:
+		set headerString = headerString _ ", "
+	}
+	set k = ##class(Util.Misc).PercentEncode(k)
+	set v = ##class(Util.Misc).PercentEncode(v)
+	if (v = "") {
+		set headerString = headerString _ k
+	} else {
+		set headerString = headerString _ k _ "=""" _ v _ """"
+	}
+	quit headerString
+]]></Implementation>
+</Method>
+
+<Method name="BuildHeaderString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>parameters:%ArrayOfDataTypes</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	// Build the header string, of the form: a="b",c="d"
+	#dim dst as %String = ""
+	#dim k as %String = ""
+	set k = ""
+	while (1)
+	{
+		#dim v as %String = parameters.GetNext(.k)
+		quit:k=""
+		do ..AppendHeaderParameter(.dst, k, v)
+	}
+	quit dst
 ]]></Implementation>
 </Method>
 </Class>

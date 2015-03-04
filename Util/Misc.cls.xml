@@ -81,6 +81,19 @@ Performs url-escaping.</Description>
 ]]></Implementation>
 </Method>
 
+<Method name="PercentEncode">
+<Description>
+Performs percent-escaping.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>text:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set text = ..UrlEncode(text)
+	set text = $replace(text, "/", "%2F")
+	quit text
+]]></Implementation>
+</Method>
+
 <Method name="IsInteger">
 <Description>
 Checks whereas passed string represents an integer.</Description>
@@ -112,32 +125,6 @@ Runs all tests across the project.</Description>
 	set status = $$$ADDSC(status, ##class(VKReader.Data.Tests.PostTests).Run())
 	set status = $$$ADDSC(status, ##class(VKReader.Data.Tests.UserTests).Run())
 	quit status
-]]></Implementation>
-</Method>
-
-<Method name="TestFunc">
-<ClassMethod>1</ClassMethod>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set domId = ##class(%iKnow.Domain).GetOrCreateId("VKAPIDomain")
-	if ##class(%iKnow.Configuration).Exists("VKAPIConfiguration") {
-    	set cfg = ##class(%iKnow.Configuration).Open("VKAPIConfiguration") 
-    } else {
-		set cfg = ##class(%iKnow.Configuration).%New("VKAPIConfiguration", 1, $LB("ru"))
-        do cfg.%Save() 
-    }
-    //set dom = ##class(%iKnow.Domain).OpenId(domId)
-    //do dom.DropData()
-	set lister = ##class(VKReader.Lister).%New(domId)
-	do lister.SetConfig("VKAPIConfiguration")
-	//set loader = ##class(%iKnow.Source.Loader).%New(domId)
-	
-	set status = lister.ProcessList("pizza", 100, 1)
-	w "The lister status is ", $system.Status.DisplayError(status), !
-	//set status = loader.ProcessBatch()
-	//w "The loader status is ", $system.Status.DisplayError(status), !
-	do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, domId,,100)
-	zw result
 ]]></Implementation>
 </Method>
 
