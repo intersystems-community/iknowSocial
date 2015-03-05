@@ -4,23 +4,23 @@
 <Abstract>1</Abstract>
 <TimeCreated>63524,64644.765551</TimeCreated>
 
-<Method name="AddArrayToArray">
+<Method name="AppendArray">
 <Description>
 Adds array A to array B</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>a:%ArrayOfDataTypes,b:%ArrayOfDataTypes</FormalSpec>
-<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set current = ""
-	set status = $$$OK
-	for {
-		set current = a.Next(current)
-		if (current = "") {
-			return status
+	if (b '= "")
+	{
+		#dim k as %String = ""
+		set k = ""
+		while (1)
+		{
+			#dim v as %String = b.GetNext(.k)
+			quit:k=""
+			do a.SetAt(v, k)
 		}
-		set status =  $$$ADDSC(status, b.SetAt(a.GetAt(current), current))
 	}
-	quit status
 ]]></Implementation>
 </Method>
 
@@ -66,6 +66,19 @@ Given 'date' and 'time' in horolog format returns corresponding UNIX-time value.
 ]]></Implementation>
 </Method>
 
+<Method name="GetUnixTime">
+<Description>
+Returns time since Unix epoch</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+	quit:..#TestUnixTime ..#UnixTimeTest
+	#dim h as %String = $ztimestamp	// get UTC time
+	// Use $NORMALIZE to truncate the time to integer seconds:
+	quit ..ConvertTimeToUnix(+h, $normalize(+$piece(h, ",", 2), -1))
+]]></Implementation>
+</Method>
+
 <Method name="UrlEncode">
 <Description>
 Performs url-escaping.</Description>
@@ -77,18 +90,6 @@ Performs url-escaping.</Description>
 	set text = $zconvert(text, "O", "UTF8")
 	// Encode using URL encoding:
 	set text = $zconvert(text, "O", "URL")
-	quit text
-]]></Implementation>
-</Method>
-
-<Method name="PercentEncode">
-<Description>
-Performs percent-escaping.</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>text:%String</FormalSpec>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[
-	set text = ..UrlEncode(text)
 	set text = $replace(text, "/", "%2F")
 	quit text
 ]]></Implementation>

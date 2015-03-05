@@ -72,8 +72,8 @@ Appends auth header parameter (encoding included) to provided string.</Descripti
 		// Authorisation header parameters are separated by a comma and a space:
 		set headerString = headerString _ ", "
 	}
-	set k = ##class(Util.Misc).PercentEncode(k)
-	set v = ##class(Util.Misc).PercentEncode(v)
+	set k = ##class(Util.Misc).UrlEncode(k)
+	set v = ##class(Util.Misc).UrlEncode(v)
 	if (v = "") {
 		set headerString = headerString _ k
 	} else {
