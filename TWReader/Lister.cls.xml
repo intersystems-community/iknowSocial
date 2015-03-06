@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.Lister">
+<Description><![CDATA[
+<p>This is a very simple Lister implementation to retrieve Twitter posts' texts. The Lister will download posts
+through a API request and store the set of items retrieved as separate Sources.</p>
+
+<p><b>Lister Parameters</b> to be supplied to <method>AddListToBatch</method> and
+	<method>ProcessList</method> calls:</p>
+<ol>
+    <li><b>query</b> As <class>%String</class> - The query to search through vk newsfeed. fe: "pizza"</li>
+	<li><b>count</b> As <class>%Integer</class> - The positive integer number of posts (from 1 to 100) to add.</li>
+	<li><b>checkExists</b> As <class>%Boolean</class> - Whether or not to check whether a post item already exists before attempting to store it (skipping if it exists),  default 1</li>
+	<li><b>startDate</b> As <class>%Date</class> - The starting date value to search posts from.</li>
+	<li><b>startTime</b> As <class>%Time</class> - The starting time value to search posts from.</li>
+	<li><b>endDate</b> As <class>%Date</class> - The ending date value to search posts to.</li>
+	<li><b>endTime</b> As <class>%Time</class> - The ending time value to search posts to.</li>
+</ol>
+
+<p><b>External ID structure:</b> [GroupName]:::[LocalRef]</p>
+<ul>
+	<li>GroupName = query</li>
+	<li>LocalRef = OwnerID#FromID#PostID</li>
+</ul>
+
+<p><b>Extracted metadata:</b> these metadata fields will be populated with corresponding
+values for each post item, where present.</p>
+<ul>
+	<li>PostDate</li>
+	<li>PostTime</li>
+	<li>AuthorID</li>
+	<li>AuthorCity</li>
+	<li>AuthorCountry</li>
+	<li>AuthorDOB</li>
+	<li>AuthorSex</li>
+</ul>
+
+<p><b>Lister alias:</b> "TwitterAPI"</p>
+<p><b>Default Processor:</b> <class>%iKnow.Source.Temp.Processor</class></p>]]></Description>
+<Super>%iKnow.Source.Lister</Super>
+<TimeCreated>63492,10251.170023</TimeCreated>
+
+<Method name="ExpandList">
+<Description><![CDATA[
+<p>Fires an API request to retrieve the list of VKReader.Data.Post objects and then finds the Text items therein, 
+storing them locally through <method>StoreTemp</method> calls. If they exist in the domain, 
+this Lister will also retrieve and populate mentioned above metadata fields. In order to do this Lister will fire an API request again to retrieve all corresponding (to metafields) information.</p>
+<p>See also <method class="%iKnow.Source.Lister">ExpandList</method> in <class>%iKnow.Source.Lister</class>.</p>]]></Description>
+<FormalSpec>listparams:%List</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	
+	set query = $li(listparams, 1)
+	set count = $li(listparams, 2)
+	set checkExists = +$lg(listparams, 3, 1)
+	set startDate = $lg(listparams, 4)
+	set startTime = $lg(listparams, 5)
+	set endDate = $lg(listparams, 6)
+	set endTime = $lg(listparams, 7)
+	//set requestType = "popular" 
+	
+	
+	set responseData = ##class(TWReader.Requests.APIPublicMethodsCaller).%New().TweetsSearch(.responseData, listparams)
+	
+	do ..RegisterMetadataKeys($lb("PostDate", "PostTime", "AuthorID", "AuthorCity", "AuthorCountry", "AuthorDOB", "AuthorSex"))
+	
+	if (($length(responseData) > 0) && ($extract(responseData, 1) = "["))
+	{
+		set responseData = "{ ""tweets"":" _ responseData _ " }"
+	}
+	#dim responseTweets as %ZEN.proxyObject
+	#dim status as %Status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseTweets)
+	#dim props as %ListOfObjects
+	do responseTweets.%CopyToArray(.props)
+	#dim dataStatus = $data(props)
+	if (dataStatus = 10)
+	{
+		#dim x as %ListOfObjects
+		set dataStatus = $data(props("tweets"), x)	// get the tweets collection
+		set:dataStatus=0 dataStatus = $data(props("statuses"), x)	// get the tweets collection
+
+		#dim tweetCount as %Integer = x.Count()
+		for i=1:1:tweetCount
+		{
+			#dim xt as %ZEN.proxyObject = x.GetAt(i)
+			#dim tweet = ##class(TWReader.Data.Tweet).%New(xt)
+			
+			/*#dim coordinates as %Library.ListOfDataTypes = tweet.Coordinates.coordinates
+			write "coordinates="_coordinates ,!
+			write " Coordinates = "_tweet.Coordinates.coordinates_" User = "_tweet.User ,!*/
+			#dim user = ##class(TWReader.Data.User).%New(tweet.User)
+			
+			set tPostDate = $piece(tweet.CreatedAtDateTime,",",1)
+			set tPostTime = $piece(tweet.CreatedAtDateTime,",",2)
+			set tOwnerID = user.Id
+			set tFromID = tweet.Ids
+			set tID = tweet.Ids
+			#dim tTextStream as %GlobalCharacterStream
+			set tTextStream = tweet.Text
+			
+			set tAuthorCity = user.Location
+			set tAuthorCountry = user.WithheldInCountries
+			set tAuthorDOB = ""
+			set tAuthorSex = ""
+			//write "tPostDate = "_tPostDate_"tPostTime = "_tPostTime_"tFromID = "_tFromID_"tAuthorCity = "_tAuthorCity_"tAuthorCountry = "_tAuthorCountry ,!
+			
+			set tLocalRef = tOwnerID_"#"_tID
+			
+			set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
+			do tTextStream.Rewind()
+			if (tTextStream.Size = 0) {
+				continue
+			}
+			set len = 32000
+			while (len = 32000) {
+				do ..StoreTemp(tRef, tTextStream.Read(.len))
+			}
+			
+			do ..SetMetadataValues(tRef, $lb(tPostDate, tPostTime, tFromID, tAuthorCity, tAuthorCountry, tAuthorDOB, tAuthorSex))
+		}
+	}
+	
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetAlias">
+<Description><![CDATA[
+<p>Lister alias: "TWAPI"</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    Quit "TwitterAPI"
+]]></Implementation>
+</Method>
+
+<Method name="SplitFullRef">
+<Description><![CDATA[
+<p>Identifies the ":::" separator and takes whatever comes before as the group name and
+the second part as local reference.</p>
+<p>See also <method class="%iKnow.Source.Lister">SplitFullRef</method> in <class>%iKnow.Source.Lister</class>.</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%Integer,fullRef:%String,*groupName:%String,*localRef:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set delim = ":::"
+	set localRef = $piece(fullRef, delim, $l(fullRef, delim))
+	set groupName = $e(fullRef, 1, *-$l(localRef)-$l(delim))
+    Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="BuildFullRef">
+<Description><![CDATA[
+<p>Builds the full ref by appending the group name and local reference, adding a triple colon in between.</p>
+<p>See also <method class="%iKnow.Source.Lister">BuildFullRef</method> in <class>%iKnow.Source.Lister</class>.</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%Integer,groupName:%String,localRef:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    quit groupName_":::"_localRef
+]]></Implementation>
+</Method>
+
+<Method name="DefaultProcessor">
+<Description><![CDATA[
+<p>This Lister uses <class>%iKnow.Source.Temp.Processor</class>, as all VK API content here won't be saved
+to database, but will be saved locally through <method>StoreTemp</method> calls.</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    Quit "%iKnow.Source.Temp.Processor"
+]]></Implementation>
+</Method>
+</Class>
+</Export>

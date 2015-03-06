@@ -143,10 +143,11 @@ Runs all tests across the project.</Description>
 
 <Method name="CreateSSLConfiguration">
 <ClassMethod>1</ClassMethod>
+<FormalSpec>SSLConfigurationName</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	new $namespace
-	set SSLConfigurationName = ##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName")
+	//set SSLConfigurationName = ##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName")
 	set $namespace = "%SYS"
 	set status = $$$OK
 	if (##class(Security.SSLConfigs).Exists(SSLConfigurationName) = 0) {
@@ -160,8 +161,18 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ..CreateSSLConfiguration()
+	set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
 	set context = ##class(VKReader.Data.Context).%New(1)
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="InstallTwitter">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ..CreateSSLConfiguration(##class(TWReader.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
+	set context = ##class(TWReader.Data.Context).%New(1)
 	quit status
 ]]></Implementation>
 </Method>

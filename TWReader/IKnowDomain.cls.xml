@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.IKnowDomain">
+<Super>%iKnow.DomainDefinition</Super>
+<TimeCreated>63512,60388.0059</TimeCreated>
+
+<XData name="Domain">
+<XMLNamespace>http://www.intersystems.com/iknow</XMLNamespace>
+<Data><![CDATA[
+<domain name="TWReaderRus">
+<configuration name="TWReaderRus" languages="ru" stemming="DEFAULT" />
+<parameter name="$$$IKPSTEMMING" value="1" />
+
+<metadata>
+<field name="PostDate" dataType="STRING"/>
+<field name="PostTime" dataType="STRING"/>
+<field name="AuthorID" dataType="STRING"/>
+<field name="AuthorCity" dataType="STRING"/>
+<field name="AuthorCountry" dataType="STRING"/>
+<field name="AuthorDOB" dataType="STRING"/>
+<field name="AuthorSEX" dataType="STRING"/>
+</metadata>
+
+<data dropBeforeBuild="true">
+<list listerClass="TWReader.Lister" configuration="TWReaderRus" batchMode="true" >
+<parameter name="query" value="pizza" />
+<parameter name="count" value="30" />
+<parameter name="checkExists" value="1" />
+<parameter name="startDate" value="" />
+<parameter name="startTime" value="" />
+<parameter name="endDate" value="" />
+<parameter name="endTime" value="" />
+</list>
+</data>
+
+</domain>
+]]></Data>
+</XData>
+</Class>
+</Export>

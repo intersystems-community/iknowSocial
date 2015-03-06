@@ -1,10 +1,11 @@
 <cspapp>/custom.css
 <cspapp>/custom.js
 <cspapp>/scaffold.CSP
+<cspapp>/twreader.csp
 <cspapp>/vkreader.CSP
 FBReader.PKG
 Misc.PKG
-Twitter.PKG
+TWReader.PKG
 TwitterReader.PKG
 Util.PKG
 VKReader.PKG

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.Data.Tweet">
+<Super>%Persistent</Super>
+<TimeCreated>62714,57306.19124</TimeCreated>
+
+<Property name="Coordinates">
+<Type>%String</Type>
+</Property>
+
+<Property name="CreatedAt">
+<Type>%String</Type>
+</Property>
+
+<Property name="FavoriteCount">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Ids">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="IdStr">
+<Type>%String</Type>
+</Property>
+
+<Property name="InReplyToStatusId">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="InReplyToUserId">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="InReplyToScreenName">
+<Type>%String</Type>
+</Property>
+
+<Property name="Lang">
+<Type>%String</Type>
+</Property>
+
+<Property name="Place">
+<Type>%String</Type>
+</Property>
+
+<Property name="Retweeted">
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="RetweetCount">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Source">
+<Type>%String</Type>
+</Property>
+
+<Property name="Text">
+<Type>%GlobalCharacterStream</Type>
+</Property>
+
+<Property name="Truncated">
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="User">
+<Type>%String</Type>
+</Property>
+
+<Property name="CreatedAtDateTime">
+<Type>%String</Type>
+<ReadOnly>1</ReadOnly>
+</Property>
+
+<Property name="IsReply">
+<Type>%Boolean</Type>
+<Calculated>1</Calculated>
+<ReadOnly>1</ReadOnly>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim status as %Status = $$$OK
+	if (oProxy '= "")
+	{
+		#dim properties As %ListOfObjects
+		do oProxy.%CopyToArray(.properties)
+		if ($data(properties) = 10)
+		{
+			set ..Coordinates = $get(properties("coordinates"))
+			set ..CreatedAt = $get(properties("created_at"))
+			set ..FavoriteCount = $get(properties("favorite_count"))
+			set ..Ids = $get(properties("id"))
+			set ..IdStr = $get(properties("id_str"))
+			set ..InReplyToStatusId = $get(properties("in_reply_to_status_id"))
+			set ..InReplyToUserId = $get(properties("in_reply_to_user_id"))
+			set ..InReplyToScreenName = $get(properties("in_reply_to_screen_name"))
+			set ..Lang = $get(properties("lang"))
+			set ..Place= $get(properties("place"))
+			set ..Retweeted = ##class(Util.Misc).ConvertToBool($get(properties("retweeted")))
+			set ..RetweetCount= $get(properties("retweet_count"))
+			set ..Source = $get(properties("source"))
+			do ..Text.Write(properties("text"))
+			set ..Truncated = ##class(Util.Misc).ConvertToBool($get(properties("truncated")))
+			set ..User = $get(properties("user"))			
+		}
+	}
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="IsReplyGet">
+<Implementation><![CDATA[	quit (..InReplyToStatusId '= "") || (..InReplyToUserId '= "") || (..InReplyToScreenName '= "") || (($length(..Text) > 0) && ($extract(..Text, 1) = "@"))
+]]></Implementation>
+</Method>
+
+<Method name="CreatedAtSet">
+<FormalSpec>createdAt:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim status as %Status = $$$OK
+	set i%CreatedAt = createdAt
+	set i%CreatedAtDateTime = ..GetFromTwitterTime(createdAt)
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="GetFromTwitterTime">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>twitterTime:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	#dim mmm as %String = $piece(twitterTime, " ", 2)
+	#dim d as %String = $piece(twitterTime, " ", 3)
+	#dim yyyy as %String = $piece(twitterTime, " ", 6)
+	#dim t as %String = $piece(twitterTime, " ", 4)
+	#dim tz as %String = $piece(twitterTime, " ", 5)
+	#dim dformat as %Integer = 6
+	#dim tformat as %Integer = 5
+	#dim datetime as %String = mmm _ " " _ d _ " " _ yyyy _ "T" _ t _ tz
+	#dim localeopt as %Boolean = 1
+	#dim h as %String = $zdatetimeh(datetime,dformat,tformat,,,,,,,,localeopt)
+	quit h
+]]></Implementation>
+</Method>
+
+<Method name="TestGetFromTwitterTime">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	#dim twitterTime as %String = "Wed Aug 27 13:08:45 +0000 2008"
+	set h = ..GetFromTwitterTime(twitterTime)
+	write $zdatetime(h), ", ", $piece(h, ",", 1), ", ", $piece(h, ",", 2), !
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^TWReader.Data.TweetD</DataLocation>
+<DefaultData>TweetDefaultData</DefaultData>
+<IdLocation>^TWReader.Data.TweetD</IdLocation>
+<IndexLocation>^TWReader.Data.TweetI</IndexLocation>
+<StreamLocation>^TWReader.Data.TweetS</StreamLocation>
+<Data name="TweetDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Coordinates</Value>
+</Value>
+<Value name="3">
+<Value>CreatedAt</Value>
+</Value>
+<Value name="4">
+<Value>FavoriteCount</Value>
+</Value>
+<Value name="5">
+<Value>Ids</Value>
+</Value>
+<Value name="6">
+<Value>IdStr</Value>
+</Value>
+<Value name="7">
+<Value>InReplyToStatusId</Value>
+</Value>
+<Value name="8">
+<Value>InReplyToUserId</Value>
+</Value>
+<Value name="9">
+<Value>InReplyToScreenName</Value>
+</Value>
+<Value name="10">
+<Value>Lang</Value>
+</Value>
+<Value name="11">
+<Value>Place</Value>
+</Value>
+<Value name="12">
+<Value>Retweeted</Value>
+</Value>
+<Value name="13">
+<Value>RetweetCount</Value>
+</Value>
+<Value name="14">
+<Value>Source</Value>
+</Value>
+<Value name="15">
+<Value>Text</Value>
+</Value>
+<Value name="16">
+<Value>Truncated</Value>
+</Value>
+<Value name="17">
+<Value>User</Value>
+</Value>
+<Value name="18">
+<Value>CreatedAtDateTime</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
