@@ -129,7 +129,7 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 <p>Lister alias: "TWAPI"</p>]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[    Quit "TwitterAPI"
+<Implementation><![CDATA[    Quit "TWAPI"
 ]]></Implementation>
 </Method>
 

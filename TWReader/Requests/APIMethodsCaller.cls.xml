@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.Requests.APIMethodsCaller">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63619,75001.090612</TimeCreated>
+
+<Parameter name="BaseSSLURL">
+<Default>https://api.twitter.com</Default>
+</Parameter>
+
+<Parameter name="SslTlsConfig">
+<Default>Twitter</Default>
+</Parameter>
+
+<Parameter name="ApiServer">
+<Default>api.twitter.com</Default>
+</Parameter>
+
+<Parameter name="ApiUserTimelineUrl">
+<Default>1.1/statuses/user_timeline.json</Default>
+</Parameter>
+
+<Parameter name="ApiSearchUrl">
+<Default>1.1/search/tweets.json</Default>
+</Parameter>
+
+<Parameter name="ApiStatusUpdateUrl">
+<Default>1.1/statuses/update.json</Default>
+</Parameter>
+
+<Method name="ResponseJsonToTweets">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>responseData:%String,userId:%String="",screenName:%String=""</FormalSpec>
+<ReturnType>%ListOfObjects</ReturnType>
+<Implementation><![CDATA[
+	#dim tweets as %ListOfObjects = ##class(%ListOfObjects).%New()
+	// %ConvertJSONToObject can't handle JSON that is just an array, so wrap an array as an object with an array property:
+	if (($length(responseData) > 0) && ($extract(responseData, 1) = "["))
+	{
+		set responseData = "{ ""tweets"":" _ responseData _ " }"
+	}
+	#dim responseTweets as %ZEN.proxyObject
+	#dim status as %Status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseTweets)
+	//write "JSON status: ",$system.Status.DisplayError(status),!
+	//write $classname(responseTweets), !
+	#dim props as %ListOfObjects
+	do responseTweets.%CopyToArray(.props)
+	#dim dataStatus = $data(props)
+	if (dataStatus = 10)
+	{
+		//write "props(tweets) is defined: ",$data(props("tweets")),", props(tweets) is null: ",props("tweets")="",!
+		#dim x as %ListOfObjects
+		set dataStatus = $data(props("tweets"), x)	// get the tweets collection
+		set:dataStatus=0 dataStatus = $data(props("statuses"), x)	// get the tweets collection
+
+		#dim tweetCount as %Integer = x.Count()
+		for i=1:1:tweetCount
+		{
+			//#dim xt as %ZEN.proxyObject = x.GetNext(.key)
+			//quit:key=""
+			#dim xt as %ZEN.proxyObject = x.GetAt(i)
+			//write "Key: ", key, !
+			// Note: we can't pass in the object resulting from xt.%CopyToArray, as this throws an UNDEFINED
+			// exception. The result of %CopyToArray appears to be a multi-dimensional array with subscripts
+			// but no direct value.
+			#dim tweet as Tweet = ##class(TwitterReader.Tweet).%New(userId, screenName, xt)
+			do tweets.Insert(tweet)
+		}
+	}
+	quit tweets
+]]></Implementation>
+</Method>
+
+<Method name="Search">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>queryString:%String,resultType:%String="recent",sinceId:%Integer="",until:%Date="",count:%Integer=15,maxId:%Integer=""</FormalSpec>
+<ReturnType>%ListOfObjects</ReturnType>
+<Implementation><![CDATA[
+	// See
+	// https://dev.twitter.com/docs/using-search
+	// for information on constructing the query string
+	
+	#dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
+	#dim location as %String = ..#ApiSearchUrl
+	#dim url = "https://" _ ..#ApiServer _ "/" _ location
+	do a.SetAt(queryString, "q")
+	do a.SetAt(resultType, "result_type")
+	if (sinceId '= "") {
+		do a.SetAt(sinceId, "since_id")
+	}
+	if (until '= "") {
+		do a.SetAt(##class(Util.Misc).DateToString(until), "until")	// date in format YYYY-MM-DD
+	}
+	if (maxId '= "") {
+		do a.SetAt(maxId, "max_id")
+	}
+	if (count = "") {
+		set count = "15"
+	}
+	do a.SetAt(count, "count")	// if count omitted, Twitter defaults to 15
+	#dim queryUrl = ##class(Util.Requests.RequestMaker).RequestArrayToQueryString(url, a)
+	
+	w "queryUrl =" _ queryUrl, !
+	
+	#dim authQuery as %String
+	#dim authHeader as %String = ##class(Util.Requests.Authorizer).GetAuthHeader("get", url)
+	
+	//s authHeader = "Authorization: "_authHeader
+	w "authHeader =" _ authHeader, !
+
+	#dim responseData as %String
+	#dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, location, a, .responseData, 2, authHeader)
+	
+	#dim tweets as %ListOfObjects = ..ResponseJsonToTweets(responseData)
+	quit tweets
+]]></Implementation>
+</Method>
+</Class>
+</Export>
