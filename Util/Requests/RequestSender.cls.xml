@@ -25,7 +25,7 @@ Holds name of SSL configuration to use with https-request (set it to the one fro
 <Description>
 Sends 'GET https://server/location?parametersString' request. Response is saved into responseText.</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[server:%String="api.vk.com",location:%String,parameters:%ArrayOfDataTypes,&responseText:%String(MAXLEN=1000000),requestType:%Integer=""]]></FormalSpec>
+<FormalSpec><![CDATA[server:%String="api.vk.com",location:%String,parameters:%ArrayOfDataTypes,&responseText:%String(MAXLEN=1000000),requestType:%Integer="",authorization:%String]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if (requestType = "") {
@@ -35,6 +35,10 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
 	set req.Server = server
 	set req.Https = 1
 	set req.SSLConfiguration = ..#SSLConfigurationName
+	if (authorization '= "")
+	{
+		set req.Authorization = authorization
+	}
 	
 	#dim k as %String = ""
 	#dim v as %String = ""
@@ -44,7 +48,11 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
 		write "Server: ", req.Server, ", Location: ", req.Location, !
 	}
 	#dim status as %Status = $$$OK
+	w req.EntityBody.Read(), !
 	set status = req.Get(##class(Util.Requests.RequestMaker).RequestArrayToQueryString(location, parameters), requestType # 3)
+	
+	w req.Authorization
+	w !
 	
 	if ($$$ISOK(status)) {
 		#dim response as %String = ""
