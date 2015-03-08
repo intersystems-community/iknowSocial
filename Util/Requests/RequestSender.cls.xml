@@ -48,7 +48,11 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
 		write "Server: ", req.Server, ", Location: ", req.Location, !
 	}
 	#dim status as %Status = $$$OK
+	w req.EntityBody.Read(), !
 	set status = req.Get(##class(Util.Requests.RequestMaker).RequestArrayToQueryString(location, parameters), requestType # 3)
+	
+	w req.Authorization
+	w !
 	
 	if ($$$ISOK(status)) {
 		#dim response as %String = ""

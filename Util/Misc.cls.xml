@@ -75,7 +75,7 @@ Returns time since Unix epoch</Description>
 	quit:..#TestUnixTime ..#UnixTimeTest
 	#dim h as %String = $ztimestamp	// get UTC time
 	// Use $NORMALIZE to truncate the time to integer seconds:
-	quit ..ConvertTimeToUnix(+h, $normalize(+$piece(h, ",", 2), -1))
+	quit ..ConvertHorologToUnixTime(+h, $normalize(+$piece(h, ",", 2), -1))
 ]]></Implementation>
 </Method>
 
@@ -112,6 +112,17 @@ Checks whereas passed combination of 'date' and 'time' can actually represent so
 <FormalSpec>date:%Date,time:%Time</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[	quit (##class(Util.Misc).IsInteger(date) && (date >= 0) && ##class(VKReader.Utils).IsInteger(time) && (time >= 0) && (time <= 86399))
+]]></Implementation>
+</Method>
+
+<Method name="DateToString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>d:%Date</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	#dim dateText as %String = ""
+	set:d'="" dateText = $zdate(d, 3)	// date in the format: YYYY-MM-DD
+	quit dateText
 ]]></Implementation>
 </Method>
 

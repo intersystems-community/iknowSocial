@@ -88,6 +88,9 @@
 	set result = $zconvert(HTTPMethod, "U") _ "&"
 	set result = result _ ##class(Util.Misc).UrlEncode(url) _ "&"
 	set parameterString = ##class(Util.Requests.RequestMaker).ArrayToEncodedParameterString(parameters)
+	if (parameterString '= "") {
+		set parameterString = $extract(parameterString, 2, $length(parameterString))
+	}
 	set parameterString = ##class(Util.Misc).UrlEncode(parameterString)
 	set result = result _ parameterString
 	quit result
@@ -133,12 +136,11 @@
 
 <Method name="GetAuthHeader">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>HTTPMethod:%String,url:%String,parameters:%ArrayOfDataTypes</FormalSpec>
+<FormalSpec>HTTPMethod:%String,url:%String</FormalSpec>
 <Implementation><![CDATA[
 	set h = ..GetOauthParameters()
-	do ##class(Util.Misc).AppendArray(h, parameters)
 	do h.SetAt(..GetSignature(HTTPMethod, url, h), "oauth_signature")
-	set header = ..#HeaderPrefix _ ##class(Util.Requests.RequestMaker).BuildHeaderString(h)
+	set header = ..#HeaderPrefix _ " " _ ##class(Util.Requests.RequestMaker).BuildHeaderString(h)
 	quit header
 ]]></Implementation>
 </Method>
