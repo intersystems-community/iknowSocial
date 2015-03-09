@@ -146,8 +146,8 @@
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
 <Implementation><![CDATA[
 	if (##class(Util.Misc).IsInteger(numberOfSources)) {
-		if (numberOfSources > ##class(TWReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
-			set numberOfSources = ##class(TWReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
+		if (numberOfSources > ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
+			set numberOfSources = ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")
 		}
 		set context = ##class(TWReader.Data.Context).%New(shouldClearDomain)
 		do context.AddMorePosts(query, numberOfSources)

@@ -4,9 +4,19 @@
 <Abstract>1</Abstract>
 <TimeCreated>63524,64644.765551</TimeCreated>
 
+<Parameter name="True">
+<Type>%String</Type>
+<Default>true</Default>
+</Parameter>
+
+<Parameter name="False">
+<Type>%String</Type>
+<Default>false</Default>
+</Parameter>
+
 <Method name="AppendArray">
 <Description>
-Adds array A to array B</Description>
+Adds array b to array a</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>a:%ArrayOfDataTypes,b:%ArrayOfDataTypes</FormalSpec>
 <Implementation><![CDATA[
@@ -42,6 +52,14 @@ Converts date in d[d].m[m].yyyy format to horolog.</Description>
 		set date = $zdateh($replace(VKDate, ".", "/"), 4)
 	}
 	quit date
+]]></Implementation>
+</Method>
+
+<Method name="ConvertToBool">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>text:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[	quit $data(text) && ($zconvert(text, "l") = ..#True)
 ]]></Implementation>
 </Method>
 
