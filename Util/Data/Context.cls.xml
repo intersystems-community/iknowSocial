@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.Data.Context">
+<IncludeCode>%IKPublic</IncludeCode>
+<Super>%RegisteredObject</Super>
+<TimeCreated>63619,65391.504269</TimeCreated>
+
+<Property name="DomainID">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Domain">
+<Type>%iKnow.Domain</Type>
+</Property>
+
+<Parameter name="ConfigurationName">
+<Type>%String</Type>
+<Default>iKnowSocialConfiguration</Default>
+</Parameter>
+
+<Parameter name="DomainName">
+<Type>%String</Type>
+<Default>iKnowSocialDomain</Default>
+</Parameter>
+
+<Method name="AddMetadataFieldIfNotExists">
+<FormalSpec>fieldName:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if (##class(%iKnow.Queries.MetadataAPI).GetFieldId(..DomainID, fieldName) = "") {
+		do ##class(%iKnow.Queries.MetadataAPI).AddField(..DomainID, fieldName, $$$MDALLOPERATORS)
+	}
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="Set">
+<FormalSpec>clearDomain:%Boolean=0</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ..DomainID = ##class(%iKnow.Domain).GetOrCreateId(..#DomainName)
+	set ..Domain = ##class(%iKnow.Domain).OpenId(..DomainID)
+	
+	set status = $$$OK
+	if (clearDomain = 1) {
+		set status = ..ClearDomain()
+		quit:$$$ISERR(status) status
+	}
+	
+	do ..AddMetadataFieldIfNotExists("PostDate")
+	do ..AddMetadataFieldIfNotExists("PostTime")
+	do ..AddMetadataFieldIfNotExists("AuthorID")
+	do ..AddMetadataFieldIfNotExists("AuthorCity")
+	do ..AddMetadataFieldIfNotExists("AuthorCountry")
+	do ..AddMetadataFieldIfNotExists("AuthorDOB")
+	do ..AddMetadataFieldIfNotExists("AuthorSex")
+	do ..AddMetadataFieldIfNotExists(##class(Misc.DomainEmotionalColoringCounter).%GetParameter("EmotionalColoringField"))
+		
+	#dim cfg as %iKnow.Configuration
+	if ##class(%iKnow.Configuration).Exists(..#ConfigurationName) {
+    	set cfg = ##class(%iKnow.Configuration).Open(..#ConfigurationName) 
+    }else {
+		set cfg = ##class(%iKnow.Configuration).%New(..#ConfigurationName, 1, $LB("ru"))
+        do cfg.%Save() 
+    }
+    set status = $$$ADDSC(status, ..Domain.SetParameter($$$IKPDEFAULTCONFIG, ..#ConfigurationName))
+    if (clearDomain = 1) {
+    	set status = $$$ADDSC(status, ..Domain.SetParameter($$$IKPSTEMMING, 1))
+    }
+    set status = $$$ADDSC(status, ..Domain.%Save())
+    set cfg.StemmingConfig = "DEFAULT"
+    set status =$$$ADDSC(status, cfg.%Save())
+    quit status
+]]></Implementation>
+</Method>
+
+<Method name="ClearDomain">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ..Domain.DropData()
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="AddMorePosts">
+<Abstract>1</Abstract>
+<FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+</Method>
+
+<Method name="CalculateEmotionalColoring">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(Misc.DomainEmotionalColoringCounter).CalcSourcesEmotionalColoring(..#DomainName)
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="%OnNew">
+<FormalSpec>clearDomain:%Boolean=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ..Set(clearDomain)
+	quit status
+]]></Implementation>
+</Method>
+</Class>
+</Export>

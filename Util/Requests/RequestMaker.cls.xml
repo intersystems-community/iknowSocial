@@ -14,16 +14,16 @@
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	#dim queryString as %String = ""
-	set queryString = location _ ..ArrayToEncodedParameterString(parameters)
+	set queryString = location _ ..ArrayToParameterString(parameters, 1)
 	quit queryString
 ]]></Implementation>
 </Method>
 
-<Method name="ArrayToEncodedParameterString">
+<Method name="ArrayToParameterString">
 <Description><![CDATA[
  Builds the parameter string, of the form "[?a[=b][&c[=d]...]]", where parameters for query are taken from parameters argument and url-encoded.]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>a:%ArrayOfDataTypes</FormalSpec>
+<FormalSpec>a:%ArrayOfDataTypes,shouldEncode:%Boolean=1</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	#dim parameterString as %String = ""
@@ -33,30 +33,78 @@
 	{
 		#dim v as %String = a.GetNext(.k)
 		quit:k=""  
-		do ..AppendEncodedParameterToParameterString(.parameterString, k, v)
+		do ..AppendParameterToParameterString(.parameterString, k, v, shouldEncode)
 	}
 	quit parameterString
 ]]></Implementation>
 </Method>
 
-<Method name="AppendEncodedParameterToParameterString">
+<Method name="AppendParameterToParameterString">
 <Description>
  Given parameter string (actually arbitrary string) appends parameter specified by key from k and value from v to parameter string.</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[&parameterString:%String,k:%String,v:%String=""]]></FormalSpec>
+<FormalSpec><![CDATA[&parameterString:%String,k:%String,v:%String="",shouldEncode:%Boolean]]></FormalSpec>
+<Private>1</Private>
 <Implementation><![CDATA[
 	if (k '= "") {
+		if (shouldEncode) {
+			set k = ##class(Util.Misc).UrlEncode(k)
+		}
 		if ($length(parameterString) > 0) {
 			set parameterString = parameterString _ "&"
 		} else {
 			set parameterString = "?"
 		}
 		if (v = "") {
-			set parameterString = parameterString _ ##class(Util.Misc).UrlEncode(k)
+			set parameterString = parameterString _ k
 		} else {
-			set parameterString = parameterString _ ##class(Util.Misc).UrlEncode(k) _ "=" _ ##class(Util.Misc).UrlEncode(v)
+			if (shouldEncode) {
+				set v = ##class(Util.Misc).UrlEncode(v)
+			}
+			set parameterString = parameterString _ k _ "=" _ v
 		}
 	}
+]]></Implementation>
+</Method>
+
+<Method name="AppendHeaderParameter">
+<Description>
+Appends auth header parameter (encoding included) to provided string.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&headerString:%String,k:%String,v:%String=""]]></FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	if ($length(headerString) > 0) {
+		// Authorisation header parameters are separated by a comma and a space:
+		set headerString = headerString _ ", "
+	}
+	set k = ##class(Util.Misc).UrlEncode(k)
+	set v = ##class(Util.Misc).UrlEncode(v)
+	if (v = "") {
+		set headerString = headerString _ k
+	} else {
+		set headerString = headerString _ k _ "=""" _ v _ """"
+	}
+	quit headerString
+]]></Implementation>
+</Method>
+
+<Method name="BuildHeaderString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>parameters:%ArrayOfDataTypes</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	// Build the header string, of the form: a="b",c="d"
+	#dim dst as %String = ""
+	#dim k as %String = ""
+	set k = ""
+	while (1)
+	{
+		#dim v as %String = parameters.GetNext(.k)
+		quit:k=""
+		do ..AppendHeaderParameter(.dst, k, v)
+	}
+	quit dst
 ]]></Implementation>
 </Method>
 </Class>

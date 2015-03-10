@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="TwitterReader.Lister">
+<Class name="TWReader.Lister">
 <Description><![CDATA[
-<p>This is a very simple Lister implementation to retrieve VK posts' texts. The Lister will download posts
+<p>This is a very simple Lister implementation to retrieve Twitter posts' texts. The Lister will download posts
 through a API request and store the set of items retrieved as separate Sources.</p>
 
 <p><b>Lister Parameters</b> to be supplied to <method>AddListToBatch</method> and
@@ -10,7 +10,7 @@ through a API request and store the set of items retrieved as separate Sources.<
 <ol>
     <li><b>query</b> As <class>%String</class> - The query to search through vk newsfeed. fe: "pizza"</li>
 	<li><b>count</b> As <class>%Integer</class> - The positive integer number of posts (from 1 to 100) to add.</li>
-	<li><b>checkExists</b> As <class>%Boolean</class> - Whether or not to check whether an post item already exists before attempting to store it (skipping if it exists),  default 1</li>
+	<li><b>checkExists</b> As <class>%Boolean</class> - Whether or not to check whether a post item already exists before attempting to store it (skipping if it exists),  default 1</li>
 	<li><b>startDate</b> As <class>%Date</class> - The starting date value to search posts from.</li>
 	<li><b>startTime</b> As <class>%Time</class> - The starting time value to search posts from.</li>
 	<li><b>endDate</b> As <class>%Date</class> - The ending date value to search posts to.</li>
@@ -35,7 +35,7 @@ values for each post item, where present.</p>
 	<li>AuthorSex</li>
 </ul>
 
-<p><b>Lister alias:</b> "VKAPI"</p>
+<p><b>Lister alias:</b> "TwitterAPI"</p>
 <p><b>Default Processor:</b> <class>%iKnow.Source.Temp.Processor</class></p>]]></Description>
 <Super>%iKnow.Source.Lister</Super>
 <TimeCreated>63492,10251.170023</TimeCreated>
@@ -49,6 +49,7 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 <FormalSpec>listparams:%List</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	
 	set query = $li(listparams, 1)
 	set count = $li(listparams, 2)
 	set checkExists = +$lg(listparams, 3, 1)
@@ -56,66 +57,68 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 	set startTime = $lg(listparams, 5)
 	set endDate = $lg(listparams, 6)
 	set endTime = $lg(listparams, 7)
+	//set requestType = "popular" 
 	
-	#dim response As %ListOfObjects
-	set tSC = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, query, count,,,startDate, startTime, endDate, endTime)
-	quit:$$$ISERR(tSC) tSC
+	set responseData = ""
+	set status = ##class(TWReader.Requests.APIMethodsCaller).TweetsSearch(.responseData, listparams)
+	quit:$$$ISERR(status) status
 	
 	do ..RegisterMetadataKeys($lb("PostDate", "PostTime", "AuthorID", "AuthorCity", "AuthorCountry", "AuthorDOB", "AuthorSex"))
 	
-	set userIds = "1"
-	set groupIds = "1"
-	
-	// This seems to be not so well-done coding.
-	for i = 1: 1: response.Count() {
-		if (response.GetAt(i).FromID < 0) {
-			set groupIds = groupIds _ "," _ (-(response.GetAt(i).FromID))
-		} else {
-			set userIds = userIds _ "," _ response.GetAt(i).FromID
-		}
+	if (($length(responseData) > 0) && ($extract(responseData, 1) = "["))
+	{
+		set responseData = "{ ""tweets"":" _ responseData _ " }"
 	}
-	
-	set tSC = ##class(VKReader.Requests.APIPublicMethodsCaller).UsersGet(.responseUsers, userIds, "sex,city,bdate,country")
-	quit:$$$ISERR(tSC) tSC
-	set tSC = ##class(VKReader.Requests.APIPublicMethodsCaller).GroupsGetById(.responseGroups, groupIds, "city,country")
-	quit:$$$ISERR(tSC) tSC
-	
-	for i = 1: 1: response.Count() {
-		set tPostDate = response.GetAt(i).Date
-		set tPostTime = response.GetAt(i).Time
-		set tOwnerID = response.GetAt(i).OwnerID
-		set tFromID = response.GetAt(i).FromID
-		set tID = response.GetAt(i).ID
-		#dim tTextStream as %GlobalCharacterStream
-		set tTextStream = response.GetAt(i).Text
-		if (tFromID < 0) {
-			set tAuthorCity = responseGroups.GetAt(-tFromID).City
-			set tAuthorCountry = responseGroups.GetAt(-tFromID).Country
+	#dim responseTweets as %ZEN.proxyObject
+	#dim status as %Status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseTweets)
+	#dim props as %ListOfObjects
+	do responseTweets.%CopyToArray(.props)
+	#dim dataStatus = $data(props)
+	if (dataStatus = 10)
+	{
+		#dim x as %ListOfObjects
+		set dataStatus = $data(props("tweets"), x)	// get the tweets collection
+		set:dataStatus=0 dataStatus = $data(props("statuses"), x)	// get the tweets collection
+
+		#dim tweetCount as %Integer = x.Count()
+		for i=1:1:tweetCount
+		{
+			#dim xt as %ZEN.proxyObject = x.GetAt(i)
+			#dim tweet = ##class(TWReader.Data.Tweet).%New(xt)
+			
+			/*#dim coordinates as %Library.ListOfDataTypes = tweet.Coordinates.coordinates
+			write "coordinates="_coordinates ,!
+			write " Coordinates = "_tweet.Coordinates.coordinates_" User = "_tweet.User ,!*/
+			#dim user = ##class(TWReader.Data.User).%New(tweet.User)
+			
+			set tPostDate = $piece(tweet.CreatedAtDateTime,",",1)
+			set tPostTime = $piece(tweet.CreatedAtDateTime,",",2)
+			set tOwnerID = user.Id
+			set tFromID = tweet.Ids
+			set tID = tweet.Ids
+			#dim tTextStream as %GlobalCharacterStream
+			set tTextStream = tweet.Text
+			
+			set tAuthorCity = user.Location
+			set tAuthorCountry = user.WithheldInCountries
 			set tAuthorDOB = ""
 			set tAuthorSex = ""
-		} else {
-			set tAuthorCity = responseUsers.GetAt(tFromID).City
-			set tAuthorCountry = responseUsers.GetAt(tFromID).Country
-			set tAuthorDOB = responseUsers.GetAt(tFromID).DOB
-			set tAuthorSex = responseUsers.GetAt(tFromID).Sex
+			//write "tPostDate = "_tPostDate_"tPostTime = "_tPostTime_"tFromID = "_tFromID_"tAuthorCity = "_tAuthorCity_"tAuthorCountry = "_tAuthorCountry ,!
+			
+			set tLocalRef = tOwnerID_"#"_tID
+			
+			set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
+			do tTextStream.Rewind()
+			if (tTextStream.Size = 0) {
+				continue
+			}
+			set len = 32000
+			while (len = 32000) {
+				do ..StoreTemp(tRef, tTextStream.Read(.len))
+			}
+			
+			do ..SetMetadataValues(tRef, $lb(tPostDate, tPostTime, tFromID, tAuthorCity, tAuthorCountry, tAuthorDOB, tAuthorSex))
 		}
-				
-		set tLocalRef = tOwnerID _ "#" _ tFromID _ "#" _ tID
-		
-		if (checkExists) {
-			continue:..RefExists(query, tLocalRef, checkExists - 1)
-		}
-		
-		set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
-		do tTextStream.Rewind()
-		if (tTextStream.Size = 0) {
-			continue
-		}
-		
-		set len = 32000
-		do ..StoreTemp(tRef, tTextStream.Read(.len))
-		
-		do ..SetMetadataValues(tRef, $lb(tPostDate, tPostTime, tFromID, tAuthorCity, tAuthorCountry, tAuthorDOB, tAuthorSex))
 	}
 	
     quit $$$OK
@@ -124,10 +127,10 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 
 <Method name="GetAlias">
 <Description><![CDATA[
-<p>Lister alias: "VKAPI"</p>]]></Description>
+<p>Lister alias: "TWAPI"</p>]]></Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[    Quit "VKAPI"
+<Implementation><![CDATA[    Quit "TWAPI"
 ]]></Implementation>
 </Method>
 

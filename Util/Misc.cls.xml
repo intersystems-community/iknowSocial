@@ -4,23 +4,33 @@
 <Abstract>1</Abstract>
 <TimeCreated>63524,64644.765551</TimeCreated>
 
-<Method name="AddArrayToArray">
+<Parameter name="True">
+<Type>%String</Type>
+<Default>true</Default>
+</Parameter>
+
+<Parameter name="False">
+<Type>%String</Type>
+<Default>false</Default>
+</Parameter>
+
+<Method name="AppendArray">
 <Description>
-Adds array A to array B</Description>
+Adds array b to array a</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>a:%ArrayOfDataTypes,b:%ArrayOfDataTypes</FormalSpec>
-<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set current = ""
-	set status = $$$OK
-	for {
-		set current = a.Next(current)
-		if (current = "") {
-			return status
+	if (b '= "")
+	{
+		#dim k as %String = ""
+		set k = ""
+		while (1)
+		{
+			#dim v as %String = b.GetNext(.k)
+			quit:k=""
+			do a.SetAt(v, k)
 		}
-		set status =  $$$ADDSC(status, b.SetAt(a.GetAt(current), current))
 	}
-	quit status
 ]]></Implementation>
 </Method>
 
@@ -45,6 +55,14 @@ Converts date in d[d].m[m].yyyy format to horolog.</Description>
 ]]></Implementation>
 </Method>
 
+<Method name="ConvertToBool">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>text:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[	quit $data(text) && ($zconvert(text, "l") = ..#True)
+]]></Implementation>
+</Method>
+
 <Method name="ConvertUnixTimeToHorolog">
 <Description>
 Given 'unixTime' in UNIX-time format saves corresponding value in horolog format to 'date' and 'time' variables. </Description>
@@ -66,6 +84,19 @@ Given 'date' and 'time' in horolog format returns corresponding UNIX-time value.
 ]]></Implementation>
 </Method>
 
+<Method name="GetUnixTime">
+<Description>
+Returns time since Unix epoch</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+	quit:..#TestUnixTime ..#UnixTimeTest
+	#dim h as %String = $ztimestamp	// get UTC time
+	// Use $NORMALIZE to truncate the time to integer seconds:
+	quit ..ConvertHorologToUnixTime(+h, $normalize(+$piece(h, ",", 2), -1))
+]]></Implementation>
+</Method>
+
 <Method name="UrlEncode">
 <Description>
 Performs url-escaping.</Description>
@@ -77,6 +108,7 @@ Performs url-escaping.</Description>
 	set text = $zconvert(text, "O", "UTF8")
 	// Encode using URL encoding:
 	set text = $zconvert(text, "O", "URL")
+	set text = $replace(text, "/", "%2F")
 	quit text
 ]]></Implementation>
 </Method>
@@ -101,6 +133,17 @@ Checks whereas passed combination of 'date' and 'time' can actually represent so
 ]]></Implementation>
 </Method>
 
+<Method name="DateToString">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>d:%Date</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	#dim dateText as %String = ""
+	set:d'="" dateText = $zdate(d, 3)	// date in the format: YYYY-MM-DD
+	quit dateText
+]]></Implementation>
+</Method>
+
 <Method name="RunAllTests">
 <Description>
 Runs all tests across the project.</Description>
@@ -115,38 +158,13 @@ Runs all tests across the project.</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="TestFunc">
-<ClassMethod>1</ClassMethod>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set domId = ##class(%iKnow.Domain).GetOrCreateId("VKAPIDomain")
-	if ##class(%iKnow.Configuration).Exists("VKAPIConfiguration") {
-    	set cfg = ##class(%iKnow.Configuration).Open("VKAPIConfiguration") 
-    } else {
-		set cfg = ##class(%iKnow.Configuration).%New("VKAPIConfiguration", 1, $LB("ru"))
-        do cfg.%Save() 
-    }
-    //set dom = ##class(%iKnow.Domain).OpenId(domId)
-    //do dom.DropData()
-	set lister = ##class(VKReader.Lister).%New(domId)
-	do lister.SetConfig("VKAPIConfiguration")
-	//set loader = ##class(%iKnow.Source.Loader).%New(domId)
-	
-	set status = lister.ProcessList("pizza", 100, 1)
-	w "The lister status is ", $system.Status.DisplayError(status), !
-	//set status = loader.ProcessBatch()
-	//w "The loader status is ", $system.Status.DisplayError(status), !
-	do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, domId,,100)
-	zw result
-]]></Implementation>
-</Method>
-
 <Method name="CreateSSLConfiguration">
 <ClassMethod>1</ClassMethod>
+<FormalSpec>SSLConfigurationName</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	new $namespace
-	set SSLConfigurationName = ##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName")
+	//set SSLConfigurationName = ##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName")
 	set $namespace = "%SYS"
 	set status = $$$OK
 	if (##class(Security.SSLConfigs).Exists(SSLConfigurationName) = 0) {
@@ -160,8 +178,18 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ..CreateSSLConfiguration()
+	set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
 	set context = ##class(VKReader.Data.Context).%New(1)
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="InstallTwitter">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ..CreateSSLConfiguration(##class(TWReader.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
+	set context = ##class(TWReader.Data.Context).%New(1)
 	quit status
 ]]></Implementation>
 </Method>

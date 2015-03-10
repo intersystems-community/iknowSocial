@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.Data.User">
+<Super>%Persistent</Super>
+<TimeCreated>62714,57306.19124</TimeCreated>
+
+<Property name="FavouritesCount">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="FollowersCount">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="FriendsCount">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Id">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Location">
+<Type>%String</Type>
+</Property>
+
+<Property name="Name">
+<Type>%String</Type>
+</Property>
+
+<Property name="ScreenName">
+<Type>%String</Type>
+</Property>
+
+<Property name="StatusesCount">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Url">
+<Type>%String</Type>
+</Property>
+
+<Property name="WithheldInCountries">
+<Type>%String</Type>
+</Property>
+
+<Property name="Text">
+<Type>%String</Type>
+</Property>
+
+<Method name="%OnNew">
+<FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim status as %Status = $$$OK
+	if (oProxy '= "")
+	{
+		#dim properties As %ListOfObjects
+		do oProxy.%CopyToArray(.properties)
+		if ($data(properties) = 10)
+		{
+			set ..FavouritesCount = $get(properties("favourites_count"))
+			set ..FollowersCount = $get(properties("followers_count"))
+			set ..FriendsCount = $get(properties("friends_count"))
+			set ..Id = $get(properties("id"))
+			set ..Location = $get(properties("location"))
+			set ..Name = $get(properties("name"))
+			set ..ScreenName = $get(properties("screen_name"))
+			set ..StatusesCount = $get(properties("statuses_count"))
+			set ..Url = $get(properties("url"))
+			set ..WithheldInCountries = $get(properties("withheld_in_countries"))
+		}
+	}
+	quit status
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^TWReader.Data.UserD</DataLocation>
+<DefaultData>UserDefaultData</DefaultData>
+<IdLocation>^TWReader.Data.UserD</IdLocation>
+<IndexLocation>^TWReader.Data.UserI</IndexLocation>
+<StreamLocation>^TWReader.Data.UserS</StreamLocation>
+<Data name="UserDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>FavouritesCount</Value>
+</Value>
+<Value name="3">
+<Value>FollowersCount</Value>
+</Value>
+<Value name="4">
+<Value>FriendsCount</Value>
+</Value>
+<Value name="5">
+<Value>Id</Value>
+</Value>
+<Value name="6">
+<Value>Location</Value>
+</Value>
+<Value name="7">
+<Value>Name</Value>
+</Value>
+<Value name="8">
+<Value>ScreenName</Value>
+</Value>
+<Value name="9">
+<Value>StatusesCount</Value>
+</Value>
+<Value name="10">
+<Value>Url</Value>
+</Value>
+<Value name="11">
+<Value>WithheldInCountries</Value>
+</Value>
+<Value name="12">
+<Value>Text</Value>
+</Value>
+<Value name="13">
+<Value>CreatedAtDateTime</Value>
+</Value>
+<Value name="14">
+<Value>CreatedAtExcelDateTime</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

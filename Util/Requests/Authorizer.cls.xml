@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.Requests.Authorizer">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63615,48357.07077</TimeCreated>
+
+<Parameter name="ConsumerKey">
+<Type>%String</Type>
+<Default>8bgOxI4bW8DbgU3wEM3081MZ7</Default>
+</Parameter>
+
+<Parameter name="ConsumerSecret">
+<Type>%String</Type>
+<Default>eQQRbMm6B26cfWDBVfHQYN6P1VDfzBBr1QNlFhIcmVl0Rhth2Y</Default>
+</Parameter>
+
+<Parameter name="AccessToken">
+<Type>%String</Type>
+<Default>347842808-IWq1pklWuC271Vwy7j049tE6FbScrRYv76zDRQMI</Default>
+</Parameter>
+
+<Parameter name="AccessTokenSecret">
+<Type>%String</Type>
+<Default>U9sitaj34McyYog6Jfp7VOyC8wcOAfzN8AAcbwVkIHCEf</Default>
+</Parameter>
+
+<Parameter name="RandomStringSize">
+<Type>%Integer</Type>
+<Default>200</Default>
+</Parameter>
+
+<Parameter name="SignatureMethod">
+<Type>%String</Type>
+<Default>HMAC-SHA1</Default>
+</Parameter>
+
+<Parameter name="OauthVersion">
+<Type>%String</Type>
+<Default>1.0</Default>
+</Parameter>
+
+<Parameter name="HeaderPrefix">
+<Type>%string</Type>
+<Default>Oauth</Default>
+</Parameter>
+
+<Property name="Nonce">
+<Type>%String</Type>
+</Property>
+
+<Property name="Timestamp">
+<Type>%String</Type>
+</Property>
+
+<Method name="%OnNew">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set ..Nonce = ..GetNonce()
+	set ..Timestamp = ##class(Util.Misc).GetUnixTime()
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="IsAlphanumeric">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>asciiCode:%Integer</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+	if ((asciiCode >= $ascii("0")) && (asciiCode <= $ascii("9"))) {
+		quit 1
+	}
+	if ((asciiCode >= $ascii("A")) && (asciiCode <= $ascii("90"))) {
+		quit 1
+	}
+	if ((asciiCode >= $ascii("a")) && (asciiCode <= $ascii("z"))) {
+		quit 1
+	}
+	quit 0
+]]></Implementation>
+</Method>
+
+<Method name="GetNonce">
+<ClassMethod>1</ClassMethod>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set untruncatedNonce = $system.Encryption.GenCryptRand(..#RandomStringSize)
+	set nonce = ""
+	for i = 1: 1 {
+		set asciiCode = $ascii(untruncatedNonce, i)
+		quit:(asciiCode = -1)
+		if (..IsAlphanumeric(asciiCode)) {
+			set nonce = nonce _ $char(asciiCode)
+		}
+	}
+	quit nonce
+]]></Implementation>
+</Method>
+
+<Method name="GetSignatureBaseString">
+<FormalSpec>HTTPMethod:%String,url:%String,parameters:%ArrayOfDataTypes</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set result = $zconvert(HTTPMethod, "U") _ "&"
+	set result = result _ ##class(Util.Misc).UrlEncode(url) _ "&"
+	set parameterString = ##class(Util.Requests.RequestMaker).ArrayToParameterString(parameters)
+	if (parameterString '= "") {
+		set parameterString = $extract(parameterString, 2, $length(parameterString))
+	}
+	set parameterString = ##class(Util.Misc).UrlEncode(parameterString)
+	set result = result _ parameterString
+	quit result
+]]></Implementation>
+</Method>
+
+<Method name="GetSigningKey">
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	quit ##class(Util.Misc).UrlEncode(..#ConsumerSecret) _ "&" _ ##class(Util.Misc).UrlEncode(..#AccessTokenSecret)
+]]></Implementation>
+</Method>
+
+<Method name="GetOauthParameters">
+<Private>1</Private>
+<ReturnType>%ArrayOfDataTypes</ReturnType>
+<Implementation><![CDATA[
+	#dim h as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
+	do h.SetAt(..#ConsumerKey, "oauth_consumer_key")
+	do h.SetAt(..Nonce, "oauth_nonce")
+	do h.SetAt(..#SignatureMethod, "oauth_signature_method")
+	do h.SetAt(..Timestamp, "oauth_timestamp")
+	do h.SetAt(..#AccessToken, "oauth_token")
+	do h.SetAt(..#OauthVersion, "oauth_version")
+	quit h
+]]></Implementation>
+</Method>
+
+<Method name="GetSignature">
+<FormalSpec>HTTPMethod:%String,url:%String,parameters:%ArrayOfDataTypes</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set h = ..GetOauthParameters()
+	do ##class(Util.Misc).AppendArray(h, parameters)
+	#dim signatureBaseString as %String = ..GetSignatureBaseString(HTTPMethod, url, h)
+	#dim signature as %String = $system.Encryption.HMACSHA1(signatureBaseString, ..GetSigningKey())
+	set signature = $system.Encryption.Base64Encode(signature)
+	quit signature
+]]></Implementation>
+</Method>
+
+<Method name="GetAuthHeader">
+<FormalSpec>HTTPMethod:%String,url:%String,parameters:%ArrayOfDataTypes</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set h = ..GetOauthParameters()
+	do h.SetAt(..GetSignature(HTTPMethod, url, parameters), "oauth_signature")
+	set header = ..#HeaderPrefix _ " " _ ##class(Util.Requests.RequestMaker).BuildHeaderString(h)
+	quit header
+]]></Implementation>
+</Method>
+</Class>
+</Export>
