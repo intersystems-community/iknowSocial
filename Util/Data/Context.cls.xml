@@ -49,6 +49,8 @@
 		quit:$$$ISERR(status) status
 	}
 	
+	do ..AddMetadataFieldIfNotExists("PostLatitude")
+	do ..AddMetadataFieldIfNotExists("PostLongitude")
 	do ..AddMetadataFieldIfNotExists("PostDate")
 	do ..AddMetadataFieldIfNotExists("PostTime")
 	do ..AddMetadataFieldIfNotExists("AuthorID")
@@ -86,7 +88,6 @@
 
 <Method name="AddMorePosts">
 <Abstract>1</Abstract>
-<FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 </Method>
 

@@ -42,6 +42,18 @@ Don't change it to have length 1</Description>
 <Unique>1</Unique>
 </Index>
 
+<Property name="Latitude">
+<Description>
+Holds latitude if present</Description>
+<Type>%Numeric</Type>
+</Property>
+
+<Property name="Longitude">
+<Description>
+Holds longitude if present</Description>
+<Type>%Numeric</Type>
+</Property>
+
 <Property name="Date">
 <Description>
  Holds date when this post was published in horolog format (UTC)</Description>
@@ -146,6 +158,12 @@ Don't change it to have length 1</Description>
 <Value name="14">
 <Value>PostType</Value>
 </Value>
+<Value name="15">
+<Value>Latitude</Value>
+</Value>
+<Value name="16">
+<Value>Longitude</Value>
+</Value>
 </Data>
 </Storage>
 
@@ -172,6 +190,10 @@ class then this oref will be the one returned to the caller of %New method.]]></
 		set ..PostType = oProxy."post_type"
 		if (oProxy."friends_only" '= "") {
 			set ..FriendsOnly = oProxy."friends_only"
+		}
+		if (oProxy."geo" '= "") {
+			set ..Latitude = $piece(oProxy."geo"."coordinates", " ", 1)
+			set ..Longitude = $piece(oProxy."geo"."coordinates", " ", 2)
 		}
 		if (oProxy."copy_history" '= "") {
 			#dim items As %ListOfObjects = oProxy."copy_history"
