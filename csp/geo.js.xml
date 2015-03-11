@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="geo.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+function Coordinates(latitude, longitude) {
+	this.latitude = latitude;
+	this.longitude = longitude;
+}
+
+function toRadians(degree) {
+    return (degree * (Math.PI / 180));
+}
+
+function CalcHaversineDistance(lat1, lat2, lon1, lon2) {
+	var lat1 = toRadians(lat1);
+	var lon1 = toRadians(lon1);
+	var lat2 = toRadians(lat2);
+	var lon2 = toRadians(lon2);
+    var R = 6372.8; // km
+    var dLat = lat2 - lat1;
+    var dLon = lon2 - lon1;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat /2) + Math.sin(dLon / 2) * Math.sin(dLon /2) * Math.cos(lat1) * Math.cos(lat2);
+    var c = 2 * Math.asin(Math.sqrt(a));
+	return R * c;
+}
+
+Coordinates.prototype.getDistance = function(anotherCoordinates) {
+	if (anotherCoordinates instanceof Coordinates) {
+		return CalcHaversineDistance(this.latitude, anotherCoordinates.latitude, this.longitude, anotherCoordinates.longitude)
+	} else {
+		return undefined;
+	}
+}
+
+Coordinates.prototype.toTuple = function() {
+	return [this.latitude, this.longitude];
+}
+
+var coordsUkraine = {
+  	"Винница" 	: new Coordinates(49.14, 28.29),
+  	"Донецк" 	: new Coordinates(48, 37.48),
+  	"Киев" 		: new Coordinates(50.27, 30.30),
+  	"Одесса" 	: new Coordinates(46.28, 30.44),
+  	"Сумы" 		: new Coordinates(50.55, 34.45),
+  	"Харьков" 	: new Coordinates(50, 36.15)
+}]]></CSP>
+</Export>

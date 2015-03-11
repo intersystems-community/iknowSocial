@@ -11,37 +11,10 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script src="custom.js"></script>
+  <script src="geo.js"></script>
   <script language="JavaScript">
   
-  	var coordsUkraine = {
-  		"Винница" : {
-  			latitude : "49.14",
-  			longitude : "28.29"
-  		},
-  		"Донецк" : {
-  			latitude : "48",
-  			longitude : "37.48"
-  		},
-  		"Киев" : {
-  			latitude : "50.27",
-  			longitude : "30.30"
-  		},
-  		"Одесса" : {
-  			latitude : "46.28",
-  			longitude : "30.44"
-  		},
-  		"Сумы" : {
-  			latitude : "50.55",
-  			longitude : "34.45"
-  		},
-  		"Харьков" : {
-  			latitude : "50",
-  			longitude : "36.15"
-  		}
-  	}
-  
   	$(document).ready(function() {
-	  	console.log(coordsUkraine)
     	var map = L.map('map', {
       		center: [50.27, 30.30],
       		zoom: 5
@@ -51,8 +24,8 @@
       		maxZoom: 18
     	}).addTo(map);
     	for (var key in coordsUkraine) {
-	    	var marker = L.marker([coordsUkraine[key].latitude, coordsUkraine[key].longitude]).addTo(map);
-    		marker.bindPopup("<b>" + key + "</b>").openPopup();
+	    	var marker = L.marker(coordsUkraine[key].toTuple()).addTo(map);
+    		marker.bindPopup("<b>" + key + "</b>");
     	}
 	});
   </script>
