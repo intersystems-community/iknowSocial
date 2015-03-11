@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="map.CSP" application="/csp/iknowsocial/" default="1"><![CDATA[
+<html>
+<head>
+  <title>Map Colorer</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+  <link rel="stylesheet" href="custom.css">
+  <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+  <script src="custom.js"></script>
+  <script language="JavaScript">
+  
+  	var coordsUkraine = {
+  		"Винница" : {
+  			latitude : "49.14",
+  			longitude : "28.29"
+  		},
+  		"Донецк" : {
+  			latitude : "48",
+  			longitude : "37.48"
+  		},
+  		"Киев" : {
+  			latitude : "50.27",
+  			longitude : "30.30"
+  		},
+  		"Одесса" : {
+  			latitude : "46.28",
+  			longitude : "30.44"
+  		},
+  		"Сумы" : {
+  			latitude : "50.55",
+  			longitude : "34.45"
+  		},
+  		"Харьков" : {
+  			latitude : "50",
+  			longitude : "36.15"
+  		}
+  	}
+  
+  	$(document).ready(function() {
+	  	console.log(coordsUkraine)
+    	var map = L.map('map', {
+      		center: [50.27, 30.30],
+      		zoom: 5
+    	});
+    	L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+      		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+      		maxZoom: 18
+    	}).addTo(map);
+    	for (var key in coordsUkraine) {
+	    	var marker = L.marker([coordsUkraine[key].latitude, coordsUkraine[key].longitude]).addTo(map);
+    		marker.bindPopup("<b>" + key + "</b>").openPopup();
+    	}
+	});
+  </script>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Map Colorer</a>
+      </div>
+      <div class="collapse navbar-collapse">
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div class="col-md-10 col-md-offset-1">
+      	<div class="panel panel-default">
+        	<div id="map"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body>
+</html>
+]]></CSP>
+</Export>

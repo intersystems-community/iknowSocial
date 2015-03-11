@@ -50,9 +50,8 @@ table {
 	height: 60vh;
 }
 
-
-
-
-
+#map {
+	height: 50vh;	
+}
 ]]></CSP>
 </Export>

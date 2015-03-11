@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="twreader.csp" application="/csp/user/" default="1"><![CDATA[
+<CSP name="twreader.csp" application="/csp/iknowsocial/" default="1"><![CDATA[
 <html>
 <head>
   <title>TWReader</title>
