@@ -44,7 +44,7 @@ $(document).ready(function() {
 		});
 		var domainId = getDomainId();
 		var stringifiedList = list.join(",");
-		#call(Util.UI.ProposeMarkers(stringifiedList, domainId))#
+		#call(Util.UIBroker.ProposeMarkers(stringifiedList, domainId))#
 	});
 	
 	$("#right-table-main-button").click(function() {
@@ -53,7 +53,7 @@ $(document).ready(function() {
 			dict[$("td:nth-child(2)", this).text()] = $("td:nth-child(3)", this).text();
 		});
 		var stringifiedDict = JSON.stringify(dict);
-		#call(Util.UI.ApproveMarkers(stringifiedDict))#
+		#call(Util.UIBroker.ApproveMarkers(stringifiedDict))#
 	});
 });
 </script>
@@ -66,7 +66,7 @@ $(document).ready(function() {
     </div>
     <div class="btn-group pull-right" id="domain-chooser">
       <script language="cache" runat="server">
-       	do ##class(Util.UI).PrintDomainsDropdown()
+       	do ##class(Util.UIBroker).PrintDomainsDropdown()
      </script>
     </div>
   </div>
@@ -107,7 +107,7 @@ $(document).ready(function() {
           <table class="table" id="left-table">
             <tbody>
               <script language="cache" runat="server">
-               	do ##class(Util.UI).PrintEmotionalsMarkers() 
+               	do ##class(Util.UIBroker).PrintEmotionalsMarkers() 
              </script>
             </tbody>
           </table>

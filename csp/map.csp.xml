@@ -16,7 +16,7 @@
   
   	$(document).ready(function() {
     	var map = L.map('map', {
-      		center: [50.27, 30.30],
+      		center: [49, 32],
       		zoom: 5
     	});
     	L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
@@ -47,7 +47,7 @@
       </div>
     </div>
     <div class="row" style="margin-top:10px">
-      <div class="col-md-10 col-md-offset-1">
+      <div class="col-md-6">
       	<div class="panel panel-default">
         	<div id="map"></div>
         </div>

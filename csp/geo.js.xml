@@ -15,7 +15,7 @@ function CalcHaversineDistance(lat1, lat2, lon1, lon2) {
 	var lon1 = toRadians(lon1);
 	var lat2 = toRadians(lat2);
 	var lon2 = toRadians(lon2);
-    var R = 6372.8; // km
+    var R = 6372.8; // Earth radius, km
     var dLat = lat2 - lat1;
     var dLon = lon2 - lon1;
     var a = Math.sin(dLat / 2) * Math.sin(dLat /2) + Math.sin(dLon / 2) * Math.sin(dLon /2) * Math.cos(lat1) * Math.cos(lat2);
@@ -36,11 +36,11 @@ Coordinates.prototype.toTuple = function() {
 }
 
 var coordsUkraine = {
-  	"Винница" 	: new Coordinates(49.14, 28.29),
-  	"Донецк" 	: new Coordinates(48, 37.48),
-  	"Киев" 		: new Coordinates(50.27, 30.30),
-  	"Одесса" 	: new Coordinates(46.28, 30.44),
-  	"Сумы" 		: new Coordinates(50.55, 34.45),
-  	"Харьков" 	: new Coordinates(50, 36.15)
+  	"Lviv" 			: new Coordinates(49.8397, 24.0297),
+  	"Donetsk" 		: new Coordinates(48.0159, 37.8029),
+  	"Kyiv" 			: new Coordinates(50.4501, 30.5234),
+  	"Odesa"		 	: new Coordinates(46.4846, 30.7326),
+  	"Sumy" 			: new Coordinates(50.9077, 34.7981),
+  	"Kharkiv" 		: new Coordinates(49.9935, 36.2304)
 }]]></CSP>
 </Export>

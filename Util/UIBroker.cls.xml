@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.UIBroker">
+<Abstract>1</Abstract>
+<TimeCreated>63623,16717.635066</TimeCreated>
+
+<Method name="GetLinkedSourceId">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>contents:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	quit "<a class=""link-to-full-source"" data-toggle=""modal"" data-target=""#show-source-id-modal"">" _ contents _ "</a>"
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// think out how to create exactly one Context
+
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// temp solution
+
+]]></Content>
+</UDLText>
+
+<Method name="AddMorePostsWithinContext">
+<Abstract>1</Abstract>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
+</Method>
+
+<Method name="ShowFullSourceById">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>sourceId:%String</FormalSpec>
+<Implementation><![CDATA[
+	set context = ##class(VKReader.Data.Context).%New()
+	do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, context.DomainID, sourceId, 0, 0)
+	
+	kill result
+	set result = "<p>"	
+	set i = ""
+	for {
+		set i = $order(tSentences(i), 1, tSentData)
+		
+		quit:(i = "")
+		set tResult = $li(tSentData, 2)
+		set result = result _ tResult _ " "
+	}
+	set result = result _ "</p>"
+	set result = ##class(%CSP.Page).QuoteJS(result)
+	
+	&js<
+		$("#show-source-id-modal .progress").hide(100);
+		$("#show-source-id-modal p").hide(400, function() {
+			$("#show-source-id-modal p").html(#(result)#);
+	    	$("#show-source-id-button").prop('disabled', false);
+			$("#show-source-id-modal p").show(400);
+		});
+		
+	>
+]]></Implementation>
+</Method>
+
+<Method name="ProposeMarkers">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>stringifiedList,domainId</FormalSpec>
+<Implementation><![CDATA[
+	set JSONClosure = ##class(Misc.EmotionalMarker).ProposeStringifiedJSONClosureForCSVOfMarkerIds(stringifiedList, domainId)
+	set JSONClosure = ##class(%CSP.Page).QuoteJS(JSONClosure)
+	&js<
+		var stringifiedResponse = #(JSONClosure)#;
+		var response = JSON.parse(stringifiedResponse);
+		for (var key in response) {
+			$("#right-table tbody").append("<tr><th scope=\"row\">-</th><td>" + key + "</td><td>" + response[key] + "</td></tr>")
+		}
+		unhighlightWholeTable("#left-table");
+		setTableToggling("#right-table");
+	>
+]]></Implementation>
+</Method>
+
+<Method name="ApproveMarkers">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>stringifiedDict</FormalSpec>
+<Implementation><![CDATA[
+	set stringifiedJSON = ##class(Misc.EmotionalMarker).ApproveMarkersFromJSONAndReturnJSONWithIds(stringifiedDict)
+	set stringifiedJSON = ##class(%CSP.Page).QuoteJS(stringifiedJSON)
+	&js<
+		dict = JSON.parse(#(stringifiedJSON)#)
+		$("#right-table .highlighted-row").prependTo("#left-table")
+		$("#left-table .highlighted-row").each(function() {
+			$("th:nth-child(1)", this).text(dict[$("td:nth-child(2)", this).text()]);
+		});
+		unhighlightWholeTable("#left-table")
+		$("#right-table-main-button").prop("disabled", true)
+		setTableToggling("#left-table")
+	>
+]]></Implementation>
+</Method>
+
+<Method name="PrintDomainsDropdown">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	set query = "select distinct * from %iKnow.""Domain"""
+	set statement = ##class(%SQL.Statement).%New()
+	set status = statement.%Prepare(query)
+	set result = statement.%Execute()
+	w "<button type=""button"" class=""btn btn-default navbar-btn dropdown-toggle"" data-toggle=""dropdown"" aria-expanded=""false"">"
+	do result.%Next()  
+	w result.Id _ " " _ result.Name _ " "
+	w "<span class=""caret""></span>"
+	w "</button>", !
+	w "<ul class=""dropdown-menu"" role=""menu"">", !
+	w "<li><a href=""#"">" _ result.Id _ " " _ result.Name _ "</a></li>", !
+	while result.%Next() {
+		w "<li><a href=""#"">" _ result.Id _ " " _ result.Name _ "</a></li>", !
+	} 
+	w "</ul>"
+]]></Implementation>
+</Method>
+
+<Method name="PrintEmotionalsMarkers">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	set query = "select distinct * from Misc.EmotionalMarker"
+	set statement = ##class(%SQL.Statement).%New()
+	set status = statement.%Prepare(query)
+	set result = statement.%Execute()
+	while result.%Next() {
+		w "<tr>", !
+		w "<th scope=""row"">" _ result.Id _ "</th>", !
+		w "<td>"_ result.Entity _"</td>", !
+		w "<td>"_ result.Weight _"</td>", !
+		w "</tr>", !
+	}
+]]></Implementation>
+</Method>
+
+<Method name="DrawTable">
+<Abstract>1</Abstract>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldCountEC:%String=""</FormalSpec>
+</Method>
+
+<Method name="ShowEC">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	do ..DrawTable("1")
+	&js<
+		$(".ec-link").slideUp(400, function() {
+			$(this).html('<span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Calculate EC').fadeIn(400);
+		});
+	>
+]]></Implementation>
+</Method>
+</Class>
+</Export>
