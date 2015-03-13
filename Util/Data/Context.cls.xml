@@ -203,7 +203,7 @@
 	set totalResult = ""
 	
 	if ($length(shouldCountEC) > 0) {
-		do context.CalculateEmotionalColoring()
+		do ..CalculateEmotionalColoring()
 	}
     set i = 1
 	set pageSize = 100

@@ -4,7 +4,7 @@
 <Super>Util.UIBroker</Super>
 <TimeCreated>63623,17389.188202</TimeCreated>
 
-<Method name="DrawTable">
+<Method name="SaveAllPosts">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>shouldCountEC:%String=""</FormalSpec>
 <Implementation><![CDATA[
@@ -16,8 +16,24 @@
 	set totalResult = context.GetAllPostsJSON()
 	&js<
 		posts = (#(totalResult)#).posts;
-		console.log(posts);
-		drawTable("#main-table", posts, ["title", "date", "time", "city", "EC"]);
+	>
+]]></Implementation>
+</Method>
+
+<Method name="DrawTable">
+<Description>
+fields must be appropriate js-array</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldCountEC:%String="",fields:%String="",tableName:%String="#main-table"</FormalSpec>
+<Implementation><![CDATA[
+	
+	do ..SaveAllPosts(shouldCountEC)
+	if ($length(fields) < 1) {
+		set fields = "['title', 'date', 'time', 'city', 'EC']"
+	}
+	&js<
+		console.log("redrawing")
+		drawTable('#(tableName)#', posts, #(fields)#);
 	>
 ]]></Implementation>
 </Method>

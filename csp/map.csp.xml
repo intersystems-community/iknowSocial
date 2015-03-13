@@ -13,7 +13,8 @@
   <script src="custom.js"></script>
   <script src="geo.js"></script>
   <script language="JavaScript">
-  
+  	var posts = {}
+  	
   	$(document).ready(function() {
     	var map = L.map('map', {
       		center: [49, 32],
@@ -50,6 +51,29 @@
       <div class="col-md-6">
       	<div class="panel panel-default">
         	<div id="map"></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+      	<div class="panel panel-default">
+          <table class="table" id="map-table-header">
+              <thead>
+                <tr>
+                  <th>SourceId</th>
+                  <th>Title</th>
+                  <th>Lat</th>
+                  <th>Long</th>
+                </tr>
+              </thead>
+          </table>
+          <div class="table-content big-content-wrapper">
+            <table class="table" id="map-table">
+              <tbody>
+              	 <script language="JavaScript">
+              	 	#call(VKReader.UIBroker.DrawTable("", "['title', 'latitude', 'longitude']", "#map-table"))#
+               </script>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

@@ -11,7 +11,9 @@ headers = {
 	"bdate" : "DOB",
 	"sex" : "Sex", 
 	"id" : "Link",
-	"EC": "EC"
+	"EC": "EC",
+	"latitude": "Lat",
+	"longitude": "Long"
 }
 
 function drawTableHeader(tableId, meta) {
