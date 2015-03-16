@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="twreader.csp" application="/csp/iknowsocial/" default="1"><![CDATA[
+<CSP name="twreader.csp" application="/csp/user/" default="1"><![CDATA[
 <html>
 <head>
   <title>TWReader</title>
@@ -28,18 +28,18 @@
 	    console.log([shouldClear, query, count]);
 	    $("#add-sources-modal .progress").show(400);
 	    $("#add-sources-button").prop('disabled', true);
-	    #call(TWReader.UI.AddMorePostsWithinContext(shouldClear, count, query))# 
+	    #call(TWReader.UIBroker.AddMorePostsWithinContext(shouldClear, count, query))# 
     }
     
     function showSourceId() {
 	    var sourceId = $("#source-id-form").val();
 	    $("#show-source-id-modal .progress").show(400);
 	    $("#show-source-id-button").prop('disabled', true);
-	    #call(TWReader.UI.ShowFullSourceById(sourceId))#
+	    #call(TWReader.UIBroker.ShowFullSourceById(sourceId))#
     }
     
     function showEC() {
-	    #call(TWReader.UI.ShowEC())#
+	    #call(TWReader.UIBroker.ShowEC())#
     }
     
     $(document).on("click", ".link-to-full-source", function () {
@@ -55,7 +55,7 @@
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
-        <a class="navbar-brand" href="#">VKReader</a>
+        <a class="navbar-brand" href="#">TWReader</a>
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav navbar-right">
@@ -94,8 +94,7 @@
                   <th>Time</th>
                   <th>City</th>
                   <th>Country</th>
-                  <th>DOB</th>
-                  <th>Sex</th>
+	              <th>Sex</th>
                   <th>Link</th>
                   <th>EC</th>
                 </tr>
@@ -105,7 +104,7 @@
             <table class="table" id="main-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(TWReader.UI.PrintTable())#
+              	 	#call(TWReader.UIBroker.DrawTable())#
                </script>
               </tbody>
             </table>
