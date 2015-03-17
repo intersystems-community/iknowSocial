@@ -1,7 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <CSP name="custom.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+headers = {
+	"sourceId" : "SourceId",
+	"title" : "Title",
+	"date" : "Date",
+	"time" : "Time",
+	"city" : "City",
+	"country" : "Country",
+	"bdate" : "DOB",
+	"sex" : "Sex", 
+	"id" : "Link",
+	"EC": "EC",
+	"latitude": "Lat",
+	"longitude": "Long"
+}
 
+function drawTableHeader(tableId, meta) {
+	$(tableId + "-header thead tr").html("")
+	for (var i = 0; i < meta.length; i++) {
+		$(tableId + "-header thead tr").append($("<th><div>" + headers[meta[i]] + "</div></th>"));
+	}
+}
+
+function wrap(contents, tag) {
+	return "<" + tag + ">" + contents + "</" + tag + ">";
+}
+
+function drawTableRow(tableId, rowObject, meta) {
+	$(wrap(rowObject.sourceId, "a")).addClass("link-to-full-source").attr({
+		"data-toggle": "modal",
+		"data-target": "#show-source-id-modal"
+	}).appendTo(tableId + " tbody").wrap('<tr scope="row"><th></th></tr>');
+	for (var i = 1; i < meta.length; i++) {
+		$(tableId + " tbody tr").last().append($("<td><div>" + rowObject[meta[i]] + "</div></td>"));
+	}
+}
+
+function drawTable(tableId, tableObject, meta) {
+	$(tableId + " tbody").html("")
+	meta = typeof meta !== 'undefined' ? meta : ["title", "date", "time", "city", "country", "bdate", "sex", "id", "EC"]
+	meta.unshift("sourceId");
+	drawTableHeader(tableId, meta);
+	for (var i = 0; i < tableObject.length; i++) {
+		drawTableRow(tableId, tableObject[i], meta);
+	}
+}
+	
   function toggleTableRow(tableId, row) {
     var tableRows = $(tableId + " tr");
     row.toggleClass("highlighted-row");

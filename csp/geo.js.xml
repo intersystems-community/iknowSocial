@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="geo.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+function Coordinates(latitude, longitude) {
+	this.latitude = latitude;
+	this.longitude = longitude;
+}
+
+function toRadians(degree) {
+    return (degree * (Math.PI / 180));
+}
+
+function CalcHaversineDistance(lat1, lat2, lon1, lon2) {
+	var lat1 = toRadians(lat1);
+	var lon1 = toRadians(lon1);
+	var lat2 = toRadians(lat2);
+	var lon2 = toRadians(lon2);
+    var R = 6372.8; // Earth radius, km
+    var dLat = lat2 - lat1;
+    var dLon = lon2 - lon1;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat /2) + Math.sin(dLon / 2) * Math.sin(dLon /2) * Math.cos(lat1) * Math.cos(lat2);
+    var c = 2 * Math.asin(Math.sqrt(a));
+	return R * c;
+}
+
+Coordinates.prototype.getDistance = function(anotherCoordinates) {
+	if (anotherCoordinates instanceof Coordinates) {
+		return CalcHaversineDistance(this.latitude, anotherCoordinates.latitude, this.longitude, anotherCoordinates.longitude)
+	} else {
+		return undefined;
+	}
+}
+
+Coordinates.prototype.toTuple = function() {
+	return [this.latitude, this.longitude];
+}
+
+var coordsUkraine = {
+  	"Lviv" 			: new Coordinates(49.8397, 24.0297),
+  	"Donetsk" 		: new Coordinates(48.0159, 37.8029),
+  	"Kyiv" 			: new Coordinates(50.4501, 30.5234),
+  	"Odesa"		 	: new Coordinates(46.4846, 30.7326),
+  	"Sumy" 			: new Coordinates(50.9077, 34.7981),
+  	"Kharkiv" 		: new Coordinates(49.9935, 36.2304)
+}]]></CSP>
+</Export>

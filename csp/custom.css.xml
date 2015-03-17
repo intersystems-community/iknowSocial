@@ -21,6 +21,10 @@ table {
 	table-layout: fixed;
 }
 
+table td div {
+	overflow-x: auto;
+}
+
 .small-content-wrapper td:nth-child(3) {
 	text-align: center;
 }
@@ -50,9 +54,8 @@ table {
 	height: 60vh;
 }
 
-
-
-
-
+#map {
+	height: 78vh;	
+}
 ]]></CSP>
 </Export>

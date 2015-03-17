@@ -10,6 +10,8 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
   <script src="custom.js"></script>
   <script language="JavaScript">
+  	var posts = {}
+  	
     $(document).ready(function() {
      	setSearch("#main-table");
      	$(".ec-link").click(function() {
@@ -28,18 +30,18 @@
 	    console.log([shouldClear, query, count]);
 	    $("#add-sources-modal .progress").show(400);
 	    $("#add-sources-button").prop('disabled', true);
-	    #call(Util.UI.AddMorePostsWithinContext(shouldClear, count, query))# 
+	    #call(VKReader.UIBroker.AddMorePostsWithinContext(shouldClear, count, query))# 
     }
     
     function showSourceId() {
 	    var sourceId = $("#source-id-form").val();
 	    $("#show-source-id-modal .progress").show(400);
 	    $("#show-source-id-button").prop('disabled', true);
-	    #call(Util.UI.ShowFullSourceById(sourceId))#
+	    #call(VKReader.UIBroker.ShowFullSourceById(sourceId))#
     }
     
     function showEC() {
-	    #call(Util.UI.ShowEC())#
+	    #call(VKReader.UIBroker.ShowEC())#
     }
     
     $(document).on("click", ".link-to-full-source", function () {
@@ -85,7 +87,7 @@
     <div class="row" style="margin-top:10px">
       <div class="col-md-10 col-md-offset-1">
         <div class="panel panel-default">
-          <table class="table">
+          <table class="table" id="main-table-header">
               <thead>
                 <tr>
                   <th>SourceId</th>
@@ -105,7 +107,7 @@
             <table class="table" id="main-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(Util.UI.PrintTable())#
+              	 	#call(VKReader.UIBroker.DrawTable())#
                </script>
               </tbody>
             </table>

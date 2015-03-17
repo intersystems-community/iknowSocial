@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="VKReader.UIBroker">
+<Super>Util.UIBroker</Super>
+<TimeCreated>63623,17389.188202</TimeCreated>
+
+<Method name="SaveAllPosts">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldCountEC:%String=""</FormalSpec>
+<Implementation><![CDATA[
+	set context = ##class(VKReader.Data.Context).%New()
+	if ($length(shouldCountEC) > 0) {
+		do context.CalculateEmotionalColoring()
+	}
+	
+	set totalResult = context.GetAllPostsJSON()
+	&js<
+		posts = (#(totalResult)#).posts;
+	>
+]]></Implementation>
+</Method>
+
+<Method name="DrawTable">
+<Description>
+fields must be appropriate js-array</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldCountEC:%String="",fields:%String="",tableName:%String="#main-table"</FormalSpec>
+<Implementation><![CDATA[
+	
+	do ..SaveAllPosts(shouldCountEC)
+	if ($length(fields) < 1) {
+		set fields = "['title', 'date', 'time', 'city', 'EC']"
+	}
+	&js<
+		console.log("redrawing")
+		drawTable('#(tableName)#', posts, #(fields)#);
+	>
+]]></Implementation>
+</Method>
+
+<Method name="AddMorePostsWithinContext">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
+<Implementation><![CDATA[
+	if (##class(Util.Misc).IsInteger(numberOfSources)) {
+		if (numberOfSources > ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
+			set numberOfSources = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
+		}
+		set context = ##class(VKReader.Data.Context).%New(shouldClearDomain)
+		do context.AddMorePosts(query, numberOfSources)
+	} else {
+		&js<console.log("Incorrect value for number of posts.")>
+	}
+	do ..DrawTable()
+	&js<
+		$("#add-sources-modal").modal('hide');
+	   	$("#add-sources-modal .progress").css("display", "none");
+	    $("#add-sources-button").prop('disabled', false);
+	>
+]]></Implementation>
+</Method>
+</Class>
+</Export>

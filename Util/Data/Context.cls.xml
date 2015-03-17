@@ -23,6 +23,11 @@
 <Default>iKnowSocialDomain</Default>
 </Parameter>
 
+<Parameter name="TitleMaxLength">
+<Type>Integer</Type>
+<Default>40</Default>
+</Parameter>
+
 <Method name="AddMetadataFieldIfNotExists">
 <FormalSpec>fieldName:%String</FormalSpec>
 <Private>1</Private>
@@ -49,6 +54,8 @@
 		quit:$$$ISERR(status) status
 	}
 	
+	do ..AddMetadataFieldIfNotExists("PostLatitude")
+	do ..AddMetadataFieldIfNotExists("PostLongitude")
 	do ..AddMetadataFieldIfNotExists("PostDate")
 	do ..AddMetadataFieldIfNotExists("PostTime")
 	do ..AddMetadataFieldIfNotExists("AuthorID")
@@ -86,7 +93,6 @@
 
 <Method name="AddMorePosts">
 <Abstract>1</Abstract>
-<FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 </Method>
 
@@ -104,6 +110,152 @@
 <Implementation><![CDATA[
 	set status = ..Set(clearDomain)
 	quit status
+]]></Implementation>
+</Method>
+
+<Method name="GetTitle">
+<FormalSpec>sourceId:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, ..DomainID, sourceId, 1, 1)
+	set tTitle = $lg($g(tSentences(1)), 2)
+	if ($length(tTitle) > ..#TitleMaxLength) {
+		set tTitle = $extract(tTitle, 1, ..#TitleMaxLength) _ "..."
+	}
+	quit tTitle
+]]></Implementation>
+</Method>
+
+<Method name="GetDate">
+<FormalSpec>externalId:%String,seed:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set tDate = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, seed, externalId)
+	if ($length(tDate) > 0) {
+		quit $zdate(tDate, 1)
+	}
+	quit ""
+]]></Implementation>
+</Method>
+
+<Method name="GetTime">
+<FormalSpec>externalId:%String,seed:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set tTime = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, seed, externalId)
+	if ($length(tTime) > 0) {
+		quit $ztime(tTime, 1)
+	}
+	quit ""
+]]></Implementation>
+</Method>
+
+<Method name="GetSex">
+<FormalSpec>externalId:%String,seed:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set tSex = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, seed, externalId)
+	if (tSex = "1") {
+		quit "F"
+	} elseif (tSex = "2") {
+		quit "M"
+	}
+	quit ""
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// keys are not quoted
+
+]]></Content>
+</UDLText>
+
+<Method name="GetJSONFromArray">
+<FormalSpec>contents:%ArrayOfDataTypes</FormalSpec>
+<Private>1</Private>
+<Implementation><![CDATA[
+	set result = "{"
+	set key = ""
+	for {
+		set key = contents.Next(key)
+		if (key = "") {
+			set result = result _ "}"
+			return result
+		}
+		set value = ##class(%CSP.Page).QuoteJS(contents.GetAt(key))
+		if ($length(result) > 1) {
+			set result = result _ ", " 
+		}
+		set result = result _  "'" _ key _ "' : " _ value 
+	}
+]]></Implementation>
+</Method>
+
+<Method name="GetAllPostsJSON">
+<FormalSpec>shouldCountEC:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set totalResult = ""
+	
+	if ($length(shouldCountEC) > 0) {
+		do ..CalculateEmotionalColoring()
+	}
+    set i = 1
+	set pageSize = 100
+	for {
+		kill result
+		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize)
+		if ($data(result) = 0) {
+			set totalResult = "{ 'posts' : [ " _ totalResult _ " ]}"
+			return totalResult
+		}
+		set p = ""
+		for {
+			set p = $order(result(p))	
+			if (p '= "") {
+				set tExternalId = $list(result(p), 2)
+				set tSourceId = ##class(%iKnow.Queries.SourceAPI).GetSourceId(..DomainID, tExternalId)
+				set tTitle = ..GetTitle(tSourceId)
+				set tLatitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLatitude", tExternalId)
+				set tLongitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLongitude", tExternalId)
+				set tDate = ..GetDate(tExternalId, "PostDate")
+				set tTime = ..GetTime(tExternalId, "PostTime")
+				set tCity = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorCity", tExternalId)
+				set tCountry = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorCountry", tExternalId)
+				set tDOB = ..GetDate(tExternalId, "AuthorDOB")
+				set tSex = ..GetSex(tExternalId, "AuthorSex")
+				set tId = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorID", tExternalId)
+				set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainEmotionalColoringCounter).#EmotionalColoringField, tExternalId)
+				set tRow = ##class(%ArrayOfDataTypes).%New()
+				do tRow.SetAt(tSourceId ,"sourceId")
+				do tRow.SetAt(tTitle ,"title")
+				do tRow.SetAt(tLatitude ,"latitude")
+				do tRow.SetAt(tLongitude ,"longitude")
+				do tRow.SetAt(tDate ,"date")
+				do tRow.SetAt(tTime ,"time")
+				do tRow.SetAt(tCity, "city")
+				do tRow.SetAt(tCountry ,"country")
+				do tRow.SetAt(tDOB ,"bdate")
+				do tRow.SetAt(tSex ,"sex")
+				do tRow.SetAt(tId, "id")
+				do tRow.SetAt(tEC, "EC")
+				
+				set postJSON = ..GetJSONFromArray(tRow)
+				if ($length(totalResult) > 0) {
+					set totalResult = totalResult _ ", "
+				}
+				set totalResult = totalResult _ postJSON
+			} else {
+				quit
+			}
+		}
+		set i = i + 1
+	}
 ]]></Implementation>
 </Method>
 </Class>

@@ -11,6 +11,8 @@ through a API request and store the set of items retrieved as separate Sources.<
     <li><b>query</b> As <class>%String</class> - The query to search through vk newsfeed. fe: "pizza"</li>
 	<li><b>count</b> As <class>%Integer</class> - The positive integer number of posts (from 1 to 100) to add.</li>
 	<li><b>checkExists</b> As <class>%Boolean</class> - Whether or not to check whether a post item already exists before attempting to store it (skipping if it exists),  default 1</li>
+	<li><b>latitude</b> As <class>%Numeric</class> - Latitude to search around.</li>
+	<li><b>longitude</b> As <class>%Numeric</class> - Longitude to search around.</li>
 	<li><b>startDate</b> As <class>%Date</class> - The starting date value to search posts from.</li>
 	<li><b>startTime</b> As <class>%Time</class> - The starting time value to search posts from.</li>
 	<li><b>endDate</b> As <class>%Date</class> - The ending date value to search posts to.</li>
@@ -26,6 +28,8 @@ through a API request and store the set of items retrieved as separate Sources.<
 <p><b>Extracted metadata:</b> these metadata fields will be populated with corresponding
 values for each post item, where present.</p>
 <ul>
+	<li>PostLatitude</li>
+	<li>PostLongitude</li>
 	<li>PostDate</li>
 	<li>PostTime</li>
 	<li>AuthorID</li>
@@ -52,16 +56,18 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 	set query = $li(listparams, 1)
 	set count = $li(listparams, 2)
 	set checkExists = +$lg(listparams, 3, 1)
-	set startDate = $lg(listparams, 4)
-	set startTime = $lg(listparams, 5)
-	set endDate = $lg(listparams, 6)
-	set endTime = $lg(listparams, 7)
+	set latitude = $lg(listparams, 4)
+	set longitude = $lg(listparams, 5)
+	set startDate = $lg(listparams, 6)
+	set startTime = $lg(listparams, 7)
+	set endDate = $lg(listparams, 8)
+	set endTime = $lg(listparams, 9)
 	
 	#dim response As %ListOfObjects
-	set tSC = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, query, count,,,startDate, startTime, endDate, endTime)
+	set tSC = ##class(VKReader.Requests.APIPublicMethodsCaller).NewsfeedSearch(.response, query, count, latitude, longitude, startDate, startTime, endDate, endTime)
 	quit:$$$ISERR(tSC) tSC
 	
-	do ..RegisterMetadataKeys($lb("PostDate", "PostTime", "AuthorID", "AuthorCity", "AuthorCountry", "AuthorDOB", "AuthorSex"))
+	do ..RegisterMetadataKeys($lb("PostLatitude", "PostLongitude", "PostDate", "PostTime", "AuthorID", "AuthorCity", "AuthorCountry", "AuthorDOB", "AuthorSex"))
 	
 	set userIds = "1"
 	set groupIds = "1"
@@ -81,6 +87,8 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 	quit:$$$ISERR(tSC) tSC
 	
 	for i = 1: 1: response.Count() {
+		set tPostLatitude = response.GetAt(i).Latitude
+		set tPostLongitude = response.GetAt(i).Longitude
 		set tPostDate = response.GetAt(i).Date
 		set tPostTime = response.GetAt(i).Time
 		set tOwnerID = response.GetAt(i).OwnerID
@@ -117,7 +125,7 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 			do ..StoreTemp(tRef, tTextStream.Read(.len))
 		}
 		
-		do ..SetMetadataValues(tRef, $lb(tPostDate, tPostTime, tFromID, tAuthorCity, tAuthorCountry, tAuthorDOB, tAuthorSex))
+		do ..SetMetadataValues(tRef, $lb(tPostLatitude, tPostLongitude, tPostDate, tPostTime, tFromID, tAuthorCity, tAuthorCountry, tAuthorDOB, tAuthorSex))
 	}
 	
     quit $$$OK

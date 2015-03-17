@@ -16,11 +16,11 @@
 </Parameter>
 
 <Method name="AddMorePosts">
-<FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
+<FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,latitude:%Numeric="",longitude:%Numeric="",startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set lister = ##class(VKReader.Lister).%New(..DomainID)
-	set status = lister.ProcessList(query, count, checkExists, startDate, startTime, endDate, endTime)
+	set status = lister.ProcessList(query, count, checkExists, latitude, longitude, startDate, startTime, endDate, endTime)
 	quit status
 ]]></Implementation>
 </Method>
