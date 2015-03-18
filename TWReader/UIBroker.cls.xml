@@ -29,7 +29,7 @@ fields must be appropriate js-array</Description>
 	
 	do ..SaveAllPosts(shouldCountEC)
 	if ($length(fields) < 1) {
-		set fields = "['sourceId','title', 'date', 'time', 'city', 'id', 'EC']"
+		set fields = "['query', 'title', 'date', 'time', 'city', 'id', 'EC' , 'latitude', 'longitude']"
 	}
 	&js<
 		console.log("redrawing")
@@ -88,6 +88,39 @@ fields must be appropriate js-array</Description>
 			$("#show-source-id-modal p").show(400);
 		});
 		
+	>
+]]></Implementation>
+</Method>
+
+<Method name="AddMorePostsByCoords">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
+<Implementation><![CDATA[
+	if (##class(Util.Misc).IsInteger(numberOfSources)) {
+		if (numberOfSources > ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
+			set numberOfSources = ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")
+		}
+		set context = ##class(TWReader.Data.Context).%New(shouldClearDomain)
+		///Get Place object by coordinates
+		do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place,lat,long)
+		///A WOEID is a Yahoo! Where On Earth ID.
+		set woeid = place.GetAt(1)."woeid"
+		///Get trends by woeid (set 3 param equal to hashtags will remove all hashtags from the trends list.)
+		do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlace(.response,woeid,"")
+		set trends = ##class(%ArrayOfObjects).%New()
+		set trends = response.GetAt(1)."trends"
+		for i = 1:1:trends.Count() {
+			set name = trends.GetAt(i)."name"
+			do context.AddMorePosts(name, numberOfSources)
+		}
+	} else {
+		&js<console.log("Incorrect value for number of posts.")>
+	}
+	do ..DrawTable()
+	&js<
+		$("#add-tweets-by-trends-modal").modal('hide');
+	   	$("#add-tweets-by-trends-modal .progress").css("display", "none");
+	    $("#add-tweets-button").prop('disabled', false);
 	>
 ]]></Implementation>
 </Method>

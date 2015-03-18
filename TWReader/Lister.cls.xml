@@ -59,67 +59,53 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 	set endTime = $lg(listparams, 7)
 	//set requestType = "popular" 
 	
-	set responseData = ""
-	set status = ##class(TWReader.Requests.APIMethodsCaller).TweetsSearch(.responseData, listparams)
+	set status = ##class(TWReader.Requests.APIMethodsCaller).TweetsSearch(.response, listparams)
 	quit:$$$ISERR(status) status
 	
-	do ..RegisterMetadataKeys($lb("PostDate", "PostTime", "AuthorID", "AuthorCity", "AuthorCountry", "AuthorDOB", "AuthorSex"))
+	do ..RegisterMetadataKeys($lb("Query", "PostDate", "PostTime", "AuthorID", "AuthorCity", "AuthorCountry", "PostLatitude", "PostLongitude"))
 	
-	if (($length(responseData) > 0) && ($extract(responseData, 1) = "["))
-	{
-		set responseData = "{ ""tweets"":" _ responseData _ " }"
-	}
-	#dim responseTweets as %ZEN.proxyObject
-	#dim status as %Status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .responseTweets)
-	#dim props as %ListOfObjects
-	do responseTweets.%CopyToArray(.props)
-	#dim dataStatus = $data(props)
-	if (dataStatus = 10)
-	{
-		#dim x as %ListOfObjects
-		set dataStatus = $data(props("tweets"), x)	// get the tweets collection
-		set:dataStatus=0 dataStatus = $data(props("statuses"), x)	// get the tweets collection
-
-		#dim tweetCount as %Integer = x.Count()
-		for i=1:1:tweetCount
-		{
-			#dim xt as %ZEN.proxyObject = x.GetAt(i)
-			#dim tweet = ##class(TWReader.Data.Tweet).%New(xt)
+	set tweets = ##class(%ArrayOfObjects).%New()
+	set tweets = response.GetAt(1)."statuses"
+	
+	for i = 1:1:tweets.Count() {
+		#dim tweet = ##class(TWReader.Data.Tweet).%New(tweets.GetAt(i))
+		#dim user = ##class(TWReader.Data.User).%New(tweet.User)
+		/*
+		write:(tweet.Coordinates'="") "coords = "_tweet.Coordinates ,!
+		
+		s:(tweet.Coordinates'="") ^Test(i) = $system.OBJ.Dump(tweet.Coordinates)
+		write:(tweet.Coordinates'="") "latitude = "_tweet.Coordinates."coordinates".GetAt(1) ,!
+		write:(tweet.Coordinates'="") "longitude = "_tweet.Coordinates."coordinates".GetAt(2) ,!
+		*/
+		set tPostDate = $piece(tweet.CreatedAtDateTime,",",1)
+		set tPostTime = $piece(tweet.CreatedAtDateTime,",",2)
+		set tOwnerID = user.Id
+		set tID = tweet.Ids
+		#dim tTextStream as %GlobalCharacterStream
+		set tTextStream = tweet.Text
 			
-			/*#dim coordinates as %Library.ListOfDataTypes = tweet.Coordinates.coordinates
-			write "coordinates="_coordinates ,!
-			write " Coordinates = "_tweet.Coordinates.coordinates_" User = "_tweet.User ,!*/
-			#dim user = ##class(TWReader.Data.User).%New(tweet.User)
+		set tAuthorCity = user.Location
+		set tAuthorCountry = user.WithheldInCountries
+		set tLatitude = ""
+		set tLongitude = ""
+		set:(tweet.Coordinates'="") tLatitude = tweet.Coordinates."coordinates".GetAt(1)
+		set:(tweet.Coordinates'="") tLongitude = tweet.Coordinates."coordinates".GetAt(2)
 			
-			set tPostDate = $piece(tweet.CreatedAtDateTime,",",1)
-			set tPostTime = $piece(tweet.CreatedAtDateTime,",",2)
-			set tOwnerID = user.Id
-			set tFromID = tweet.Ids
-			set tID = tweet.Ids
-			#dim tTextStream as %GlobalCharacterStream
-			set tTextStream = tweet.Text
+		set tLocalRef = tOwnerID_"#"_tID
 			
-			set tAuthorCity = user.Location
-			set tAuthorCountry = user.WithheldInCountries
-			set tAuthorDOB = ""
-			set tAuthorSex = ""
-			//write "tPostDate = "_tPostDate_"tPostTime = "_tPostTime_"tFromID = "_tFromID_"tAuthorCity = "_tAuthorCity_"tAuthorCountry = "_tAuthorCountry ,!
-			
-			set tLocalRef = tOwnerID_"#"_tID
-			
-			set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
-			do tTextStream.Rewind()
-			if (tTextStream.Size = 0) {
-				continue
-			}
-			set len = 32000
-			while (len = 32000) {
-				do ..StoreTemp(tRef, tTextStream.Read(.len))
-			}
-			
-			do ..SetMetadataValues(tRef, $lb(tPostDate, tPostTime, tFromID, tAuthorCity, tAuthorCountry, tAuthorDOB, tAuthorSex))
+		set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
+		do tTextStream.Rewind()
+		if (tTextStream.Size = 0) {
+			continue
 		}
+		set len = 32000
+		while (len = 32000) {
+			do ..StoreTemp(tRef, tTextStream.Read(.len))
+		}
+			
+		do ..SetMetadataValues(tRef, $lb(query, tPostDate, tPostTime, tID, tAuthorCity, tAuthorCountry, tLatitude, tLongitude))
 	}
+	
 	
     quit $$$OK
 ]]></Implementation>
