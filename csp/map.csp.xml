@@ -13,9 +13,19 @@
   <script src="custom.js"></script>
   <script src="geo.js"></script>
   <script language="JavaScript">
-  	var posts = {}
+  	
   	
   	$(document).ready(function() {
+	  	postCallback = function() {
+  			var geoPosts = GeoPost.getFromPosts();
+  			posts = geoPosts;
+    		console.log(geoPosts);
+    		for (var key in geoPosts) {
+	    		console.log(geoPosts[key].toTuple());
+    			L.circle(geoPosts[key].toTuple(), 20000).addTo(map);
+    		}
+  		}
+	  	
     	var map = L.map('map', {
       		center: [49, 32],
       		zoom: 5
@@ -24,10 +34,11 @@
       		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       		maxZoom: 18
     	}).addTo(map);
-    	for (var key in coordsUkraine) {
-	    	var marker = L.marker(coordsUkraine[key].toTuple()).addTo(map);
+    	for (var key in UkraineCities) {
+	    	var marker = L.marker(UkraineCities[key].toTuple()).addTo(map);
     		marker.bindPopup("<b>" + key + "</b>");
     	}
+    	
 	});
   </script>
 </head>

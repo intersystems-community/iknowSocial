@@ -87,6 +87,7 @@ fields must be appropriate js-array</Description>
 		set fields = "['title', 'date', 'time', 'city', 'EC']"
 	}
 	&js<
+		postCallback();
 		drawTable('#(tableName)#', posts, #(fields)#);
 	>
 ]]></Implementation>

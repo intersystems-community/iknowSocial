@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <CSP name="custom.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+var posts = {}
+  	
+function postCallback(){
+}
+
 headers = {
 	"sourceId" : "SourceId",
 	"title" : "Title",

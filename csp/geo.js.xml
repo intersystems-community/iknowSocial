@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <CSP name="geo.js" application="/csp/iknowsocial/" default="1"><![CDATA[
-function Coordinates(latitude, longitude) {
+function GeoPoint(latitude, longitude) {
 	this.latitude = latitude;
 	this.longitude = longitude;
 }
@@ -23,24 +23,67 @@ function CalcHaversineDistance(lat1, lat2, lon1, lon2) {
 	return R * c;
 }
 
-Coordinates.prototype.getDistance = function(anotherCoordinates) {
-	if (anotherCoordinates instanceof Coordinates) {
-		return CalcHaversineDistance(this.latitude, anotherCoordinates.latitude, this.longitude, anotherCoordinates.longitude)
+GeoPoint.prototype.getDistance = function(anotherGeoPoint) {
+	if (anotherGeoPoint instanceof GeoPoint) {
+		return CalcHaversineDistance(this.latitude, anotherGeoPoint.latitude, this.longitude, anotherGeoPoint.longitude)
 	} else {
 		return undefined;
 	}
 }
 
-Coordinates.prototype.toTuple = function() {
+GeoPoint.prototype.toTuple = function() {
 	return [this.latitude, this.longitude];
 }
 
-var coordsUkraine = {
-  	"Lviv" 			: new Coordinates(49.8397, 24.0297),
-  	"Donetsk" 		: new Coordinates(48.0159, 37.8029),
-  	"Kyiv" 			: new Coordinates(50.4501, 30.5234),
-  	"Odesa"		 	: new Coordinates(46.4846, 30.7326),
-  	"Sumy" 			: new Coordinates(50.9077, 34.7981),
-  	"Kharkiv" 		: new Coordinates(49.9935, 36.2304)
+GeoPoint.clusterize = function(points, centers) {
+	// this is very inefficient
+	
+	var array = []
+	for (var i = 0; i < centers.length; i++) {
+		array.push([])
+	}
+	
+	for (var point in points) {
+		var distToCenters = centers.map(function(center) {
+			return point.getDistance(center);
+		}); 
+		var minDist = Math.min.apply(Math, distToCenters);
+		var minIndex = distToCenters.indexOf(minDist);
+		array[minIndex].push(point);
+	}
+	
+	return array;
+}
+
+function GeoPost(rawObject) {
+	GeoPoint.call(this, rawObject.latitude, rawObject.longitude)
+	for (key in rawObject) {
+		if (key != "latitude" && key != "longitude") {
+			this[key] = rawObject[key];
+		}
+	}
+}
+
+GeoPost.prototype = new GeoPoint();
+
+GeoPost.getFromPosts = function() {
+	var array = []
+	//console.log(posts)
+	for (var i = 0; i < posts.length; i++) {
+		//console.log(posts[i]);
+		if (posts[i].latitude != "" && posts[i].longitude != "") {
+			array.unshift(new GeoPost(posts[i]));
+		}
+	}
+	return array;
+}
+
+var UkraineCities = {
+  	"Lviv" 			: new GeoPoint(49.8397, 24.0297),
+  	"Donetsk" 		: new GeoPoint(48.0159, 37.8029),
+  	"Kyiv" 			: new GeoPoint(50.4501, 30.5234),
+  	"Odesa"		 	: new GeoPoint(46.4846, 30.7326),
+  	"Sumy" 			: new GeoPoint(50.9077, 34.7981),
+  	"Kharkiv" 		: new GeoPoint(49.9935, 36.2304)
 }]]></CSP>
 </Export>
