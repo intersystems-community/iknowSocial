@@ -232,6 +232,7 @@
 				set tId = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorID", tExternalId)
 				set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainEmotionalColoringCounter).#EmotionalColoringField, tExternalId)
 				set tRow = ##class(%ArrayOfDataTypes).%New()
+				set tQuery = $piece($piece(tExternalId,":::",1),":",3)
 				do tRow.SetAt(tSourceId ,"sourceId")
 				do tRow.SetAt(tTitle ,"title")
 				do tRow.SetAt(tLatitude ,"latitude")
@@ -244,6 +245,7 @@
 				do tRow.SetAt(tSex ,"sex")
 				do tRow.SetAt(tId, "id")
 				do tRow.SetAt(tEC, "EC")
+				do tRow.SetAt(tQuery, "query")
 				
 				set postJSON = ..GetJSONFromArray(tRow)
 				if ($length(totalResult) > 0) {
