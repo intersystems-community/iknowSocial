@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <CSP name="geo.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+var METERS_IN_KILOMETER = 1000;
+var GRADUSES_IN_PI = 180;
+
 function GeoPoint(latitude, longitude) {
 	this.latitude = latitude;
 	this.longitude = longitude;
 }
 
 function toRadians(degree) {
-    return (degree * (Math.PI / 180));
+    return (degree * (Math.PI / GRADUSES_IN_PI));
 }
 
 function CalcHaversineDistance(lat1, lat2, lon1, lon2) {
@@ -35,24 +38,39 @@ GeoPoint.prototype.toTuple = function() {
 	return [this.latitude, this.longitude];
 }
 
+GeoPoint.getMinimumPairwiseDistance = function(centers) {
+	var keys = Object.keys(centers);
+	var result = Infinity;
+	for (var i = 0; i < keys.length; i++) {
+		for (var j = i + 1; j < keys.length; j++) {
+			result = Math.min(result, centers[keys[i]].getDistance(centers[keys[j]]));
+		}
+	}
+	return result
+}
+
 GeoPoint.clusterize = function(points, centers) {
 	// this is very inefficient
 	
-	var array = []
-	for (var i = 0; i < centers.length; i++) {
-		array.push([])
+	var clusters = {}
+	for (var key in centers) {
+		clusters[key] = [];
 	}
 	
-	for (var point in points) {
-		var distToCenters = centers.map(function(center) {
-			return point.getDistance(center);
-		}); 
-		var minDist = Math.min.apply(Math, distToCenters);
-		var minIndex = distToCenters.indexOf(minDist);
-		array[minIndex].push(point);
+	for (var i = 0; i < points.length; i++) {
+		var minDist = Infinity;
+		var closestCenter = undefined;
+		for (var key in centers) {
+			var distToCenter = points[i].getDistance(centers[key]);
+			if (minDist > distToCenter) {
+				minDist = distToCenter;
+				closestCenter = key;
+			}
+		}
+		clusters[closestCenter].push(points[i]);
 	}
 	
-	return array;
+	return clusters;
 }
 
 function GeoPost(rawObject) {
@@ -76,6 +94,21 @@ GeoPost.getFromPosts = function() {
 		}
 	}
 	return array;
+}
+
+// initial value is 1 to avoid zero.
+GeoPost.getTotalAbsoluteEC = function(array) {
+	var result = 1;
+	for (var i = 0; i < array.length; i++) {
+		result += Math.abs(parseInt(array[i].EC));
+	}
+	return result;
+}
+
+GeoPost.getECDistanceUnit = function(points, centers) {
+	var total = GeoPost.getTotalAbsoluteEC(points);
+	var pairwiseDistance = GeoPoint.getMinimumPairwiseDistance(centers) * METERS_IN_KILOMETER;
+	return pairwiseDistance / total; 
 }
 
 var UkraineCities = {

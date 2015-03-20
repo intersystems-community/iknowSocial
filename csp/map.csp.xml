@@ -22,7 +22,16 @@
     		console.log(geoPosts);
     		for (var key in geoPosts) {
 	    		console.log(geoPosts[key].toTuple());
-    			L.circle(geoPosts[key].toTuple(), 20000).addTo(map);
+    			//L.circle(geoPosts[key].toTuple(), 20000).addTo(map);
+    		}
+    		var clusters = GeoPoint.clusterize(posts, UkraineCities);
+    		var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, UkraineCities);
+    		console.log(clusters);
+    		console.log(ECDistanceUnit);
+    		for (var key in UkraineCities) {
+	    		var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
+	    		console.log(radius);
+    			L.circle(UkraineCities[key].toTuple(), radius).addTo(map);
     		}
   		}
 	  	
