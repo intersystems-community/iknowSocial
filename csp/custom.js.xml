@@ -104,5 +104,41 @@ function drawTable(tableId, tableObject, meta) {
       });
     });
   }
-]]></CSP>
+
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+//http://stackoverflow.com/questions/4161369/html-color-codes-red-to-yellow-to-green
+function generateGYRGradient() {
+	var result = [];
+	var red = 255; //i.e. FF
+	var green = 0;
+	var stepSize = 5; //how many colors do you want?
+	while(green < 255) {
+    	green += stepSize;
+    	if(green > 255) {
+	    	green = 255;
+		}
+		output(red, green); //assume output is function that takes RGB
+	}
+	while(red > 0) {
+    	red -= stepSize;
+    	if(red < 0) {
+	    	red = 0;
+	    }
+    	output(red, green); //assume output is function that takes RGB
+	}
+	
+	function output(red, green) {
+		result.push(rgbToHex(red, green, 0));
+	}
+	
+	return result;
+}]]></CSP>
 </Export>

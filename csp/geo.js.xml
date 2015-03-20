@@ -96,13 +96,49 @@ GeoPost.getFromPosts = function() {
 	return array;
 }
 
-// initial value is 1 to avoid zero.
+// initial value is 1 to avoid zero and to make non-emotional cities happier, gonna change this later
 GeoPost.getTotalAbsoluteEC = function(array) {
-	var result = 1;
-	for (var i = 0; i < array.length; i++) {
-		result += Math.abs(parseInt(array[i].EC));
+	return array.reduce(function(previous, current) {
+		return Math.abs(parseInt(current.EC)) + previous;
+	}, 1);
+}
+
+// here we don't need this
+GeoPost.getTotalEC = function(array) {
+	return array.reduce(function(previous, current) {
+		return parseInt(current.EC) + previous;
+	}, 0);
+}
+
+GeoPost.getECMin = function(clusters) {
+	var keys = Object.keys(clusters);
+	var min = Infinity;
+	for (var i = 0; i < keys.length; i++) {
+		min = Math.min(min, GeoPost.getTotalEC(clusters[keys[i]]));
 	}
-	return result;
+	return min;
+}
+
+GeoPost.getECAmplitude = function(clusters) {
+	var keys = Object.keys(clusters);
+	var max = -Infinity;
+	var min = Infinity;
+	for (var i = 0; i < keys.length; i++) {
+		max = Math.max(max, GeoPost.getTotalEC(clusters[keys[i]]));
+		min = Math.min(min, GeoPost.getTotalEC(clusters[keys[i]]));
+	}
+	return max - min;
+}
+
+GeoPost.getECRelations = function(clusters) {
+	var relations = {};
+	var ampl = GeoPost.getECAmplitude(clusters);
+	var min = GeoPost.getECMin(clusters);
+	
+	for (var key in clusters) {
+		relations[key] = (GeoPost.getTotalEC(clusters[key]) - min) / (ampl + 1);
+	}
+	return relations;
 }
 
 GeoPost.getECDistanceUnit = function(points, centers) {
