@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <CSP name="geo.js" application="/csp/iknowsocial/" default="1"><![CDATA[
-function Coordinates(latitude, longitude) {
+var METERS_IN_KILOMETER = 1000;
+var GRADUSES_IN_PI = 180;
+
+function GeoPoint(latitude, longitude) {
 	this.latitude = latitude;
 	this.longitude = longitude;
 }
 
 function toRadians(degree) {
-    return (degree * (Math.PI / 180));
+    return (degree * (Math.PI / GRADUSES_IN_PI));
 }
 
 function CalcHaversineDistance(lat1, lat2, lon1, lon2) {
@@ -23,24 +26,163 @@ function CalcHaversineDistance(lat1, lat2, lon1, lon2) {
 	return R * c;
 }
 
-Coordinates.prototype.getDistance = function(anotherCoordinates) {
-	if (anotherCoordinates instanceof Coordinates) {
-		return CalcHaversineDistance(this.latitude, anotherCoordinates.latitude, this.longitude, anotherCoordinates.longitude)
+GeoPoint.prototype.getDistance = function(anotherGeoPoint) {
+	if (anotherGeoPoint instanceof GeoPoint) {
+		return CalcHaversineDistance(this.latitude, anotherGeoPoint.latitude, this.longitude, anotherGeoPoint.longitude)
 	} else {
 		return undefined;
 	}
 }
 
-Coordinates.prototype.toTuple = function() {
+GeoPoint.prototype.toTuple = function() {
 	return [this.latitude, this.longitude];
 }
 
-var coordsUkraine = {
-  	"Lviv" 			: new Coordinates(49.8397, 24.0297),
-  	"Donetsk" 		: new Coordinates(48.0159, 37.8029),
-  	"Kyiv" 			: new Coordinates(50.4501, 30.5234),
-  	"Odesa"		 	: new Coordinates(46.4846, 30.7326),
-  	"Sumy" 			: new Coordinates(50.9077, 34.7981),
-  	"Kharkiv" 		: new Coordinates(49.9935, 36.2304)
+// map is leafletjs object here,
+// callback accepts data from request
+GeoPoint.getGeonamesCities = function(map, callback) {
+	var bounds = map.getBounds();
+	var geonamesUsername = 'iknowsocial';
+	$.ajax({
+		url : 'http://api.geonames.org/citiesJSON',
+		dataType : 'jsonp',
+		data : {
+			north : bounds._northEast.lat,
+			south : bounds._southWest.lat,
+			east : bounds._northEast.lng,
+			west : bounds._southWest.lng,
+			username : geonamesUsername
+		},
+		success : function(data) {
+			var centers = {};
+			data = data.geonames;
+			for (var i = 0; i < data.length; i++) {
+				centers[data[i].name] = new GeoPoint(data[i].lat, data[i].lng);
+			}
+			console.log(centers);
+			callback(centers);
+		},
+		error : function(xhr, textStatus) {
+			console.log(xhr, textStatus);
+		}
+	})
+}
+
+GeoPoint.getMinimumPairwiseDistance = function(centers) {
+	var keys = Object.keys(centers);
+	var result = Infinity;
+	for (var i = 0; i < keys.length; i++) {
+		for (var j = i + 1; j < keys.length; j++) {
+			result = Math.min(result, centers[keys[i]].getDistance(centers[keys[j]]));
+		}
+	}
+	return result
+}
+
+GeoPoint.clusterize = function(points, centers) {
+	// this is very inefficient
+	
+	var clusters = {}
+	for (var key in centers) {
+		clusters[key] = [];
+	}
+	
+	for (var i = 0; i < points.length; i++) {
+		var minDist = Infinity;
+		var closestCenter = undefined;
+		for (var key in centers) {
+			var distToCenter = points[i].getDistance(centers[key]);
+			if (minDist > distToCenter) {
+				minDist = distToCenter;
+				closestCenter = key;
+			}
+		}
+		clusters[closestCenter].push(points[i]);
+	}
+	
+	return clusters;
+}
+
+function GeoPost(rawObject) {
+	GeoPoint.call(this, rawObject.latitude, rawObject.longitude)
+	for (key in rawObject) {
+		if (key != "latitude" && key != "longitude") {
+			this[key] = rawObject[key];
+		}
+	}
+}
+
+GeoPost.prototype = new GeoPoint();
+
+GeoPost.getFromPosts = function() {
+	var array = []
+	//console.log(posts)
+	for (var i = 0; i < posts.length; i++) {
+		//console.log(posts[i]);
+		if (posts[i].latitude != "" && posts[i].longitude != "") {
+			array.unshift(new GeoPost(posts[i]));
+		}
+	}
+	return array;
+}
+
+// initial value is 1 to avoid zero and to make non-emotional cities happier, gonna change this later
+GeoPost.getTotalAbsoluteEC = function(array) {
+	return array.reduce(function(previous, current) {
+		return Math.abs(parseInt(current.EC)) + previous;
+	}, 1);
+}
+
+// here we don't need this
+GeoPost.getTotalEC = function(array) {
+	return array.reduce(function(previous, current) {
+		return parseInt(current.EC) + previous;
+	}, 0);
+}
+
+GeoPost.getECMin = function(clusters) {
+	var keys = Object.keys(clusters);
+	var min = Infinity;
+	for (var i = 0; i < keys.length; i++) {
+		min = Math.min(min, GeoPost.getTotalEC(clusters[keys[i]]));
+	}
+	return min;
+}
+
+GeoPost.getECAmplitude = function(clusters) {
+	var keys = Object.keys(clusters);
+	var max = -Infinity;
+	var min = Infinity;
+	for (var i = 0; i < keys.length; i++) {
+		max = Math.max(max, GeoPost.getTotalEC(clusters[keys[i]]));
+		min = Math.min(min, GeoPost.getTotalEC(clusters[keys[i]]));
+	}
+	return max - min;
+}
+
+GeoPost.getECRelations = function(clusters) {
+	var relations = {};
+	var ampl = GeoPost.getECAmplitude(clusters);
+	var min = GeoPost.getECMin(clusters);
+	
+	for (var key in clusters) {
+		relations[key] = (GeoPost.getTotalEC(clusters[key]) - min) / (ampl + 1);
+	}
+	return relations;
+}
+
+GeoPost.getECDistanceUnit = function(points, centers) {
+	var total = GeoPost.getTotalAbsoluteEC(points);
+	var pairwiseDistance = GeoPoint.getMinimumPairwiseDistance(centers) * METERS_IN_KILOMETER;
+	return pairwiseDistance / total; 
+}
+
+var UkraineCities = {
+  	"Lviv" 			: new GeoPoint(49.8397, 24.0297),
+  	"Donetsk" 		: new GeoPoint(48.0159, 37.8029),
+  	"Kyiv" 			: new GeoPoint(50.4501, 30.5234),
+  	"Odesa"		 	: new GeoPoint(46.4846, 30.7326),
+  	"Sumy" 			: new GeoPoint(50.9077, 34.7981),
+  	"Kharkiv" 		: new GeoPoint(49.9935, 36.2304)
 }]]></CSP>
 </Export>
