@@ -101,5 +101,24 @@
 	quit status
 ]]></Implementation>
 </Method>
+
+<Method name="GetTrendsByPlaceJSON">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*responseData:%String,id:%Integer=1,exclude:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
+	do a.SetAt(id, "id")
+	do:(exclude'="") a.SetAt(exclude, "exclude")
+	
+	#dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsPlaceUrl
+	#dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
+	set responseData = ""
+	#dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData, , authHeader)
+	//write responseData,!
+	//set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+	quit status
+]]></Implementation>
+</Method>
 </Class>
 </Export>

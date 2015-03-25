@@ -4,6 +4,27 @@
 <Super>Util.UIBroker</Super>
 <TimeCreated>63623,17389.188202</TimeCreated>
 
+<Method name="DrawTrends">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>fields:%String="",tableName:%String="#trends-table",lat:%String,long:%String</FormalSpec>
+<Implementation><![CDATA[
+	s response=""
+	do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place,lat,long)
+	set woeid = place.GetAt(1)."woeid"
+	do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlaceJSON(.response,woeid)
+	
+	set response = $replace(response,"[{","{",1,1)
+	set response = $replace(response,"}]}]","}]}")
+	set response = $replace(response,"name","sourceId")
+	
+	&js<
+		trends = (#(response)#).trends;
+		drawTable('#(tableName)#', trends, #(fields)#);
+		$('#(tableName)#').find('a').data('target')="#add-tweets-by-trends-modal";
+	>
+]]></Implementation>
+</Method>
+
 <Method name="SaveAllPosts">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>shouldCountEC:%String=""</FormalSpec>
@@ -29,8 +50,9 @@ fields must be appropriate js-array</Description>
 	
 	do ..SaveAllPosts(shouldCountEC)
 	if ($length(fields) < 1) {
-		set fields = "['query', 'title', 'date', 'time', 'city', 'id', 'EC' , 'latitude', 'longitude']"
+		set fields = "['title', 'date', 'time', 'city', 'id', 'EC' , 'latitude', 'longitude']"
 	}
+	write "fileds = "_fields ,!
 	&js<
 		console.log("redrawing")
 		drawTable('#(tableName)#', posts, #(fields)#);
@@ -113,7 +135,7 @@ fields must be appropriate js-array</Description>
 			set name = trends.GetAt(i)."name"
 			do context.AddMorePosts(name, numberOfSources)
 		}
-	} else {
+} else {
 		&js<console.log("Incorrect value for number of posts.")>
 	}
 	do ..DrawTable()
