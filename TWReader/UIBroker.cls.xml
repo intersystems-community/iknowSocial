@@ -23,98 +23,10 @@
 		$('#(tableName)#').find('a').data('target')="#add-tweets-by-trends-modal";
 	>
 ]]></Implementation>
-</Method>
-
-<Method name="SaveAllPosts">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>shouldCountEC:%String=""</FormalSpec>
-<Implementation><![CDATA[
-	set context = ##class(TWReader.Data.Context).%New()
-	if ($length(shouldCountEC) > 0) {
-		do context.CalculateEmotionalColoring()
-	}
-	
-	set totalResult = context.GetAllPostsJSON()
-	&js<
-		posts = (#(totalResult)#).posts;
-	>
-]]></Implementation>
-</Method>
-
-<Method name="DrawTable">
-<Description>
-fields must be appropriate js-array</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>shouldCountEC:%String="",fields:%String="",tableName:%String="#main-table"</FormalSpec>
-<Implementation><![CDATA[
-	
-	do ..SaveAllPosts(shouldCountEC)
-	if ($length(fields) < 1) {
-		set fields = "['title', 'date', 'time', 'city', 'id', 'EC' , 'latitude', 'longitude']"
-	}
-	write "fileds = "_fields ,!
-	&js<
-		console.log("redrawing")
-		drawTable('#(tableName)#', posts, #(fields)#);
-	>
-]]></Implementation>
-</Method>
-
-<Method name="AddMorePostsWithinContext">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
-<Implementation><![CDATA[
-	if (##class(Util.Misc).IsInteger(numberOfSources)) {
-		if (numberOfSources > ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
-			set numberOfSources = ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")
-		}
-		set context = ##class(TWReader.Data.Context).%New(shouldClearDomain)
-		do context.AddMorePosts(query, numberOfSources)
-	} else {
-		&js<console.log("Incorrect value for number of posts.")>
-	}
-	do ..DrawTable()
-	&js<
-		$("#add-sources-modal").modal('hide');
-	   	$("#add-sources-modal .progress").css("display", "none");
-	    $("#add-sources-button").prop('disabled', false);
-	>
-]]></Implementation>
-</Method>
-
-<Method name="ShowFullSourceById">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>sourceId:%String</FormalSpec>
-<Implementation><![CDATA[
-	set context = ##class(TWReader.Data.Context).%New()
-	do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, context.DomainID, sourceId, 0, 0)
-	
-	kill result
-	set result = "<p>"	
-	set i = ""
-	for {
-		set i = $order(tSentences(i), 1, tSentData)
-		
-		quit:(i = "")
-		set tResult = $li(tSentData, 2)
-		set result = result _ tResult _ " "
-	}
-	set result = result _ "</p>"
-	set result = ##class(%CSP.Page).QuoteJS(result)
-	
-	&js<
-		$("#show-source-id-modal .progress").hide(100);
-		$("#show-source-id-modal p").hide(400, function() {
-			$("#show-source-id-modal p").html(#(result)#);
-	    	$("#show-source-id-button").prop('disabled', false);
-			$("#show-source-id-modal p").show(400);
-		});
-		
-	>
-]]></Implementation>
-</Method>
-
-<Method name="AddMorePostsByCoords">
+</Method><Parameter name="ContextType">
+<Type>%String</Type>
+<Default>TW</Default>
+</Parameter><Method name="AddMorePostsByCoords">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
 <Implementation><![CDATA[

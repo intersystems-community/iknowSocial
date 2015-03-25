@@ -4,6 +4,21 @@
 <Abstract>1</Abstract>
 <TimeCreated>63623,16717.635066</TimeCreated>
 
+<Parameter name="ContextType">
+<Type>%String</Type>
+</Parameter>
+
+<Method name="InstantiateContext">
+<Description>
+Ewwww</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldClearDomain:%String=0</FormalSpec>
+<Private>1</Private>
+<ReturnType>Util.Data.Context</ReturnType>
+<Implementation><![CDATA[	quit $classmethod(..#ContextType _ "Reader.Data.Context", "%New", shouldClearDomain)
+]]></Implementation>
+</Method>
+
 <Method name="GetLinkedSourceId">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>contents:%String</FormalSpec>
@@ -12,31 +27,11 @@
 ]]></Implementation>
 </Method>
 
-<UDLText name="T">
-<Content><![CDATA[
-// think out how to create exactly one Context
-
-]]></Content>
-</UDLText>
-
-<UDLText name="T">
-<Content><![CDATA[
-// temp solution
-
-]]></Content>
-</UDLText>
-
-<Method name="AddMorePostsWithinContext">
-<Abstract>1</Abstract>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
-</Method>
-
 <Method name="ShowFullSourceById">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>sourceId:%String</FormalSpec>
 <Implementation><![CDATA[
-	set context = ##class(VKReader.Data.Context).%New()
+	set context = ..InstantiateContext()
 	do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, context.DomainID, sourceId, 0, 0)
 	
 	kill result
@@ -60,6 +55,74 @@
 			$("#show-source-id-modal p").show(400);
 		});
 		
+	>
+]]></Implementation>
+</Method>
+
+<Method name="SaveAllPosts">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldCountEC:%String=""</FormalSpec>
+<Implementation><![CDATA[
+	set context = ..InstantiateContext()
+	if ($length(shouldCountEC) > 0) {
+		do context.CalculateEmotionalColoring()
+	}
+	
+	set totalResult = context.GetAllPostsJSON()
+	&js<
+		posts = (#(totalResult)#).posts;
+	>
+]]></Implementation>
+</Method>
+
+<Method name="DrawTable">
+<Description>
+fields must be appropriate js-array</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldCountEC:%String="",fields:%String="",tableName:%String="#main-table"</FormalSpec>
+<Implementation><![CDATA[
+	
+	do ..SaveAllPosts(shouldCountEC)
+	if ($length(fields) < 1) {
+		set fields = "['title', 'date', 'time', 'city', 'EC']"
+	}
+	&js<
+		postCallback();
+		drawTable('#(tableName)#', posts, #(fields)#);
+	>
+]]></Implementation>
+</Method>
+
+<Method name="AddMorePostsWithinContext">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
+<Implementation><![CDATA[
+	if (##class(Util.Misc).IsInteger(numberOfSources)) {
+		if (numberOfSources > ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
+			set numberOfSources = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
+		}
+		set context = ..InstantiateContext(shouldClearDomain)
+		do context.AddMorePosts(query, numberOfSources)
+	} else {
+		&js<console.log("Incorrect value for number of posts.")>
+	}
+	do ..DrawTable()
+	&js<
+		$("#add-sources-modal").modal('hide');
+	   	$("#add-sources-modal .progress").css("display", "none");
+	    $("#add-sources-button").prop('disabled', false);
+	>
+]]></Implementation>
+</Method>
+
+<Method name="ShowEC">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	do ..DrawTable("1")
+	&js<
+		$(".ec-link").slideUp(400, function() {
+			$(this).html('<span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Calculate EC').fadeIn(400);
+		});
 	>
 ]]></Implementation>
 </Method>
@@ -136,24 +199,6 @@
 		w "<td>"_ result.Weight _"</td>", !
 		w "</tr>", !
 	}
-]]></Implementation>
-</Method>
-
-<Method name="DrawTable">
-<Abstract>1</Abstract>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>shouldCountEC:%String=""</FormalSpec>
-</Method>
-
-<Method name="ShowEC">
-<ClassMethod>1</ClassMethod>
-<Implementation><![CDATA[
-	do ..DrawTable("1")
-	&js<
-		$(".ec-link").slideUp(400, function() {
-			$(this).html('<span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Calculate EC').fadeIn(400);
-		});
-	>
 ]]></Implementation>
 </Method>
 </Class>
