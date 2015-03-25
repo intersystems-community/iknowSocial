@@ -13,26 +13,30 @@
   <script src="custom.js"></script>
   <script src="geo.js"></script>
   <script language="JavaScript">
-  	
+  	var emotionalCircles = L.layerGroup([]);
   	
   	$(document).ready(function() {
 	  	postCallback = function() {
+		  	emotionalCircles.clearLayers();
   			var geoPosts = GeoPost.getFromPosts();
   			posts = geoPosts;
-    		console.log(geoPosts);
-    		for (var key in geoPosts) {
-    			//L.circle(geoPosts[key].toTuple(), 20000).addTo(map);
-    		}
-    		var clusters = GeoPoint.clusterize(posts, UkraineCities);
-    		var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, UkraineCities);
-    		var gradient = generateGYRGradient();
-    		var relations = GeoPost.getECRelations(clusters);
-    		for (var key in UkraineCities) {
-	    		var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
-    			L.circle(UkraineCities[key].toTuple(), radius, {
-    				color : gradient[Math.max(Math.floor(relations[key] * gradient.length) - 1, 0)]
-    			}).addTo(map);
-    		}
+    		//for (var key in geoPosts) {
+    		//	//L.circle(geoPosts[key].toTuple(), 20000).addTo(map);
+    		//}
+    		boxCities = GeoPoint.getGeonamesCities(map, function(cities) {
+    			var clusters = GeoPoint.clusterize(posts, cities);
+    			var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, cities);
+    			var gradient = generateGYRGradient();
+    			var relations = GeoPost.getECRelations(clusters);
+    			for (var key in cities) {
+	    			var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
+    				emotionalCircles.addLayer(L.circle(cities[key].toTuple(), radius, {
+    					color : gradient[Math.max(Math.floor(relations[key] * gradient.length) - 1, 0)]
+    				}));
+    			}
+    			emotionalCircles.addTo(map);
+    		});
+    		
   		}
 	  	
     	var map = L.map('map', {
@@ -43,11 +47,11 @@
       		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       		maxZoom: 18
     	}).addTo(map);
-    	for (var key in UkraineCities) {
-	    	var marker = L.marker(UkraineCities[key].toTuple()).addTo(map);
-    		marker.bindPopup("<b>" + key + "</b>");
-    	}
-    	
+    	//for (var key in UkraineCities) {
+	    //	var marker = L.marker(UkraineCities[key].toTuple()).addTo(map);
+    	//	marker.bindPopup("<b>" + key + "</b>");
+    	//}
+    	map.on('zoomend', postCallback);
 	});
   </script>
 </head>

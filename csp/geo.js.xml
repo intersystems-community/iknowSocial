@@ -38,6 +38,36 @@ GeoPoint.prototype.toTuple = function() {
 	return [this.latitude, this.longitude];
 }
 
+// map is leafletjs object here,
+// callback accepts data from request
+GeoPoint.getGeonamesCities = function(map, callback) {
+	var bounds = map.getBounds();
+	var geonamesUsername = 'iknowsocial';
+	$.ajax({
+		url : 'http://api.geonames.org/citiesJSON',
+		dataType : 'jsonp',
+		data : {
+			north : bounds._northEast.lat,
+			south : bounds._southWest.lat,
+			east : bounds._northEast.lng,
+			west : bounds._southWest.lng,
+			username : geonamesUsername
+		},
+		success : function(data) {
+			var centers = {};
+			data = data.geonames;
+			for (var i = 0; i < data.length; i++) {
+				centers[data[i].name] = new GeoPoint(data[i].lat, data[i].lng);
+			}
+			console.log(centers);
+			callback(centers);
+		},
+		error : function(xhr, textStatus) {
+			console.log(xhr, textStatus);
+		}
+	})
+}
+
 GeoPoint.getMinimumPairwiseDistance = function(centers) {
 	var keys = Object.keys(centers);
 	var result = Infinity;
