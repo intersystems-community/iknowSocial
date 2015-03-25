@@ -44,7 +44,7 @@
       		zoom: 5
     	});
     	L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
-      		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+      		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       		maxZoom: 18
     	}).addTo(map);
     	//for (var key in UkraineCities) {
