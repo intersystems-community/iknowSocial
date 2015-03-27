@@ -53,10 +53,10 @@
 	    #call(TWReader.UIBroker.ShowEC())#
     }
     
-    $(document).on("click", ".trends-source .link-to-full-source", function () {
-     	var sourceId = $(this).text();
-     	$("#tweets-form").val(sourceId);
-     	addTweetsByTrends()
+    $(document).on("click", "#trends-table .link-to-full-source", function () {
+     	var query = $(this).text();
+     	$("#query-form").val(query);
+     	addSources()
 	});
 
     $(document).on("click", ".link-to-full-source", function () {
@@ -102,9 +102,9 @@
       </div>
     </div>
     <div class="row" style="margin-top:10px">
-      <div class="col-md-2">
+      <div class="col-md-3">
         <div class="panel panel-default">
-          <table class="table">
+          <table class="table table-striped">
               <thead>
                 <tr>
                   <th class="trends-source">Trends</th>
@@ -112,7 +112,7 @@
               </thead>
           </table>
           <div class="table-content big-content-wrapper">
-            <table class="table" id="trends-table">
+            <table class="table table-striped" id="trends-table">
               <tbody>
               	 <script language="JavaScript">
               	 	#call(TWReader.UIBroker.DrawTrends("[]","#trends-table","46.4846","30.7326"))#
@@ -122,7 +122,7 @@
           </div>
         </div>
        </div>
-       <div class="col-md-10">
+       <div class="col-md-9">
         <div class="panel panel-default">
           <table class="table">
               <thead>
@@ -132,9 +132,7 @@
                   <th>Date</th>
                   <th>Time</th>
                   <th>City</th>
-                  <th>Link</th>
-                  <th>Latitude</th>
-                  <th>Longitude</th>
+                  <th>EC</th>
                 </tr>
               </thead>
           </table>
@@ -142,7 +140,7 @@
             <table class="table" id="main-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(TWReader.UIBroker.DrawTable())#
+              	 	#call(TWReader.UIBroker.DrawTable("0","['title', 'date', 'time', 'city', 'EC']"))#
                </script>
               </tbody>
             </table>

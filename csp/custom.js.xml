@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="custom.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+<CSP name="custom.js" application="/csp/user/" default="1"><![CDATA[
 var posts = {}
   	
 function postCallback(){
@@ -32,24 +32,25 @@ function wrap(contents, tag) {
 	return "<" + tag + ">" + contents + "</" + tag + ">";
 }
 
-function drawTableRow(tableId, rowObject, meta) {
+function drawTableRow(tableId, rowObject, meta, link) {
 	$(wrap(rowObject.sourceId, "a")).addClass("link-to-full-source").attr({
 		"data-toggle": "modal",
-		"data-target": "#show-source-id-modal"
+		"data-target": link
 	}).appendTo(tableId + " tbody").wrap('<tr scope="row"><th></th></tr>');
 	for (var i = 1; i < meta.length; i++) {
 		$(tableId + " tbody tr").last().append($("<td><div>" + rowObject[meta[i]] + "</div></td>"));
 	}
 }
 
-function drawTable(tableId, tableObject, meta) {
+function drawTable(tableId, tableObject, meta, link) {
 	$(tableId + " tbody").html("")
 	meta = typeof meta !== 'undefined' ? meta : ["title", "date", "time", "city", "country", "bdate", "sex", "id", "EC"]
+	link = typeof link !== 'undefined' ? link : "#show-source-id-modal"
 	meta.unshift("sourceId");
-	drawTableHeader(tableId, meta);
-	for (var i = 0; i < tableObject.length; i++) {
-		drawTableRow(tableId, tableObject[i], meta);
+	drawTableHeader(tableId, meta);	for (var i = 0; i < tableObject.length; i++) {
+		drawTableRow(tableId, tableObject[i], meta, link);
 	}
+
 }
 	
   function toggleTableRow(tableId, row) {

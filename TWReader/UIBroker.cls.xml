@@ -4,6 +4,11 @@
 <Super>Util.UIBroker</Super>
 <TimeCreated>63623,17389.188202</TimeCreated>
 
+<Parameter name="ContextType">
+<Type>%String</Type>
+<Default>TW</Default>
+</Parameter>
+
 <Method name="DrawTrends">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>fields:%String="",tableName:%String="#trends-table",lat:%String,long:%String</FormalSpec>
@@ -19,14 +24,12 @@
 	
 	&js<
 		trends = (#(response)#).trends;
-		drawTable('#(tableName)#', trends, #(fields)#);
-		$('#(tableName)#').find('a').data('target')="#add-tweets-by-trends-modal";
+		drawTable('#(tableName)#', trends, #(fields)#,'#');
 	>
 ]]></Implementation>
-</Method><Parameter name="ContextType">
-<Type>%String</Type>
-<Default>TW</Default>
-</Parameter><Method name="AddMorePostsByCoords">
+</Method>
+
+<Method name="AddMorePostsByCoords">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
 <Implementation><![CDATA[
