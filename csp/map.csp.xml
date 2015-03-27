@@ -17,8 +17,8 @@
   	var emotionalCircles = L.layerGroup([]);
   	
   	function anchorOnclick(anchor) {
-	  	$(anchor)[0].scrollIntoView();
         console.log(anchor);
+	  	$(anchor)[0].scrollIntoView();
         higlightAndFadeTableRow(anchor);
     }
   	
@@ -30,32 +30,38 @@
     	});
   	}
   	
-  	$(document).ready(function() {
-	  	postCallback = function() {
-		  	emotionalCircles.clearLayers();
-  			posts = GeoPost.getFromPosts(posts);
-    		for (var key in posts) {
-	    		bindGeoPostMarker(posts[key], map);
+  	function drawEmotionalCircles(circlesGroup, posts, map) {
+	  	boxCities = GeoPoint.getGeonamesCities(map, function(cities) {
+		  	circlesGroup.clearLayers();
+    		var clusters = GeoPoint.clusterize(posts, cities);
+    		var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, cities);
+    		var gradient = generateGYRGradient();
+    		var relations = GeoPost.getECRelations(clusters);
+    		for (var key in cities) {
+	    		var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
+    			circlesGroup.addLayer(L.circle(cities[key].toTuple(), radius, {
+    				color : gradient[Math.max(Math.floor(relations[key] * gradient.length) - 1, 0)]
+    			}));
     		}
-    		boxCities = GeoPoint.getGeonamesCities(map, function(cities) {
-    			var clusters = GeoPoint.clusterize(posts, cities);
-    			var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, cities);
-    			var gradient = generateGYRGradient();
-    			var relations = GeoPost.getECRelations(clusters);
-    			for (var key in cities) {
-	    			var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
-    				emotionalCircles.addLayer(L.circle(cities[key].toTuple(), radius, {
-    					color : gradient[Math.max(Math.floor(relations[key] * gradient.length) - 1, 0)]
-    				}));
-    			}
-    			emotionalCircles.addTo(map);
-    		});
-  		}
-		
-    	var map = L.map('map', {
+    		circlesGroup.addTo(map);
+    	});
+  	}
+  	
+  	$(document).ready(function() {
+	  	var map = L.map('map', {
       		center: [49, 32],
       		zoom: 5
     	});
+    	
+    	postCallback = function() {
+  			posts = GeoPost.getFromPosts(posts);
+  			console.log(posts);
+    		for (var key in posts) {
+	    		bindGeoPostMarker(posts[key], map);
+    		}
+    		drawEmotionalCircles(emotionalCircles, posts, map);
+  		}
+    	
     	L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
     	//L.tileLayer('http://c.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg', {
     	//L.tileLayer('http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
@@ -63,7 +69,9 @@
       		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       		maxZoom: 18
     	}).addTo(map);
-    	map.on('zoomend', postCallback);
+    	map.on('zoomend', function() {
+    		drawEmotionalCircles(emotionalCircles, posts, map);
+    	});
 	});
   </script>
 </head>
@@ -105,7 +113,7 @@
             <table class="table" id="map-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(VKReader.UIBroker.DrawTable("", "['title', 'latitude', 'longitude']", "#map-table"))#
+              	 	#call(TWReader.UIBroker.DrawTable("", "['title', 'latitude', 'longitude', 'EC']", "#map-table"))#
                </script>
               </tbody>
             </table>

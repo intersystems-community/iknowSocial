@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="custom.js" application="/csp/user/" default="1"><![CDATA[
+<CSP name="custom.js" application="/csp/iknowsocial/" default="1"><![CDATA[
 var posts = {}
 
 function postCallback(){
@@ -45,10 +45,11 @@ function higlightAndFadeTableRow(rowId) {
 }
 
 function drawTableRow(tableId, rowObject, meta, link) {
+	var rowId = tableId.slice(1) + '-row-' + rowObject.sourceId;
 	$(wrap(rowObject.sourceId, "a")).addClass("link-to-full-source").attr({
 		"data-toggle": "modal",
 		"data-target": link
-	}).appendTo(tableId + " tbody").wrap('<tr scope="row"><th></th></tr>');
+	}).appendTo(tableId + " tbody").wrap('<tr scope="row" ' + 'id="' + rowId + '"><th></th></tr>');
 	for (var i = 1; i < meta.length; i++) {
 		$(tableId + " tbody tr").last().append($("<td><div>" + rowObject[meta[i]] + "</div></td>"));
 	}
@@ -153,5 +154,6 @@ function generateGYRGradient() {
 	}
 
 	return result;
-}]]></CSP>
+}
+]]></CSP>
 </Export>
