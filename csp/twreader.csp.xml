@@ -53,11 +53,18 @@
 	    #call(TWReader.UIBroker.ShowEC())#
     }
     
+    $(document).on("click", "#trends-table .link-to-full-source", function () {
+     	var query = $(this).text();
+     	$("#query-form").val(query);
+     	addSources()
+	});
+
     $(document).on("click", ".link-to-full-source", function () {
      	var sourceId = $(this).text();
      	$("#source-id-form").val(sourceId);
      	showSourceId()
 	});
+	
 	
 	
   </script>
@@ -85,7 +92,7 @@
   </nav>
   <div class="container">
     <div class="row">
-      <div class="col-md-10 col-md-offset-1">
+      <div class="col-md-12">
         <div class="input-group">
           <input type="text" class="form-control" placeholder="Search titles..." id="main-table-search-pane">
           <span class="input-group-btn">
@@ -95,21 +102,37 @@
       </div>
     </div>
     <div class="row" style="margin-top:10px">
-      <div class="col-md-10 col-md-offset-1">
+      <div class="col-md-3">
+        <div class="panel panel-default">
+          <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="trends-source">Trends</th>
+                </tr>
+              </thead>
+          </table>
+          <div class="table-content big-content-wrapper">
+            <table class="table table-striped" id="trends-table">
+              <tbody>
+              	 <script language="JavaScript">
+              	 	#call(TWReader.UIBroker.DrawTrends("[]","#trends-table","46.4846","30.7326"))#
+               </script>
+              </tbody>
+            </table>
+          </div>
+        </div>
+       </div>
+       <div class="col-md-9">
         <div class="panel panel-default">
           <table class="table">
               <thead>
                 <tr>
-                  <th>SourceId</th>
-                  <th>Trend</th>
-                  <th>Title</th>
+                  <th>Id</th>
+                  <th>Tweet</th>
                   <th>Date</th>
                   <th>Time</th>
                   <th>City</th>
-                  <th>Link</th>
                   <th>EC</th>
-                  <th>Latitude</th>
-                  <th>Longitude</th>
                 </tr>
               </thead>
           </table>
@@ -117,7 +140,7 @@
             <table class="table" id="main-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(TWReader.UIBroker.DrawTable())#
+              	 	#call(TWReader.UIBroker.DrawTable("0","['title', 'date', 'time', 'city', 'EC']"))#
                </script>
               </tbody>
             </table>
@@ -233,5 +256,6 @@
   </div>
 
 </body>
-</html>]]></CSP>
+</html>
+]]></CSP>
 </Export>
