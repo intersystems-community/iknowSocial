@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
   <link rel="stylesheet" href="custom.css">
   <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script src="custom.js"></script>
@@ -15,14 +16,27 @@
   <script language="JavaScript">
   	var emotionalCircles = L.layerGroup([]);
   	
+  	function anchorOnclick(anchor) {
+	  	$(anchor)[0].scrollIntoView();
+        console.log(anchor);
+        higlightAndFadeTableRow(anchor);
+    }
+  	
+  	function bindGeoPostMarker(rowObj, map) {
+	  	var anchor = '#' + 'map-table-row-' + rowObj.sourceId;
+    	var marker = L.marker(rowObj.toTuple()).addTo(map);
+    	marker.on('click', function() {
+    		anchorOnclick(anchor);
+    	});
+  	}
+  	
   	$(document).ready(function() {
 	  	postCallback = function() {
 		  	emotionalCircles.clearLayers();
-  			var geoPosts = GeoPost.getFromPosts();
-  			posts = geoPosts;
-    		//for (var key in geoPosts) {
-    		//	//L.circle(geoPosts[key].toTuple(), 20000).addTo(map);
-    		//}
+  			posts = GeoPost.getFromPosts(posts);
+    		for (var key in posts) {
+	    		bindGeoPostMarker(posts[key], map);
+    		}
     		boxCities = GeoPoint.getGeonamesCities(map, function(cities) {
     			var clusters = GeoPoint.clusterize(posts, cities);
     			var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, cities);
@@ -36,21 +50,19 @@
     			}
     			emotionalCircles.addTo(map);
     		});
-    		
   		}
-	  	
+		
     	var map = L.map('map', {
       		center: [49, 32],
       		zoom: 5
     	});
-    	L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+    	L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    	//L.tileLayer('http://c.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg', {
+    	//L.tileLayer('http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    	//L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
       		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       		maxZoom: 18
     	}).addTo(map);
-    	//for (var key in UkraineCities) {
-	    //	var marker = L.marker(UkraineCities[key].toTuple()).addTo(map);
-    	//	marker.bindPopup("<b>" + key + "</b>");
-    	//}
     	map.on('zoomend', postCallback);
 	});
   </script>

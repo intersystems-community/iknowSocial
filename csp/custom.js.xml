@@ -32,11 +32,24 @@ function wrap(contents, tag) {
 	return "<" + tag + ">" + contents + "</" + tag + ">";
 }
 
+function higlightAndFadeTableRow(rowId) {
+//http://stackoverflow.com/questions/1757988/highlight-then-fade-highlight-for-list-items-dynamically-added-to-a-list
+	var colorStr = '#DDDDFF'; // color of highlight
+	$(rowId).each(function (i, x) {
+    	$(this).css("background-color", colorStr);
+    	setTimeout(function(){
+        	$(x).css("background-color","#ffffff"); // reset background
+        	$(x).effect("highlight", {color: colorStr}, 1000); // animate
+    	}, 500);
+	});
+}
+
 function drawTableRow(tableId, rowObject, meta) {
+	var rowId = tableId.slice(1) + '-row-' + rowObject.sourceId;
 	$(wrap(rowObject.sourceId, "a")).addClass("link-to-full-source").attr({
 		"data-toggle": "modal",
 		"data-target": "#show-source-id-modal"
-	}).appendTo(tableId + " tbody").wrap('<tr scope="row"><th></th></tr>');
+	}).appendTo(tableId + " tbody").wrap('<tr scope="row" ' + 'id="' + rowId + '"><th></th></tr>');
 	for (var i = 1; i < meta.length; i++) {
 		$(tableId + " tbody tr").last().append($("<td><div>" + rowObject[meta[i]] + "</div></td>"));
 	}

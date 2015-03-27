@@ -59,7 +59,6 @@ GeoPoint.getGeonamesCities = function(map, callback) {
 			for (var i = 0; i < data.length; i++) {
 				centers[data[i].name] = new GeoPoint(data[i].lat, data[i].lng);
 			}
-			console.log(centers);
 			callback(centers);
 		},
 		error : function(xhr, textStatus) {
@@ -114,11 +113,9 @@ function GeoPost(rawObject) {
 
 GeoPost.prototype = new GeoPoint();
 
-GeoPost.getFromPosts = function() {
+GeoPost.getFromPosts = function(posts) {
 	var array = []
-	//console.log(posts)
 	for (var i = 0; i < posts.length; i++) {
-		//console.log(posts[i]);
 		if (posts[i].latitude != "" && posts[i].longitude != "") {
 			array.unshift(new GeoPost(posts[i]));
 		}
