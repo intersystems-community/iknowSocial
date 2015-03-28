@@ -15,6 +15,10 @@
   <script src="geo.js"></script>
   <script language="JavaScript">
   	var emotionalCircles = L.layerGroup([]);
+    
+    $(document).on("click", "#trends-table .link-to-full-source", function () {
+	    #call(TWReader.UIBroker.AddMorePostsWithinContext(0, 100, $(this).text(), 1, "['title', 'EC']", "#map-table"))#
+	});
   	
   	function anchorOnclick(anchor) {
         console.log(anchor);
@@ -87,25 +91,43 @@
   </nav>
   <div class="container">
     <div class="row">
-      <div class="col-md-10 col-md-offset-1">
+      <div class="col-md-12">
         
       </div>
     </div>
     <div class="row" style="margin-top:10px">
+      <div class="col-md-3">
+        <div class="panel panel-default">
+          <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="trends-source">Trends</th>
+                </tr>
+              </thead>
+          </table>
+          <div class="table-content big-content-wrapper">
+            <table class="table table-striped" id="trends-table">
+              <tbody>
+              	 <script language="JavaScript">
+              	 	#call(TWReader.UIBroker.DrawTrends("['sourceId']","#trends-table","46.4846","30.7326"))#
+               </script>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
       <div class="col-md-6">
       	<div class="panel panel-default">
         	<div id="map"></div>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-3">
       	<div class="panel panel-default">
           <table class="table" id="map-table-header">
               <thead>
                 <tr>
-                  <th>SourceId</th>
                   <th>Title</th>
-                  <th>Lat</th>
-                  <th>Long</th>
+                  <th>EC</th>
                 </tr>
               </thead>
           </table>
@@ -113,7 +135,7 @@
             <table class="table" id="map-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(TWReader.UIBroker.DrawTable("", "['title', 'latitude', 'longitude', 'EC']", "#map-table"))#
+              	 	#call(TWReader.UIBroker.DrawTable("", "['title', 'EC']", "#map-table"))#
                </script>
               </tbody>
             </table>
@@ -122,7 +144,6 @@
       </div>
     </div>
   </div>
-
 
 </body>
 </html>
