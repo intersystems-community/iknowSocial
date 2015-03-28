@@ -95,10 +95,6 @@
                   <th>Date</th>
                   <th>Time</th>
                   <th>City</th>
-                  <th>Country</th>
-                  <th>DOB</th>
-                  <th>Sex</th>
-                  <th>Link</th>
                   <th>EC</th>
                 </tr>
               </thead>
