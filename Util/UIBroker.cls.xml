@@ -84,7 +84,7 @@ fields must be appropriate js-array</Description>
 	
 	do ..SaveAllPosts(shouldCountEC)
 	if ($length(fields) < 1) {
-		set fields = "['title', 'date', 'time', 'city', 'EC']"
+		set fields = "['sourceId', 'title', 'date', 'time', 'city', 'EC']"
 	}
 	&js<
 		postCallback();
@@ -152,14 +152,18 @@ fields must be appropriate js-array</Description>
 	set stringifiedJSON = ##class(Misc.EmotionalMarker).ApproveMarkersFromJSONAndReturnJSONWithIds(stringifiedDict)
 	set stringifiedJSON = ##class(%CSP.Page).QuoteJS(stringifiedJSON)
 	&js<
-		dict = JSON.parse(#(stringifiedJSON)#)
-		$("#right-table .highlighted-row").prependTo("#left-table")
+		dict = JSON.parse(#(stringifiedJSON)#);
+		$("#right-table .highlighted-row").filter(function(i) {
+			var key = $("td:nth-child(2)", this).text();
+			return dict[key] !== undefined;
+		}).prependTo("#left-table");
 		$("#left-table .highlighted-row").each(function() {
 			$("th:nth-child(1)", this).text(dict[$("td:nth-child(2)", this).text()]);
 		});
-		unhighlightWholeTable("#left-table")
-		$("#right-table-main-button").prop("disabled", true)
-		setTableToggling("#left-table")
+		unhighlightWholeTable("#left-table");
+		unhighlightWholeTable("#right-table");
+		$("#right-table-main-button").prop("disabled", true);
+		setTableToggling("#left-table");
 	>
 ]]></Implementation>
 </Method>

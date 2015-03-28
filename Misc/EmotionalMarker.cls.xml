@@ -108,7 +108,10 @@
 			quit
 		}
 		kill marker
-		do ##class(Misc.EmotionalMarker).DirectlyApproveMarker(current, dict.%data(current), .marker)
+		set status = ##class(Misc.EmotionalMarker).DirectlyApproveMarker(current, dict.%data(current), .marker)
+		if ($$$ISERR(status)) {
+			continue
+		}
 		set result = result _ ", """ _ current _ """: """ _ marker.%Id() _ """"
 	}
 	set result = "{" _ $extract(result, 2, $length(result)) _ "}"
