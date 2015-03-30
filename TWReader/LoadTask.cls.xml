@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.LoadTask">
+<Super>%SYS.Task.Definition</Super>
+<TimeCreated>63638,65063.347621</TimeCreated>
+
+<Method name="OnTask">
+<Description><![CDATA[
+This method is responsible for executing the task.<br>
+At the scheduled time, the Task Manager creates an instance of this object,
+sets any property values using the stored "settings" for the task, and then
+invokes this method to execute the task.<br>
+In order to execute a real task, override this method in a subclass.]]></Description>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ d ##class(TWReader.UIBroker).AddMorePostsByCoords("0", "100", "46.4846", "30.7326")
+ Quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>
