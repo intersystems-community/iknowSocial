@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Tasks><Task>
+  <Name>LoadTweets</Name>
+  <RunAsUser>UnknownUser</RunAsUser>
+  <EmailOutput>false</EmailOutput>
+  <Expires>true</Expires>
+  <OpenOutputFile>false</OpenOutputFile>
+  <OutputFileIsBinary>true</OutputFileIsBinary>
+  <SuspendOnError>false</SuspendOnError>
+  <Suspended>0</Suspended>
+  <Priority>0</Priority>
+  <TaskClass>TWReader.LoadTask</TaskClass>
+  <IsBatch>false</IsBatch>
+  <NameSpace>USER</NameSpace>
+  <TimePeriod>0</TimePeriod>
+  <TimePeriodEvery>1</TimePeriodEvery>
+  <DailyFrequency>1</DailyFrequency>
+  <DailyFrequencyTime>0</DailyFrequencyTime>
+  <DailyIncrement>10</DailyIncrement>
+  <DailyStartTime>00:00:00</DailyStartTime>
+  <DailyEndTime>23:59:59</DailyEndTime>
+  <JobGUID>9865C463-9090-44D6-902A-D196E2ADDF9E</JobGUID>
+  <StartDate>2015-03-27</StartDate>
+  <EndDate>2015-04-28</EndDate>
+  <LastSchedule>,</LastSchedule>
+  <LastStarted>63638,66600</LastStarted>
+  <LastFinished>63638,66618</LastFinished>
+  <Error>Задача истекла для 2015-03-27 18:00 Задача завершилась</Error>
+  <MirrorStatus>1</MirrorStatus>
+  <Type>2</Type>
+  <RescheduleOnStart>false</RescheduleOnStart>
+  <DeleteAfterRun>false</DeleteAfterRun>
+  <Description>Load tweets to domain</Description>
+  <DisplayRun>Ежедневно, каждый день</DisplayRun>
+  <DisplayInterval>Каждую(е) 10 минуту(ы) между 00:00:00 и 23:59:59</DisplayInterval>
+  <DisplayStarted>2015-03-27 18:30</DisplayStarted>
+  <DisplayStartDate>2015-03-27</DisplayStartDate>
+  <DisplayEndDate>2015-04-28</DisplayEndDate>
+  <DisplayDayNextScheduled>2015-03-27</DisplayDayNextScheduled>
+  <DisplayFinished>2015-03-27 18:30</DisplayFinished>
+  <DisplayStatus>1</DisplayStatus>
+  <DisplayNextScheduled>2015-03-27 00:10:00</DisplayNextScheduled>
+  <DisplayNextScheduledBrief>2015-03-27 00:10</DisplayNextScheduledBrief>
+</Task>
+
+</Tasks>
