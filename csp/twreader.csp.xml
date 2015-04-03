@@ -67,7 +67,11 @@
 	});
 	
     function redrawTableByPage(pageNum, pageSize) {
+<<<<<<< HEAD
     	#call(TWReader.UIBroker.DrawTable("0","['sourceId','title', 'date', 'time', 'city', 'EC']","#main-table",pageNum,pageSize))#
+=======
+    	#call(TWReader.UIBroker.DrawTable("0","['title', 'date', 'time', 'city', 'EC']","#main-table",pageNum,pageSize))#
+>>>>>>> remotes/origin/twitter-trends-reader
     }
         
 </script>
@@ -143,7 +147,12 @@
             <table class="table" id="main-table">
               <tbody>
               	 <script language="JavaScript">
+<<<<<<< HEAD
 					redrawTableByPage("1","8");               </script>
+=======
+              	 		redrawTableByPage("1","8");
+               </script>
+>>>>>>> remotes/origin/twitter-trends-reader
               </tbody>
             </table>
 	   	  </div>
