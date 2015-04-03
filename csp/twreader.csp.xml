@@ -9,6 +9,7 @@
   <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
   <script src="custom.js"></script>
+  <script src="jquery.bootpag.js"></script>
   <script language="JavaScript">
     $(document).ready(function() {
      	setSearch("#main-table");
@@ -65,9 +66,11 @@
      	showSourceId()
 	});
 	
-	
-	
-  </script>
+    function redrawTableByPage(pageNum, pageSize) {
+    	#call(TWReader.UIBroker.DrawTable("0","['title', 'date', 'time', 'city', 'EC']","#main-table",pageNum,pageSize))#
+    }
+        
+</script>
 </head>
 <body>
   <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -140,12 +143,17 @@
             <table class="table" id="main-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(TWReader.UIBroker.DrawTable("0","['title', 'date', 'time', 'city', 'EC']"))#
+              	 		redrawTableByPage("1","8");
                </script>
               </tbody>
             </table>
-          </div>
+	   	  </div>
         </div>
+		<div class="col-md-9 col-md-offset-2" id="page-selection"></div>
+			<script language="JavaScript">
+              	#call(TWReader.UIBroker.RedrawTable("8"))#
+    		</script>	   	  
+	   	  
       </div>
     </div>
   </div>
