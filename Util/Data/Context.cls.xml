@@ -211,7 +211,6 @@
 	for {
 		kill result
 		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize)
-		write "result = "_$data(result) ,!
 		if ($data(result) = 0) {
 			set totalResult = "{ 'posts' : [ " _ totalResult _ " ]}"
 			return totalResult
