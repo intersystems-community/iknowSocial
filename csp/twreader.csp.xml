@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="twreader.csp" application="/csp/user/" default="1"><![CDATA[
+<CSP name="twreader.csp" application="/csp/iknowsocial/" default="1"><![CDATA[
 <html>
 <head>
   <title>TWReader</title>
@@ -115,7 +115,7 @@
             <table class="table table-striped" id="trends-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(TWReader.UIBroker.DrawTrends("[]","#trends-table","46.4846","30.7326"))#
+              	 	#call(TWReader.UIBroker.DrawTrends("['sourceId']","#trends-table","46.4846","30.7326"))#
                </script>
               </tbody>
             </table>
@@ -124,7 +124,7 @@
        </div>
        <div class="col-md-9">
         <div class="panel panel-default">
-          <table class="table">
+          <table class="table" id="main-table-header">
               <thead>
                 <tr>
                   <th>Id</th>
@@ -140,7 +140,7 @@
             <table class="table" id="main-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(TWReader.UIBroker.DrawTable("0","['title', 'date', 'time', 'city', 'EC']"))#
+              	 	#call(TWReader.UIBroker.DrawTable("0","['sourceId', 'title', 'date', 'time', 'city', 'EC']"))#
                </script>
               </tbody>
             </table>

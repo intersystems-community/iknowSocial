@@ -44,7 +44,7 @@
 <Implementation><![CDATA[
 	#dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
 	do a.SetAt($li(listparams, 1), "q")
-	do a.SetAt("popular", "result_type")
+	do a.SetAt("recent", "result_type")
 	do a.SetAt($li(listparams, 2), "count")
 	do:($li(listparams, 2)="") a.SetAt(15, "count")
 	//do ..AddParameter(a, "since_id", sinceId)

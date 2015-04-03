@@ -15,7 +15,6 @@ $(document).ready(function() {
 	
 	var getDomainId = function() {
 		var res = ($("#domain-chooser button").text()).split(" ");
-		console.log(res)
 		return res[0]
 	}
 	

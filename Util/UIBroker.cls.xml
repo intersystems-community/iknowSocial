@@ -84,7 +84,7 @@ fields must be appropriate js-array</Description>
 	
 	do ..SaveAllPosts(shouldCountEC)
 	if ($length(fields) < 1) {
-		set fields = "['title', 'date', 'time', 'city', 'EC']"
+		set fields = "['sourceId', 'title', 'date', 'time', 'city', 'EC']"
 	}
 	&js<
 		postCallback();
@@ -95,7 +95,7 @@ fields must be appropriate js-array</Description>
 
 <Method name="AddMorePostsWithinContext">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String</FormalSpec>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String,shouldCountEC:%String="",fields:%String="",tableName:%String="#main-table"</FormalSpec>
 <Implementation><![CDATA[
 	if (##class(Util.Misc).IsInteger(numberOfSources)) {
 		if (numberOfSources > ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
@@ -106,7 +106,7 @@ fields must be appropriate js-array</Description>
 	} else {
 		&js<console.log("Incorrect value for number of posts.")>
 	}
-	do ..DrawTable()
+	do ..DrawTable(shouldCountEC, fields, tableName)
 	&js<
 		$("#add-sources-modal").modal('hide');
 	   	$("#add-sources-modal .progress").css("display", "none");
@@ -152,14 +152,18 @@ fields must be appropriate js-array</Description>
 	set stringifiedJSON = ##class(Misc.EmotionalMarker).ApproveMarkersFromJSONAndReturnJSONWithIds(stringifiedDict)
 	set stringifiedJSON = ##class(%CSP.Page).QuoteJS(stringifiedJSON)
 	&js<
-		dict = JSON.parse(#(stringifiedJSON)#)
-		$("#right-table .highlighted-row").prependTo("#left-table")
+		dict = JSON.parse(#(stringifiedJSON)#);
+		$("#right-table .highlighted-row").filter(function(i) {
+			var key = $("td:nth-child(2)", this).text();
+			return dict[key] !== undefined;
+		}).prependTo("#left-table");
 		$("#left-table .highlighted-row").each(function() {
 			$("th:nth-child(1)", this).text(dict[$("td:nth-child(2)", this).text()]);
 		});
-		unhighlightWholeTable("#left-table")
-		$("#right-table-main-button").prop("disabled", true)
-		setTableToggling("#left-table")
+		unhighlightWholeTable("#left-table");
+		unhighlightWholeTable("#right-table");
+		$("#right-table-main-button").prop("disabled", true);
+		setTableToggling("#left-table");
 	>
 ]]></Implementation>
 </Method>

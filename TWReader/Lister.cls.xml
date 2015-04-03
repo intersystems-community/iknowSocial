@@ -88,8 +88,8 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 		set tAuthorCountry = user.WithheldInCountries
 		set tLatitude = ""
 		set tLongitude = ""
-		set:(tweet.Coordinates'="") tLatitude = tweet.Coordinates."coordinates".GetAt(1)
-		set:(tweet.Coordinates'="") tLongitude = tweet.Coordinates."coordinates".GetAt(2)
+		set:(tweet.Coordinates'="") tLatitude = tweet.Coordinates."coordinates".GetAt(2)
+		set:(tweet.Coordinates'="") tLongitude = tweet.Coordinates."coordinates".GetAt(1)
 			
 		set tLocalRef = tOwnerID_"#"_tID
 			

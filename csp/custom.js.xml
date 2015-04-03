@@ -1,110 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="custom.js" application="/csp/user/" default="1"><![CDATA[
+<CSP name="custom.js" application="/csp/iknowsocial/" default="1"><![CDATA[
 var posts = {}
-  	
+
 function postCallback(){
-}
-
-headers = {
-	"sourceId" : "SourceId",
-	"title" : "Title",
-	"date" : "Date",
-	"time" : "Time",
-	"city" : "City",
-	"country" : "Country",
-	"bdate" : "DOB",
-	"sex" : "Sex", 
-	"id" : "Link",
-	"EC": "EC",
-	"latitude": "Lat",
-	"longitude": "Long"
-}
-
-function drawTableHeader(tableId, meta) {
-	$(tableId + "-header thead tr").html("")
-	for (var i = 0; i < meta.length; i++) {
-		$(tableId + "-header thead tr").append($("<th><div>" + headers[meta[i]] + "</div></th>"));
-	}
 }
 
 function wrap(contents, tag) {
 	return "<" + tag + ">" + contents + "</" + tag + ">";
 }
 
+function higlightAndFadeTableRow(rowId) {
+//http://stackoverflow.com/questions/1757988/highlight-then-fade-highlight-for-list-items-dynamically-added-to-a-list
+	var colorStr = '#DDDDFF'; // color of highlight
+	$(rowId).each(function (i, x) {
+    	$(this).css("background-color", colorStr);
+    	setTimeout(function(){
+        	$(x).css("background-color","#ffffff"); // reset background
+        	$(x).effect("highlight", {color: colorStr}, 1000); // animate
+    	}, 500);
+	});
+}
+
 function drawTableRow(tableId, rowObject, meta, link) {
-	$(wrap(rowObject.sourceId, "a")).addClass("link-to-full-source").attr({
-		"data-toggle": "modal",
-		"data-target": link
-	}).appendTo(tableId + " tbody").wrap('<tr scope="row"><th></th></tr>');
-	for (var i = 1; i < meta.length; i++) {
-		$(tableId + " tbody tr").last().append($("<td><div>" + rowObject[meta[i]] + "</div></td>"));
+	var rowId = tableId.slice(1) + '-row-' + rowObject.sourceId;
+	$('<tr scope="row" ' + 'id="' + rowId + '"></tr>').appendTo(tableId + " tbody");
+	if (meta.indexOf("sourceId") !== -1) {
+		$(wrap(rowObject.sourceId, "a")).addClass("link-to-full-source").attr({
+			"data-toggle": "modal",
+			"data-target": link
+		}).appendTo($(tableId + " tbody tr").last()).wrap("<th></th>");
+	}
+	for (var i = 0; i < meta.length; i++) {
+		if (meta[i] !== "sourceId") {
+			$(tableId + " tbody tr").last().append($("<td><div>" + rowObject[meta[i]] + "</div></td>"));
+		}
 	}
 }
 
 function drawTable(tableId, tableObject, meta, link) {
 	$(tableId + " tbody").html("")
-	meta = typeof meta !== 'undefined' ? meta : ["title", "date", "time", "city", "country", "bdate", "sex", "id", "EC"]
+	meta = typeof meta !== 'undefined' ? meta : ["sourceId", "title", "date", "time", "city", "country", "bdate", "sex", "id", "EC"]
 	link = typeof link !== 'undefined' ? link : "#show-source-id-modal"
-	meta.unshift("sourceId");
-	drawTableHeader(tableId, meta);	for (var i = 0; i < tableObject.length; i++) {
+	for (var i = 0; i < tableObject.length; i++) {
 		drawTableRow(tableId, tableObject[i], meta, link);
 	}
 
 }
-	
-  function toggleTableRow(tableId, row) {
+
+function toggleTableRow(tableId, row) {
     var tableRows = $(tableId + " tr");
     row.toggleClass("highlighted-row");
     $(tableId + "-main-button").prop("disabled", tableRows.filter(".highlighted-row").length < 1);
-  };
+};
 
-  function unhighlightTableRow(tableId, row) {
+function unhighlightTableRow(tableId, row) {
     var tableRows = $(tableId + " tr");
     row.removeClass("highlighted-row");
     $(tableId + "-main-button").prop("disabled", tableRows.filter(".highlighted-row").length < 1);
-  }
+}
 
-  function toggleWholeTable(tableId) {
+function toggleWholeTable(tableId) {
     var tableRows = $(tableId + " tr");
     tableRows.each(function() {
-      toggleTableRow(tableId, $(this));
+    	toggleTableRow(tableId, $(this));
     });
-  };
+};
 
-  function unhighlightWholeTable(tableId) {
+function unhighlightWholeTable(tableId) {
     var tableRows = $(tableId + " tr");
     tableRows.each(function() {
-      unhighlightTableRow(tableId, $(this));
+	    unhighlightTableRow(tableId, $(this));
     });
-  }
+}
 
-  function setTableToggling(tableId) {
-    console.log(tableId);
+function setTableToggling(tableId) {
     var tableRows = $(tableId + " tr");
     tableRows.off("click");
     tableRows.click(function() {
-      toggleTableRow(tableId, $(this));
+	    toggleTableRow(tableId, $(this));
     });
-  };
+};
 
-  function setSearch(tableId) {
+function setSearch(tableId) {
     $(tableId + '-search-pane').keyup(function() {
-      var text = $(this).val();
-      $(tableId + ' tr td:nth-child(2)').each(function() {
-        var elem = $(this);
-        if (elem.text().indexOf(text) > -1) {
-          elem.parent().css({
-            "display":"table-row"
-          });
-        } else {
-          elem.parent().css({
-            "display":"none"
-          });
-        }
-      });
+    	var text = $(this).val();
+      	$(tableId + ' tr td:nth-child(2)').each(function() {
+        	var elem = $(this);
+        	if (elem.text().indexOf(text) > -1) {
+          		elem.parent().css({
+            		"display":"table-row"
+          		});
+        	} else {
+          		elem.parent().css({
+            		"display":"none"
+          		});
+        	}
+      	});
     });
-  }
+}
 
 function componentToHex(c) {
     var hex = c.toString(16);
@@ -135,11 +129,12 @@ function generateGYRGradient() {
 	    }
     	output(red, green); //assume output is function that takes RGB
 	}
-	
+
 	function output(red, green) {
 		result.push(rgbToHex(red, green, 0));
 	}
-	
+
 	return result;
-}]]></CSP>
+}
+]]></CSP>
 </Export>

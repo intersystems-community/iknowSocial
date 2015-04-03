@@ -8,50 +8,74 @@
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
   <link rel="stylesheet" href="custom.css">
   <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script src="custom.js"></script>
   <script src="geo.js"></script>
   <script language="JavaScript">
   	var emotionalCircles = L.layerGroup([]);
+    
+    $(document).on("click", "#trends-table .link-to-full-source", function () {
+	    #call(TWReader.UIBroker.AddMorePostsWithinContext(0, 100, $(this).text(), 1, "['title', 'EC']", "#map-table"))#
+	});
+  	
+  	function anchorOnclick(anchor) {
+        console.log(anchor);
+	  	$(anchor)[0].scrollIntoView();
+        higlightAndFadeTableRow(anchor);
+    }
+  	
+  	function bindGeoPostMarker(rowObj, map) {
+	  	var anchor = '#' + 'map-table-row-' + rowObj.sourceId;
+    	var marker = L.marker(rowObj.toTuple()).addTo(map);
+    	marker.on('click', function() {
+    		anchorOnclick(anchor);
+    	});
+  	}
+  	
+  	function drawEmotionalCircles(circlesGroup, posts, map) {
+	  	boxCities = GeoPoint.getGeonamesCities(map, function(cities) {
+		  	circlesGroup.clearLayers();
+    		var clusters = GeoPoint.clusterize(posts, cities);
+    		var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, cities);
+    		var gradient = generateGYRGradient();
+    		var relations = GeoPost.getECRelations(clusters);
+    		for (var key in cities) {
+	    		var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
+    			circlesGroup.addLayer(L.circle(cities[key].toTuple(), radius, {
+    				color : gradient[Math.max(Math.floor(relations[key] * gradient.length) - 1, 0)]
+    			}));
+    		}
+    		circlesGroup.addTo(map);
+    	});
+  	}
   	
   	$(document).ready(function() {
-	  	postCallback = function() {
-		  	emotionalCircles.clearLayers();
-  			var geoPosts = GeoPost.getFromPosts();
-  			posts = geoPosts;
-    		//for (var key in geoPosts) {
-    		//	//L.circle(geoPosts[key].toTuple(), 20000).addTo(map);
-    		//}
-    		boxCities = GeoPoint.getGeonamesCities(map, function(cities) {
-    			var clusters = GeoPoint.clusterize(posts, cities);
-    			var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, cities);
-    			var gradient = generateGYRGradient();
-    			var relations = GeoPost.getECRelations(clusters);
-    			for (var key in cities) {
-	    			var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
-    				emotionalCircles.addLayer(L.circle(cities[key].toTuple(), radius, {
-    					color : gradient[Math.max(Math.floor(relations[key] * gradient.length) - 1, 0)]
-    				}));
-    			}
-    			emotionalCircles.addTo(map);
-    		});
-    		
-  		}
-	  	
-    	var map = L.map('map', {
+	  	var map = L.map('map', {
       		center: [49, 32],
       		zoom: 5
     	});
-    	L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+    	
+    	postCallback = function() {
+  			posts = GeoPost.getFromPosts(posts);
+  			console.log(posts);
+    		for (var key in posts) {
+	    		bindGeoPostMarker(posts[key], map);
+    		}
+    		drawEmotionalCircles(emotionalCircles, posts, map);
+  		}
+    	
+    	L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    	//L.tileLayer('http://c.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg', {
+    	//L.tileLayer('http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    	//L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
       		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       		maxZoom: 18
     	}).addTo(map);
-    	//for (var key in UkraineCities) {
-	    //	var marker = L.marker(UkraineCities[key].toTuple()).addTo(map);
-    	//	marker.bindPopup("<b>" + key + "</b>");
-    	//}
-    	map.on('zoomend', postCallback);
+    	map.on('zoomend', function() {
+    		drawEmotionalCircles(emotionalCircles, posts, map);
+    	});
 	});
   </script>
 </head>
@@ -67,25 +91,43 @@
   </nav>
   <div class="container">
     <div class="row">
-      <div class="col-md-10 col-md-offset-1">
+      <div class="col-md-12">
         
       </div>
     </div>
     <div class="row" style="margin-top:10px">
+      <div class="col-md-3">
+        <div class="panel panel-default">
+          <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="trends-source">Trends</th>
+                </tr>
+              </thead>
+          </table>
+          <div class="table-content big-content-wrapper">
+            <table class="table table-striped" id="trends-table">
+              <tbody>
+              	 <script language="JavaScript">
+              	 	#call(TWReader.UIBroker.DrawTrends("['sourceId']","#trends-table","46.4846","30.7326"))#
+               </script>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
       <div class="col-md-6">
       	<div class="panel panel-default">
         	<div id="map"></div>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-3">
       	<div class="panel panel-default">
           <table class="table" id="map-table-header">
               <thead>
                 <tr>
-                  <th>SourceId</th>
                   <th>Title</th>
-                  <th>Lat</th>
-                  <th>Long</th>
+                  <th>EC</th>
                 </tr>
               </thead>
           </table>
@@ -93,7 +135,7 @@
             <table class="table" id="map-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(VKReader.UIBroker.DrawTable("", "['title', 'latitude', 'longitude']", "#map-table"))#
+              	 	#call(TWReader.UIBroker.DrawTable("", "['title', 'EC']", "#map-table"))#
                </script>
               </tbody>
             </table>
@@ -102,7 +144,6 @@
       </div>
     </div>
   </div>
-
 
 </body>
 </html>
