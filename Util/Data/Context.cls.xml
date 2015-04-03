@@ -207,9 +207,7 @@
 	}
 	set i=pageNum
     set:(pageNum=0) i = 1
-	//set pageSize = 100
-	write "pageNum="_pageNum ,!
-	write "pageSize="_pageSize ,!
+
 	for {
 		kill result
 		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize)
