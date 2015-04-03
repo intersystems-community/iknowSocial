@@ -20,3 +20,9 @@ To install `iknowSocial`, import code from this repo to your namespace with a us
 
 In case all went smooth, you'll get your status `$$$OK`.
 Under the hood this method creates an empty SSL configuration with name defined by parameter `SSLConfigurationName` from class `Util.Requests.RequestSender`. It also creates iKnow domain with russian iKnow configuration and sets stemming for this domain.
+
+
+###LoadingTask
+Open Cache' Management Portal->System Operation->Task Manager->Import Tasks.
+Import tasks from a file LoadTweetsTask.xml.
+Open Portal->System Operation->Task Manager->Task Schedule. Task name is "LoadTweets" 
