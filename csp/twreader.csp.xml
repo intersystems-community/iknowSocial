@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="twreader.csp" application="/csp/iknowsocial/" default="1"><![CDATA[
+<CSP name="twreader.csp" application="/csp/user/" default="1"><![CDATA[
 <html>
 <head>
   <title>TWReader</title>
@@ -67,11 +67,7 @@
 	});
 	
     function redrawTableByPage(pageNum, pageSize) {
-<<<<<<< HEAD
     	#call(TWReader.UIBroker.DrawTable("0","['sourceId','title', 'date', 'time', 'city', 'EC']","#main-table",pageNum,pageSize))#
-=======
-    	#call(TWReader.UIBroker.DrawTable("0","['title', 'date', 'time', 'city', 'EC']","#main-table",pageNum,pageSize))#
->>>>>>> remotes/origin/twitter-trends-reader
     }
         
 </script>
@@ -147,12 +143,8 @@
             <table class="table" id="main-table">
               <tbody>
               	 <script language="JavaScript">
-<<<<<<< HEAD
-					redrawTableByPage("1","8");               </script>
-=======
               	 		redrawTableByPage("1","8");
                </script>
->>>>>>> remotes/origin/twitter-trends-reader
               </tbody>
             </table>
 	   	  </div>
