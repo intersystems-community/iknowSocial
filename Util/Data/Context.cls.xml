@@ -197,7 +197,7 @@
 </Method>
 
 <Method name="GetAllPostsJSON">
-<FormalSpec>shouldCountEC:%String=""</FormalSpec>
+<FormalSpec>shouldCountEC:%String="",pageNum:%Integer=0,pageSize:%Integer=100</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	set totalResult = ""
@@ -205,8 +205,9 @@
 	if ($length(shouldCountEC) > 0) {
 		do ..CalculateEmotionalColoring()
 	}
-    set i = 1
-	set pageSize = 100
+	set i=pageNum
+    set:(pageNum=0) i = 1
+
 	for {
 		kill result
 		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize)
@@ -256,6 +257,7 @@
 				quit
 			}
 		}
+		return:(pageNum'=0) "{ 'posts' : [ " _ totalResult _ " ]}"
 		set i = i + 1
 	}
 ]]></Implementation>
