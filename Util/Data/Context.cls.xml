@@ -153,6 +153,21 @@
 ]]></Implementation>
 </Method>
 
+<Method name="GetUnixtime">
+<FormalSpec>externalId:%String,seedDate:%String,seedTime:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set tDate = ..GetDate(externalId, seedDate)
+	set tTime = ..GetTime(externalId, seedTime)
+	if (($length(tDate) > 0) && ($length(tTime) > 0)) {
+		set tUnixtime = ##class(Util.Misc).ConvertHorologToUnixTime($zdateh(tDate, 1), $ztimeh(tTime, 1))
+		quit tUnixtime
+	}
+	quit ""
+]]></Implementation>
+</Method>
+
 <Method name="GetSex">
 <FormalSpec>externalId:%String,seed:%String</FormalSpec>
 <Private>1</Private>
@@ -226,6 +241,7 @@
 				set tLongitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLongitude", tExternalId)
 				set tDate = ..GetDate(tExternalId, "PostDate")
 				set tTime = ..GetTime(tExternalId, "PostTime")
+				set tUnixtime = ..GetUnixtime(tExternalId, "PostDate", "PostTime")
 				set tCity = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorCity", tExternalId)
 				set tCountry = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorCountry", tExternalId)
 				set tDOB = ..GetDate(tExternalId, "AuthorDOB")
@@ -240,6 +256,7 @@
 				do tRow.SetAt(tLongitude ,"longitude")
 				do tRow.SetAt(tDate ,"date")
 				do tRow.SetAt(tTime ,"time")
+				do tRow.SetAt(tUnixtime, "unixtime")
 				do tRow.SetAt(tCity, "city")
 				do tRow.SetAt(tCountry ,"country")
 				do tRow.SetAt(tDOB ,"bdate")
