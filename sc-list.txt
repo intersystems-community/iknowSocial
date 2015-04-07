@@ -1,6 +1,7 @@
 <cspapp>/custom.css
 <cspapp>/custom.js
 <cspapp>/geo.js
+<cspapp>/jquery.bootpag.js
 <cspapp>/map.CSP
 <cspapp>/scaffold.CSP
 <cspapp>/twreader.csp
