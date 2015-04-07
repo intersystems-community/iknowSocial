@@ -5,51 +5,30 @@
 <head>
   <title>Map Colorer</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="http://code.shutterstock.com/rickshaw/rickshaw.css">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" >
   <link rel="stylesheet" href="custom.css">
+  <style>
+  .big-content-wrapper {
+	  height: 38vh;
+  }
+  </style>
   <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
   <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rickshaw/1.5.1/rickshaw.min.js"></script>
   <script src="custom.js"></script>
   <script src="geo.js"></script>
+  <script src="chart.js"></script>
   <script language="JavaScript">
   	var emotionalCircles = L.layerGroup([]);
     
     $(document).on("click", "#trends-table .link-to-full-source", function () {
 	    #call(TWReader.UIBroker.AddMorePostsWithinContext(0, 100, $(this).text(), 1, "['title', 'EC']", "#map-table"))#
 	});
-  	
-  	function anchorOnclick(anchor) {
-        console.log(anchor);
-	  	$(anchor)[0].scrollIntoView();
-        higlightAndFadeTableRow(anchor);
-    }
-  	
-  	function bindGeoPostMarker(rowObj, map) {
-	  	var anchor = '#' + 'map-table-row-' + rowObj.sourceId;
-    	var marker = L.marker(rowObj.toTuple()).addTo(map);
-    	marker.on('click', function() {
-    		anchorOnclick(anchor);
-    	});
-  	}
-  	
-  	function drawEmotionalCircles(circlesGroup, posts, map) {
-	  	boxCities = GeoPoint.getGeonamesCities(map, function(cities) {
-		  	circlesGroup.clearLayers();
-    		var clusters = GeoPoint.clusterize(posts, cities);
-    		var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, cities);
-    		var gradient = generateGYRGradient();
-    		var relations = GeoPost.getECRelations(clusters);
-    		for (var key in cities) {
-	    		var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
-    			circlesGroup.addLayer(L.circle(cities[key].toTuple(), radius, {
-    				color : gradient[Math.max(Math.floor(relations[key] * gradient.length) - 1, 0)]
-    			}));
-    		}
-    		circlesGroup.addTo(map);
-    	});
-  	}
   	
   	$(document).ready(function() {
 	  	var map = L.map('map', {
@@ -64,12 +43,10 @@
 	    		bindGeoPostMarker(posts[key], map);
     		}
     		drawEmotionalCircles(emotionalCircles, posts, map);
+    		drawTrendsGraph(posts);
   		}
     	
     	L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-    	//L.tileLayer('http://c.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg', {
-    	//L.tileLayer('http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-    	//L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
       		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       		maxZoom: 18
     	}).addTo(map);
@@ -92,7 +69,11 @@
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-        
+      	<div class="panel panel-default">
+      		<div id="trends-chart"> </div>
+      		
+      	</div>
+      	<div id="preview"></div>
       </div>
     </div>
     <div class="row" style="margin-top:10px">
@@ -118,7 +99,8 @@
       </div>
       <div class="col-md-6">
       	<div class="panel panel-default">
-        	<div id="map"></div>
+        	<div id="map" class="panel-body big-content-wrapper"></div>
+        	<div class="panel-footer">Circles?</div>
         </div>
       </div>
       <div class="col-md-3">

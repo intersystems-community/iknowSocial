@@ -109,6 +109,8 @@ function GeoPost(rawObject) {
 			this[key] = rawObject[key];
 		}
 	}
+	this.EC = parseInt(this.EC);
+	this.unixtime = parseInt(this.unixtime);
 }
 
 GeoPost.prototype = new GeoPoint();
@@ -181,5 +183,36 @@ var UkraineCities = {
   	"Odesa"		 	: new GeoPoint(46.4846, 30.7326),
   	"Sumy" 			: new GeoPoint(50.9077, 34.7981),
   	"Kharkiv" 		: new GeoPoint(49.9935, 36.2304)
+}
+
+function anchorOnclick(anchor) {
+	console.log(anchor);
+	$(anchor)[0].scrollIntoView();
+    higlightAndFadeTableRow(anchor);
+}
+  	
+function bindGeoPostMarker(rowObj, map) {
+	var anchor = '#' + 'map-table-row-' + rowObj.sourceId;
+   	var marker = L.marker(rowObj.toTuple()).addTo(map);
+   	marker.on('click', function() {
+    	anchorOnclick(anchor);
+    });
+}
+  	
+function drawEmotionalCircles(circlesGroup, posts, map) {
+	boxCities = GeoPoint.getGeonamesCities(map, function(cities) {
+		circlesGroup.clearLayers();
+    	var clusters = GeoPoint.clusterize(posts, cities);
+    	var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, cities);
+    	var gradient = generateGYRGradient();
+    	var relations = GeoPost.getECRelations(clusters);
+    	for (var key in cities) {
+	    	var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
+    		circlesGroup.addLayer(L.circle(cities[key].toTuple(), radius, {
+    			color : gradient[Math.max(Math.floor(relations[key] * gradient.length) - 1, 0)]
+    		}));
+    	}
+    	circlesGroup.addTo(map);
+	});
 }]]></CSP>
 </Export>

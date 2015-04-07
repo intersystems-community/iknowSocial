@@ -54,8 +54,8 @@ table td div {
 	height: 60vh;
 }
 
-#map {
-	height: 78vh;	
+#trends-chart {
+	height: 40vh;
 }
 ]]></CSP>
 </Export>
