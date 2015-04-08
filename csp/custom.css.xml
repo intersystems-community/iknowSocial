@@ -47,15 +47,15 @@ table td div {
 }
 
 .big-content-wrapper {
-	height: 73vh;
+	height: 68vh;
 }
 
 .small-content-wrapper {
 	height: 60vh;
 }
 
-#map {
-	height: 78vh;	
+#trends-chart {
+	height: 40vh;
 }
 ]]></CSP>
 </Export>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="chart.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+function composeWindowedECDataForTrend(timeWindow, posts) {
+	posts.sort(function(a, b) {
+		if (a.query !== b.query) {
+		  	return (a.query < b.query) ? -1 : 1;
+		} else if (a.unixtime !== b.unixtime) {
+		  	return (parseInt(a.unixtime) < parseInt(b.unixtime)) ? -1 : 1;
+		} else if (a.id !== b.id) {
+		  	return (a.id < b.id) ? -1 : 1;
+		} else {
+			return 0;
+		}
+	});
+	var currentSum = 0;
+	var leftmostIndex = 0;
+	var result = [];
+	for (var i = 0; i < posts.length; i++) {
+		currentSum += posts[i].EC;
+	  	while (posts[i].unixtime - posts[leftmostIndex].unixtime > timeWindow) {
+		  	currentSum -= posts[leftmostIndex++].EC;
+	  	}
+	  	result.push({x : posts[i].unixtime, y : currentSum});
+	}
+	return result;
+}
+  	
+function composeWindowedECData(timeWindow, posts) {
+	if (posts.length === 0) {
+		return [];
+	}
+	var palette = new Rickshaw.Color.Palette();
+	var trends = {};
+	for (var i = 0; i < posts.length; i++) {
+		if (trends[posts[i].query] === undefined) {
+			trends[posts[i].query] = [];
+		}
+		trends[posts[i].query].push(posts[i]);
+	}
+	var data = [];
+	for (var key in trends) {
+		console.log(key);
+	  	data.push({	name	: key, 
+	  				data	: composeWindowedECDataForTrend(timeWindow, trends[key]), 
+	  				color	: palette.color() });
+	}
+	console.log(Rickshaw.Series.zeroFill);
+	Rickshaw.Series.zeroFill(data)
+	return data;
+}
+  	
+function drawTrendsGraph(posts) {
+	var data = composeWindowedECData(3600 * 24, posts);
+	console.log(data);
+	var graph = new Rickshaw.Graph( {
+    	element: document.querySelector("#trends-chart"),
+       	renderer: 'line',
+        series: data
+	} );
+	var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+   		graph: graph
+	} );
+	var axes 	= new Rickshaw.Graph.Axis.Time({ 
+		graph: graph 
+	});
+	axes.render();
+	var preview	= new Rickshaw.Graph.RangeSlider({
+		graph: graph,
+		element: document.querySelector("#preview")
+	});
+	graph.render();
+}]]></CSP>
+</Export>
