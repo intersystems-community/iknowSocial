@@ -25,34 +25,48 @@
   <script src="chart.js"></script>
   <script language="JavaScript">
   	var emotionalCircles = L.layerGroup([]);
+    var postsMarkers = L.layerGroup([]);
     
     $(document).on("click", "#trends-table .link-to-full-source", function () {
 	    #call(TWReader.UIBroker.AddMorePostsWithinContext(0, 100, $(this).text(), 1, "['title', 'EC']", "#map-table"))#
 	});
   	
   	$(document).ready(function() {
-	  	var map = L.map('map', {
-      		center: [49, 32],
-      		zoom: 5
+	  	var map = L.map('map');
+    	map.on('load', function() {
+	    	console.log("load");
+	    	redrawMapbox(map);
     	});
+    	map.setView([49, 32], 5);
     	
     	postCallback = function() {
   			posts = GeoPost.getFromPosts(posts);
   			console.log(posts);
-    		for (var key in posts) {
-	    		bindGeoPostMarker(posts[key], map);
-    		}
+  			drawPostsMarkers(postsMarkers, posts, map);
     		drawEmotionalCircles(emotionalCircles, posts, map);
     		drawTrendsGraph(posts);
   		}
+    	
+    	function redrawMapbox(map) {
+	    	var boundsSW = map.getBounds()._southWest;
+	    	var boundsNE = map.getBounds()._northEast;
+	    	console.log(boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng));
+	    	#call(TWReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng)))#
+    	}
     	
     	L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
       		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       		maxZoom: 18
     	}).addTo(map);
+    	
+    	// event listeners are separated, because otherwise setView fires them all
     	map.on('zoomend', function() {
-    		drawEmotionalCircles(emotionalCircles, posts, map);
+	    	redrawMapbox(map);
     	});
+    	map.on('moveend', function() {
+	    	redrawMapbox(map);
+    	});
+    	
 	});
   </script>
 </head>
@@ -101,27 +115,6 @@
       	<div class="panel panel-default">
         	<div id="map" class="panel-body big-content-wrapper"></div>
         	<div class="panel-footer">Circles?</div>
-        </div>
-      </div>
-      <div class="col-md-3">
-      	<div class="panel panel-default">
-          <table class="table" id="map-table-header">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>EC</th>
-                </tr>
-              </thead>
-          </table>
-          <div class="table-content big-content-wrapper">
-            <table class="table" id="map-table">
-              <tbody>
-              	 <script language="JavaScript">
-              	 	#call(TWReader.UIBroker.DrawTable("", "['title', 'EC']", "#map-table"))#
-               </script>
-              </tbody>
-            </table>
-          </div>
         </div>
       </div>
     </div>

@@ -59,18 +59,15 @@ Ewwww</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="SaveAllPosts">
+<Method name="SavePosts">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>shouldCountEC:%String="",pageNum,pageSize</FormalSpec>
+<FormalSpec>shouldCountEC:%String="",pageNum,pageSize,latTL,longTL,latBR,longBR</FormalSpec>
 <Implementation><![CDATA[
 	set context = ..InstantiateContext()
-	if ($length(shouldCountEC) > 0) {
-		do context.CalculateEmotionalColoring()
-	}
-	
-	set totalResult = context.GetAllPostsJSON("0",pageNum, pageSize)
+	set totalResult = context.GetPostsJSON(shouldCountEC, pageNum, pageSize, latTL, longTL, latBR, longBR)
 	&js<
 		posts = (#(totalResult)#).posts;
+		postCallback();
 	>
 ]]></Implementation>
 </Method>
@@ -79,14 +76,14 @@ Ewwww</Description>
 <Description>
 fields must be appropriate js-array</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>shouldCountEC:%String="",fields:%String="",tableName:%String="#main-table",pageNum:%String="",pageSize:%String=""</FormalSpec>
+<FormalSpec>shouldCountEC:%String="",fields:%String="",tableName:%String="#main-table",pageNum:%String="",pageSize:%String="",latTL="",longTL="",latBR="",longBR=""</FormalSpec>
 <Implementation><![CDATA[
-	do ..SaveAllPosts(shouldCountEC, pageNum, pageSize)
+	do ..SavePosts(shouldCountEC, pageNum, pageSize, latTL, longTL, latBR, longBR)
 	if ($length(fields) < 1) {
 		set fields = "['sourceId', 'title', 'date', 'time', 'city', 'EC']"
 	}
 	&js<
-		postCallback();
+		//postCallback();
 		drawTable('#(tableName)#', posts, #(fields)#);
 	>
 ]]></Implementation>

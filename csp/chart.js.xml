@@ -40,19 +40,17 @@ function composeWindowedECData(timeWindow, posts) {
 	}
 	var data = [];
 	for (var key in trends) {
-		console.log(key);
 	  	data.push({	name	: key, 
 	  				data	: composeWindowedECDataForTrend(timeWindow, trends[key]), 
 	  				color	: palette.color() });
 	}
-	console.log(Rickshaw.Series.zeroFill);
 	Rickshaw.Series.zeroFill(data)
 	return data;
 }
   	
 function drawTrendsGraph(posts) {
+	$("#trends-chart").html("")
 	var data = composeWindowedECData(3600 * 24, posts);
-	console.log(data);
 	var graph = new Rickshaw.Graph( {
     	element: document.querySelector("#trends-chart"),
        	renderer: 'line',

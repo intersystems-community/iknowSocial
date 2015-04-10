@@ -211,8 +211,64 @@
 ]]></Implementation>
 </Method>
 
-<Method name="GetAllPostsJSON">
-<FormalSpec>shouldCountEC:%String="",pageNum:%Integer=0,pageSize:%Integer=100</FormalSpec>
+<Method name="IsValidLatitude">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>lat</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[	quit (($length(lat) > 0) && (lat >= -90) && (lat <= 90))
+]]></Implementation>
+</Method>
+
+<Method name="IsValidLongitude">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>long</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[	quit (($length(long) > 0) && (long >= -180) && (long <= 180))
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// presume valid coord box
+
+]]></Content>
+</UDLText>
+
+<Method name="CheckCoordinateBox">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>lat,long,latTL,longTL,latBR,longBR</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+	if (..IsValidLatitude(latTL) && ..IsValidLatitude(latBR) && ..IsValidLongitude(longTL) && ..IsValidLongitude(longBR)){
+		if '(..IsValidLatitude(lat) && ..IsValidLongitude(long)) {
+			quit 0
+		}
+		set longCheck = 0
+		if (longTL < longBR) {
+			if ((longTL < long) && (long < longBR)) {
+				set longCheck = 1			
+			}
+		} else {
+			if (((longTL < long) && (long < 180)) || ((-180 < long) && (long < longBR))) {
+				set longCheck = 1
+			}
+		}
+		set latCheck = 0
+		if ((latBR < lat) && (lat < latTL)) {
+			set latCheck = 1
+		}
+		quit (longCheck && latCheck)
+	} else {
+		quit 1
+	}
+]]></Implementation>
+</Method>
+
+<Method name="GetPostsJSON">
+<FormalSpec>shouldCountEC:%String="",pageNum:%Integer=0,pageSize:%Integer=100,latTL="",longTL="",latBR="",longBR=""</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	set totalResult = ""
@@ -220,11 +276,11 @@
 	if ($length(shouldCountEC) > 0) {
 		do ..CalculateEmotionalColoring()
 	}
-	set i=pageNum
-    set:(pageNum=0) i = 1
+	set i = pageNum
+    set:(pageNum = 0) i = 1
 
 	for {
-		kill result
+		kill result		
 		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize)
 		if ($data(result) = 0) {
 			set totalResult = "{ 'posts' : [ " _ totalResult _ " ]}"
@@ -250,6 +306,9 @@
 				set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainEmotionalColoringCounter).#EmotionalColoringField, tExternalId)
 				set tRow = ##class(%ArrayOfDataTypes).%New()
 				set tQuery = $piece($piece(tExternalId,":::",1),":",3)
+				if ('..CheckCoordinateBox(tLatitude, tLongitude, latTL, longTL, latBR, longBR)) {
+					continue
+				}
 				do tRow.SetAt(tSourceId ,"sourceId")
 				do tRow.SetAt(tTitle ,"title")
 				do tRow.SetAt(tLatitude ,"latitude")
@@ -274,7 +333,7 @@
 				quit
 			}
 		}
-		return:(pageNum'=0) "{ 'posts' : [ " _ totalResult _ " ]}"
+		return:(pageNum '= 0) "{ 'posts' : [ " _ totalResult _ " ]}"
 		set i = i + 1
 	}
 ]]></Implementation>
