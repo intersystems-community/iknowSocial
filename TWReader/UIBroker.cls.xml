@@ -47,8 +47,13 @@
 		set trends = ##class(%ArrayOfObjects).%New()
 		set trends = response.GetAt(1)."trends"
 		for i = 1:1:trends.Count() {
-			set name = trends.GetAt(i)."name"
-			do context.AddMorePosts(name, numberOfSources)
+			set trend = ##class(TWReader.Data.Trend).%New()
+			set trend.name = trends.GetAt(i)."name"
+			set trend.date = $zdt($h,3)
+			set trend.rank = i
+			d trend.%Save()
+			
+			do context.AddMorePosts(trend.name, numberOfSources)
 		}
 } else {
 		&js<console.log("Incorrect value for number of posts.")>
