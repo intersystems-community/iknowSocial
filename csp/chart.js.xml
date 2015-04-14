@@ -47,12 +47,11 @@ function composeWindowedECData(timeWindow, posts) {
 	Rickshaw.Series.zeroFill(data)
 	return data;
 }
-  	
-function drawTrendsGraph(posts) {
-	$("#trends-chart").html("")
-	var data = composeWindowedECData(3600 * 24, posts);
+
+function redrawGraph(data, divId, sliderId) {
+	$(divId).html("")
 	var graph = new Rickshaw.Graph( {
-    	element: document.querySelector("#trends-chart"),
+    	element: document.querySelector(divId),
        	renderer: 'line',
         series: data
 	} );
@@ -65,7 +64,7 @@ function drawTrendsGraph(posts) {
 	axes.render();
 	var preview	= new Rickshaw.Graph.RangeSlider({
 		graph: graph,
-		element: document.querySelector("#preview")
+		element: document.querySelector(sliderId)
 	});
 	graph.render();
 }]]></CSP>

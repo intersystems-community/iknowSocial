@@ -2,9 +2,11 @@
 <Export generator="Cache" version="25">
 <CSP name="custom.js" application="/csp/iknowsocial/" default="1"><![CDATA[
 var posts = {}
+var trendsMutualData = {}
 
-function postCallback(){
-}
+function postCallback() {}
+
+function trendCallback() {}
 
 function wrap(contents, tag) {
 	return "<" + tag + ">" + contents + "</" + tag + ">";

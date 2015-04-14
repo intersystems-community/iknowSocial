@@ -10,6 +10,14 @@
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" >
   <link rel="stylesheet" href="custom.css">
   <style>
+  	.graph-list {
+	  	list-style-type: none;
+  	}
+  	
+  	.graph-list li {
+	  	margin-bottom: 10px;
+  	}
+  	
   	#map {
 	  	height: 80vh;
   	}
@@ -34,7 +42,6 @@
   	$(document).ready(function() {
 	  	var map = L.map('map');
     	map.on('load', function() {
-	    	console.log("load");
 	    	redrawMapbox(map);
     	});
     	map.setView([49, 32], 5);
@@ -44,14 +51,24 @@
   			console.log(posts);
   			drawPostsMarkers(postsMarkers, posts, map);
     		drawEmotionalCircles(emotionalCircles, posts, map);
-    		drawTrendsGraph(posts);
+    		redrawGraph(composeWindowedECData(3600 * 24, posts), "#trends-chart", "#preview");
+  		}
+  		
+  		trendCallback = function() {
+	  		var palette = new Rickshaw.Color.Palette();
+	  		for (var i in trendsMutualData) {
+	  			trendsMutualData[i].color = palette.color();
+	  		}
+	  		console.log(trendsMutualData);
+	  		redrawGraph(trendsMutualData, "#trends-chart-mutual", "#preview-mutual");
   		}
     	
     	function redrawMapbox(map) {
 	    	var boundsSW = map.getBounds()._southWest;
 	    	var boundsNE = map.getBounds()._northEast;
 	    	console.log(boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng));
-	    	#call(TWReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng)))#
+	    	#call(TWReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng)))#;
+	    	#call(TWReader.UIBroker.SaveTrends())#
     	}
     	
     	L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
@@ -110,11 +127,20 @@
       </div>
       
       <div class="col-md-6">
-      	<div class="panel panel-default">
-      		<div id="trends-chart"> </div>
-      		
-      	</div>
-      	<div id="preview"></div>
+      	<ul class="graph-list">
+      		<li>
+      			<div class="panel panel-info graph-panel">
+      				<div id="trends-chart"> </div>
+      			</div>
+      			<div id="preview"></div>
+      		</li>
+      		<li>
+      			<div class="panel panel-info graph-panel">
+      				<div id="trends-chart-mutual"> </div>
+      			</div>
+      			<div id="preview-mutual"></div>
+      		</li>
+      	</ul>
       </div>
     </div>
     </div>
