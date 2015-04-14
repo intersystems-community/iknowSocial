@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.Data.Trend">
+<Super>%Persistent</Super>
+<TimeCreated>62714,57306.19124</TimeCreated>
+
+<Property name="id">
+<Type>%Library.Integer</Type>
+<SqlColumnNumber>2</SqlColumnNumber>
+<Identity>1</Identity>
+</Property>
+
+<Property name="name">
+<Type>%Library.String</Type>
+<SqlColumnNumber>3</SqlColumnNumber>
+</Property>
+
+<Property name="date">
+<Type>%Library.TimeStamp</Type>
+<SqlColumnNumber>4</SqlColumnNumber>
+</Property>
+
+<Property name="rank">
+<Type>%Library.Integer</Type>
+<SqlColumnNumber>5</SqlColumnNumber>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^TWReader.Data.TrendD</DataLocation>
+<DefaultData>TrendDefaultData</DefaultData>
+<IdLocation>^TWReader.Data.TrendD</IdLocation>
+<IndexLocation>^TWReader.Data.TrendI</IndexLocation>
+<StreamLocation>^TWReader.Data.TrendS</StreamLocation>
+<Data name="TrendDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>name</Value>
+</Value>
+<Value name="3">
+<Value>date</Value>
+</Value>
+<Value name="4">
+<Value>rank</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
