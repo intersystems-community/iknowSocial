@@ -10,9 +10,9 @@
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" >
   <link rel="stylesheet" href="custom.css">
   <style>
-  .big-content-wrapper {
-	  height: 38vh;
-  }
+  	#map {
+	  	height: 80vh;
+  	}
   </style>
   <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
   <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
@@ -81,17 +81,8 @@
     </div>
   </nav>
   <div class="container">
-    <div class="row">
-      <div class="col-md-12">
-      	<div class="panel panel-default">
-      		<div id="trends-chart"> </div>
-      		
-      	</div>
-      	<div id="preview"></div>
-      </div>
-    </div>
     <div class="row" style="margin-top:10px">
-      <div class="col-md-3">
+      <!---<div class="col-md-3">
         <div class="panel panel-default">
           <table class="table table-striped">
               <thead>
@@ -110,11 +101,37 @@
             </table>
           </div>
         </div>
-      </div>
+      </div>--->
       <div class="col-md-6">
       	<div class="panel panel-default">
         	<div id="map" class="panel-body big-content-wrapper"></div>
-        	<div class="panel-footer">Circles?</div>
+        	<div class="panel-footer"><a data-toggle="modal" data-target="#what-are-circles-modal">What are these circles?</a></div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+      	<div class="panel panel-default">
+      		<div id="trends-chart"> </div>
+      		
+      	</div>
+      	<div id="preview"></div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="what-are-circles-modal" tabindex="-1" role="dialog" aria-labelledby="circles-description" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">What are these circles?</h4>
+        </div>
+        <div class="modal-body">
+          <p>Circles are here to express emotional coloring of what is going on there in social networks. Based on georgaphy of posts you have already downloaded and awesome iKnow sentiment analysis features, we calculate emotional assesment for every single piece of information we have and show it on map for the biggest cities. Circles color is for type of emotions: green is usually posistive, while red is negative or something. Circles radius is closely related to density of posts nearby.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Got it!</button>
         </div>
       </div>
     </div>
