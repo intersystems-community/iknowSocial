@@ -188,6 +188,11 @@ var UkraineCities = {
 function bindGeoPostMarker(markersGroup, rowObj) {
 	var anchor = '#' + 'map-table-row-' + rowObj.sourceId;
    	var marker = L.marker(rowObj.toTuple())
+   	var color = (rowObj.EC > 0) ? "green" : "red";
+   	if (rowObj.EC === 0) {
+	   	color = "black";
+   	}
+   	marker.bindPopup("<b><font color=" + color + ">" + rowObj.EC + "</font></b>:" + rowObj.title);
    	marker.on('click', function() {
     	console.log(marker.getLatLng());
     });
