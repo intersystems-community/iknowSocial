@@ -42,16 +42,18 @@
   	$(document).ready(function() {
 	  	var map = L.map('map');
     	map.on('load', function() {
-	    	redrawMapbox(map);
+	    	redrawMapbox(map, 'load');
     	});
     	map.setView([49, 32], 5);
     	
-    	postCallback = function() {
+    	postCallback = function(event) {
   			posts = GeoPost.getFromPosts(posts);
   			console.log(posts);
-  			drawPostsMarkers(postsMarkers, posts, map);
     		drawEmotionalCircles(emotionalCircles, posts, map);
-    		redrawGraph(composeWindowedECData(3600 * 24, posts), "#trends-chart", "#preview");
+  			drawPostsMarkers(postsMarkers, posts, map);
+    		if (event === 'load') {
+    			redrawGraph(composeWindowedECData(3600 * 24, posts), "#trends-chart", "#preview");
+    		}
   		}
   		
   		trendCallback = function() {
@@ -63,12 +65,14 @@
 	  		redrawGraph(trendsMutualData, "#trends-chart-mutual", "#preview-mutual");
   		}
     	
-    	function redrawMapbox(map) {
+    	function redrawMapbox(map, event) {
 	    	var boundsSW = map.getBounds()._southWest;
 	    	var boundsNE = map.getBounds()._northEast;
 	    	console.log(boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng));
-	    	#call(TWReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng)))#;
-	    	#call(TWReader.UIBroker.SaveTrends())#
+	    	#call(TWReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng), event))#;
+	    	if (event === 'load') {
+	    		#call(TWReader.UIBroker.SaveTrends())#
+	    	}
     	}
     	
     	L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
