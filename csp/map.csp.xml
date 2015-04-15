@@ -10,9 +10,17 @@
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" >
   <link rel="stylesheet" href="custom.css">
   <style>
-  .big-content-wrapper {
-	  height: 38vh;
-  }
+  	.graph-list {
+	  	list-style-type: none;
+  	}
+  	
+  	.graph-list li {
+	  	margin-bottom: 10px;
+  	}
+  	
+  	#map {
+	  	height: 80vh;
+  	}
   </style>
   <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
   <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
@@ -25,34 +33,61 @@
   <script src="chart.js"></script>
   <script language="JavaScript">
   	var emotionalCircles = L.layerGroup([]);
+    var postsMarkers = L.layerGroup([]);
     
     $(document).on("click", "#trends-table .link-to-full-source", function () {
 	    #call(TWReader.UIBroker.AddMorePostsWithinContext(0, 100, $(this).text(), 1, "['title', 'EC']", "#map-table"))#
 	});
   	
   	$(document).ready(function() {
-	  	var map = L.map('map', {
-      		center: [49, 32],
-      		zoom: 5
+	  	var map = L.map('map');
+    	map.on('load', function() {
+	    	redrawMapbox(map, 'load');
     	});
+    	map.setView([49, 32], 5);
     	
-    	postCallback = function() {
+    	postCallback = function(event) {
   			posts = GeoPost.getFromPosts(posts);
   			console.log(posts);
-    		for (var key in posts) {
-	    		bindGeoPostMarker(posts[key], map);
-    		}
     		drawEmotionalCircles(emotionalCircles, posts, map);
-    		drawTrendsGraph(posts);
+  			drawPostsMarkers(postsMarkers, posts, map);
+    		if (event === 'load') {
+    			redrawGraph(composeWindowedECData(3600 * 24, posts), "#trends-chart", "#preview");
+    		}
   		}
+  		
+  		trendCallback = function() {
+	  		var palette = new Rickshaw.Color.Palette();
+	  		for (var i in trendsMutualData) {
+	  			trendsMutualData[i].color = palette.color();
+	  		}
+	  		console.log(trendsMutualData);
+	  		redrawGraph(trendsMutualData, "#trends-chart-mutual", "#preview-mutual");
+  		}
+    	
+    	function redrawMapbox(map, event) {
+	    	var boundsSW = map.getBounds()._southWest;
+	    	var boundsNE = map.getBounds()._northEast;
+	    	console.log(boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng));
+	    	#call(TWReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng), event))#;
+	    	if (event === 'load') {
+	    		#call(TWReader.UIBroker.SaveTrends())#
+	    	}
+    	}
     	
     	L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
       		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       		maxZoom: 18
     	}).addTo(map);
+    	
+    	// event listeners are separated, because otherwise setView fires them all
     	map.on('zoomend', function() {
-    		drawEmotionalCircles(emotionalCircles, posts, map);
+	    	redrawMapbox(map);
     	});
+    	map.on('moveend', function() {
+	    	redrawMapbox(map);
+    	});
+    	
 	});
   </script>
 </head>
@@ -67,17 +102,8 @@
     </div>
   </nav>
   <div class="container">
-    <div class="row">
-      <div class="col-md-12">
-      	<div class="panel panel-default">
-      		<div id="trends-chart"> </div>
-      		
-      	</div>
-      	<div id="preview"></div>
-      </div>
-    </div>
     <div class="row" style="margin-top:10px">
-      <div class="col-md-3">
+      <!---<div class="col-md-3">
         <div class="panel panel-default">
           <table class="table table-striped">
               <thead>
@@ -96,32 +122,46 @@
             </table>
           </div>
         </div>
-      </div>
+      </div>--->
       <div class="col-md-6">
       	<div class="panel panel-default">
         	<div id="map" class="panel-body big-content-wrapper"></div>
-        	<div class="panel-footer">Circles?</div>
+        	<div class="panel-footer"><a data-toggle="modal" data-target="#what-are-circles-modal">What are these circles?</a></div>
         </div>
       </div>
-      <div class="col-md-3">
-      	<div class="panel panel-default">
-          <table class="table" id="map-table-header">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>EC</th>
-                </tr>
-              </thead>
-          </table>
-          <div class="table-content big-content-wrapper">
-            <table class="table" id="map-table">
-              <tbody>
-              	 <script language="JavaScript">
-              	 	#call(TWReader.UIBroker.DrawTable("", "['title', 'EC']", "#map-table"))#
-               </script>
-              </tbody>
-            </table>
-          </div>
+      
+      <div class="col-md-6">
+      	<ul class="graph-list">
+      		<li>
+      			<div class="panel panel-info graph-panel">
+      				<div id="trends-chart"> </div>
+      			</div>
+      			<div id="preview"></div>
+      		</li>
+      		<li>
+      			<div class="panel panel-info graph-panel">
+      				<div id="trends-chart-mutual"> </div>
+      			</div>
+      			<div id="preview-mutual"></div>
+      		</li>
+      	</ul>
+      </div>
+    </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="what-are-circles-modal" tabindex="-1" role="dialog" aria-labelledby="circles-description" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">What are these circles?</h4>
+        </div>
+        <div class="modal-body">
+          <p>Circles are here to express emotional coloring of what is going on there in social networks. Based on georgaphy of posts you have already downloaded and awesome iKnow sentiment analysis features, we calculate emotional assesment for every single piece of information we have and show it on map for the biggest cities. Circles color is for type of emotions: green is usually posistive, while red is negative or something. Circles radius is closely related to density of posts nearby.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Got it!</button>
         </div>
       </div>
     </div>

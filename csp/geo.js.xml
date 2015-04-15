@@ -184,19 +184,27 @@ var UkraineCities = {
   	"Sumy" 			: new GeoPoint(50.9077, 34.7981),
   	"Kharkiv" 		: new GeoPoint(49.9935, 36.2304)
 }
-
-function anchorOnclick(anchor) {
-	console.log(anchor);
-	$(anchor)[0].scrollIntoView();
-    higlightAndFadeTableRow(anchor);
-}
   	
-function bindGeoPostMarker(rowObj, map) {
+function bindGeoPostMarker(markersGroup, rowObj) {
 	var anchor = '#' + 'map-table-row-' + rowObj.sourceId;
-   	var marker = L.marker(rowObj.toTuple()).addTo(map);
+   	var marker = L.marker(rowObj.toTuple())
+   	var color = (rowObj.EC > 0) ? "green" : "red";
+   	if (rowObj.EC === 0) {
+	   	color = "black";
+   	}
+   	marker.bindPopup("<b><font color=" + color + ">" + rowObj.EC + "</font></b>:" + rowObj.title);
    	marker.on('click', function() {
-    	anchorOnclick(anchor);
+    	console.log(marker.getLatLng());
     });
+    markersGroup.addLayer(marker);
+}
+ 
+function drawPostsMarkers(markersGroup, posts, map) {
+	markersGroup.clearLayers();
+	for (var key in posts) {
+		bindGeoPostMarker(markersGroup, posts[key]);
+    }
+    markersGroup.addTo(map);
 }
   	
 function drawEmotionalCircles(circlesGroup, posts, map) {
@@ -214,5 +222,17 @@ function drawEmotionalCircles(circlesGroup, posts, map) {
     	}
     	circlesGroup.addTo(map);
 	});
+}
+
+function getCutLong(long) {
+	var res = long;
+	res %= 360;
+	if (res > 180) {
+		res -= 360;	
+	}
+	if (long < -180) {
+		res += 360;
+	}
+	return res;
 }]]></CSP>
 </Export>

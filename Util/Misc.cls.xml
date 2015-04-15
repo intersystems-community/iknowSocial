@@ -55,6 +55,17 @@ Converts date in d[d].m[m].yyyy format to horolog.</Description>
 ]]></Implementation>
 </Method>
 
+<Method name="ConvertTrendsDateTimeToUnixTime">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dt:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set tDate = $zdateh($piece(dt, " ", 1), 3)
+	set tTime = $ztimeh($piece(dt, " ", 2)) 
+	quit ##class(Util.Misc).ConvertHorologToUnixTime(tDate, tTime)
+]]></Implementation>
+</Method>
+
 <Method name="ConvertToBool">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>text:%String</FormalSpec>

@@ -29,7 +29,7 @@
 ]]></Implementation>
 </Method>
 
-<Method name="AddMorePostsByCoords">
+<Method name="SaveMorePostsByCoords">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
 <Implementation><![CDATA[
@@ -46,23 +46,66 @@
 		do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlace(.response,woeid,"")
 		set trends = ##class(%ArrayOfObjects).%New()
 		set trends = response.GetAt(1)."trends"
+		set dt = $zdt($h, 3)
 		for i = 1:1:trends.Count() {
 			set trend = ##class(TWReader.Data.Trend).%New()
 			set trend.name = trends.GetAt(i)."name"
-			set trend.date = $zdt($h,3)
+			set trend.date = dt
 			set trend.rank = i
 			d trend.%Save()
 			
 			do context.AddMorePosts(trend.name, numberOfSources)
 		}
-} else {
+		do context.CalculateEmotionalColoring()
+	} else {
 		&js<console.log("Incorrect value for number of posts.")>
 	}
+]]></Implementation>
+</Method>
+
+<Method name="AddMorePostsByCoords">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
+<Implementation><![CDATA[
+	do ..SaveMorePostsByCoords(shouldClearDomain, numberOfSources, lat, long)
 	do ..DrawTable()
 	&js<
 		$("#add-tweets-by-trends-modal").modal('hide');
 	   	$("#add-tweets-by-trends-modal .progress").css("display", "none");
 	    $("#add-tweets-button").prop('disabled', false);
+	>
+]]></Implementation>
+</Method>
+
+<Method name="SaveTrends">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	set query = "select * from TWReader_Data.Trend order by name"
+	set statement = ##class(%SQL.Statement).%New()
+	set status = statement.%Prepare(query)
+	set result = statement.%Execute()
+	if ('result.%Next()) {
+		quit
+	}
+	set prevName = result.name
+	set tUnixtime = ##class(Util.Misc).ConvertTrendsDateTimeToUnixTime(result.date)
+	set trends = "[{""name"":""" _ prevName _ """, ""data"":[" _ "{""x"":" _ tUnixtime _ ", ""y"":" _ (11 - result.rank) _ "}"
+	while result.%Next() {
+		set name = result.name
+		if (name '= prevName) {
+			set prevName = name
+			set trends = trends _ "]}, {""name"":""" _ prevName _ """, ""data"":["
+		} else {
+			set trends = trends _ ","
+		}
+		set tUnixtime = ##class(Util.Misc).ConvertTrendsDateTimeToUnixTime(result.date)
+		set trends = trends _ "{""x"":" _ tUnixtime _ ", ""y"":" _ (11 - result.rank) _ "}"
+		
+	}
+	set trends = trends _ "]}]"
+	&js<
+		trendsMutualData = #(trends)#
+		trendCallback();
 	>
 ]]></Implementation>
 </Method>

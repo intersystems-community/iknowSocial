@@ -8,6 +8,11 @@
 <Type>%String</Type>
 </Parameter>
 
+<Parameter name="PostTablePageSize">
+<Type>%Integer</Type>
+<Default>8</Default>
+</Parameter>
+
 <Method name="InstantiateContext">
 <Description>
 Ewwww</Description>
@@ -59,18 +64,15 @@ Ewwww</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="SaveAllPosts">
+<Method name="SavePosts">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>shouldCountEC:%String="",pageNum,pageSize</FormalSpec>
+<FormalSpec>shouldCountEC:%String="",pageNum,pageSize,latTL,longTL,latBR,longBR,event</FormalSpec>
 <Implementation><![CDATA[
 	set context = ..InstantiateContext()
-	if ($length(shouldCountEC) > 0) {
-		do context.CalculateEmotionalColoring()
-	}
-	
-	set totalResult = context.GetAllPostsJSON("0",pageNum, pageSize)
+	set totalResult = context.GetPostsJSON(shouldCountEC, pageNum, pageSize, latTL, longTL, latBR, longBR)
 	&js<
 		posts = (#(totalResult)#).posts;
+		postCallback('#(event)#');
 	>
 ]]></Implementation>
 </Method>
@@ -79,14 +81,14 @@ Ewwww</Description>
 <Description>
 fields must be appropriate js-array</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>shouldCountEC:%String="",fields:%String="",tableName:%String="#main-table",pageNum:%String="",pageSize:%String=""</FormalSpec>
+<FormalSpec>shouldCountEC:%String="",fields:%String="",tableName:%String="#main-table",pageNum:%String="",pageSize:%String="",latTL="",longTL="",latBR="",longBR=""</FormalSpec>
 <Implementation><![CDATA[
-	do ..SaveAllPosts(shouldCountEC, pageNum, pageSize)
+	do ..SavePosts(shouldCountEC, pageNum, pageSize, latTL, longTL, latBR, longBR)
 	if ($length(fields) < 1) {
 		set fields = "['sourceId', 'title', 'date', 'time', 'city', 'EC']"
 	}
 	&js<
-		postCallback();
+		//postCallback();
 		drawTable('#(tableName)#', posts, #(fields)#);
 	>
 ]]></Implementation>
@@ -117,7 +119,9 @@ fields must be appropriate js-array</Description>
 <Method name="ShowEC">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-	do ..DrawTable("1")
+	set context = ..InstantiateContext()
+	do context.CalculateEmotionalColoring()
+	do ..RedrawTable(..#PostTablePageSize)
 	&js<
 		$(".ec-link").slideUp(400, function() {
 			$(this).html('<span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Calculate EC').fadeIn(400);

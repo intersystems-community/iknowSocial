@@ -40,21 +40,18 @@ function composeWindowedECData(timeWindow, posts) {
 	}
 	var data = [];
 	for (var key in trends) {
-		console.log(key);
 	  	data.push({	name	: key, 
 	  				data	: composeWindowedECDataForTrend(timeWindow, trends[key]), 
 	  				color	: palette.color() });
 	}
-	console.log(Rickshaw.Series.zeroFill);
 	Rickshaw.Series.zeroFill(data)
 	return data;
 }
-  	
-function drawTrendsGraph(posts) {
-	var data = composeWindowedECData(3600 * 24, posts);
-	console.log(data);
+
+function redrawGraph(data, divId, sliderId) {
+	$(divId).html("")
 	var graph = new Rickshaw.Graph( {
-    	element: document.querySelector("#trends-chart"),
+    	element: document.querySelector(divId),
        	renderer: 'line',
         series: data
 	} );
@@ -67,7 +64,7 @@ function drawTrendsGraph(posts) {
 	axes.render();
 	var preview	= new Rickshaw.Graph.RangeSlider({
 		graph: graph,
-		element: document.querySelector("#preview")
+		element: document.querySelector(sliderId)
 	});
 	graph.render();
 }]]></CSP>
