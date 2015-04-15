@@ -13,7 +13,7 @@ invokes this method to execute the task.<br>
 In order to execute a real task, override this method in a subclass.]]></Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
- d ##class(TWReader.UIBroker).AddMorePostsByCoords("0", "100", "46.4846", "30.7326")
+ d ##class(TWReader.UIBroker).SaveMorePostsByCoords("0", "100", "46.4846", "30.7326")
  Quit $$$OK
 ]]></Implementation>
 </Method>

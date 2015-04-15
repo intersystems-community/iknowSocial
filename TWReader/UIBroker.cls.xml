@@ -29,7 +29,7 @@
 ]]></Implementation>
 </Method>
 
-<Method name="AddMorePostsByCoords">
+<Method name="SaveMorePostsByCoords">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
 <Implementation><![CDATA[
@@ -56,9 +56,18 @@
 			
 			do context.AddMorePosts(trend.name, numberOfSources)
 		}
+		do context.CalculateEmotionalColoring()
 	} else {
 		&js<console.log("Incorrect value for number of posts.")>
 	}
+]]></Implementation>
+</Method>
+
+<Method name="AddMorePostsByCoords">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
+<Implementation><![CDATA[
+	do ..SaveMorePostsByCoords(shouldClearDomain, numberOfSources, lat, long)
 	do ..DrawTable()
 	&js<
 		$("#add-tweets-by-trends-modal").modal('hide');
