@@ -66,7 +66,7 @@ Ewwww</Description>
 
 <Method name="SavePosts">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>shouldCountEC:%String="",pageNum,pageSize,latTL,longTL,latBR,longBR,event</FormalSpec>
+<FormalSpec>shouldCountEC:%String="",pageNum,pageSize,latTL,longTL,latBR,longBR,event=""</FormalSpec>
 <Implementation><![CDATA[
 	set context = ..InstantiateContext()
 	set totalResult = context.GetPostsJSON(shouldCountEC, pageNum, pageSize, latTL, longTL, latBR, longBR)

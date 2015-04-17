@@ -29,12 +29,12 @@
 </Parameter>
 
 <Method name="AddMetadataFieldIfNotExists">
-<FormalSpec>fieldName:%String</FormalSpec>
+<FormalSpec>fieldName:%String,dataType:%String=$$$MDDTSTRING</FormalSpec>
 <Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if (##class(%iKnow.Queries.MetadataAPI).GetFieldId(..DomainID, fieldName) = "") {
-		do ##class(%iKnow.Queries.MetadataAPI).AddField(..DomainID, fieldName, $$$MDALLOPERATORS)
+		do ##class(%iKnow.Queries.MetadataAPI).AddField(..DomainID, fieldName, $$$MDALLOPERATORS, dataType)
 	}
 	quit $$$OK
 ]]></Implementation>
@@ -54,8 +54,8 @@
 		quit:$$$ISERR(status) status
 	}
 	
-	do ..AddMetadataFieldIfNotExists("PostLatitude")
-	do ..AddMetadataFieldIfNotExists("PostLongitude")
+	do ..AddMetadataFieldIfNotExists("PostLatitude", $$$MDDTNUMBER)
+	do ..AddMetadataFieldIfNotExists("PostLongitude", $$$MDDTNUMBER)
 	do ..AddMetadataFieldIfNotExists("PostDate")
 	do ..AddMetadataFieldIfNotExists("PostTime")
 	do ..AddMetadataFieldIfNotExists("AuthorID")
@@ -63,7 +63,7 @@
 	do ..AddMetadataFieldIfNotExists("AuthorCountry")
 	do ..AddMetadataFieldIfNotExists("AuthorDOB")
 	do ..AddMetadataFieldIfNotExists("AuthorSex")
-	do ..AddMetadataFieldIfNotExists(##class(Misc.DomainEmotionalColoringCounter).%GetParameter("EmotionalColoringField"))
+	do ..AddMetadataFieldIfNotExists(##class(Misc.DomainEmotionalColoringCounter).%GetParameter("EmotionalColoringField"), $$$MDDTNUMBER)
 		
 	#dim cfg as %iKnow.Configuration
 	if ##class(%iKnow.Configuration).Exists(..#ConfigurationName) {
@@ -236,33 +236,29 @@
 ]]></Content>
 </UDLText>
 
-<Method name="CheckCoordinateBox">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>lat,long,latTL,longTL,latBR,longBR</FormalSpec>
+<Method name="CoordinateBoxFilter">
+<FormalSpec>latTL,longTL,latBR,longBR</FormalSpec>
 <Private>1</Private>
-<ReturnType>%Boolean</ReturnType>
+<ReturnType>%iKnow.Filters.Filter</ReturnType>
 <Implementation><![CDATA[
 	if (..IsValidLatitude(latTL) && ..IsValidLatitude(latBR) && ..IsValidLongitude(longTL) && ..IsValidLongitude(longBR)){
-		if '(..IsValidLatitude(lat) && ..IsValidLongitude(long)) {
-			quit 0
-		}
-		set longCheck = 0
+		set longFilter = ""
 		if (longTL < longBR) {
-			if ((longTL < long) && (long < longBR)) {
-				set longCheck = 1			
-			}
+			set longFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLongitude", "BETWEEN", longTL _ ";" _ longBR)
 		} else {
-			if (((longTL < long) && (long < 180)) || ((-180 < long) && (long < longBR))) {
-				set longCheck = 1
-			}
+			set belowFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLongitude", "BETWEEN", longTL _ ";" _ "180")
+			set aboveFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLongitude", "BETWEEN", "-180" _ ";" _ longBR)
+			set longFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "OR", 0)
+			do longFilter.AddSubFilter(belowFilter)
+			do longFilter.AddSubFilter(aboveFilter)
 		}
-		set latCheck = 0
-		if ((latBR < lat) && (lat < latTL)) {
-			set latCheck = 1
-		}
-		quit (longCheck && latCheck)
+		set latFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLatitude", "BETWEEN", latBR _ ";" _ latTL)
+		set coordFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "AND", 0)
+		do coordFilter.AddSubFilter(longFilter)
+		do coordFilter.AddSubFilter(latFilter)
+		quit coordFilter
 	} else {
-		quit 1
+		quit ""
 	}
 ]]></Implementation>
 </Method>
@@ -278,10 +274,12 @@
 	}
 	set i = pageNum
     set:(pageNum = 0) i = 1
-
+	
+	set coordFilter = ..CoordinateBoxFilter(latTL, longTL, latBR, longBR)
+		
 	for {
 		kill result		
-		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize)
+		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize, coordFilter)
 		if ($data(result) = 0) {
 			set totalResult = "{ 'posts' : [ " _ totalResult _ " ]}"
 			return totalResult
@@ -291,10 +289,10 @@
 			set p = $order(result(p))	
 			if (p '= "") {
 				set tExternalId = $list(result(p), 2)
-				set tSourceId = ##class(%iKnow.Queries.SourceAPI).GetSourceId(..DomainID, tExternalId)
-				set tTitle = ..GetTitle(tSourceId)
 				set tLatitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLatitude", tExternalId)
 				set tLongitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLongitude", tExternalId)
+				set tSourceId = ##class(%iKnow.Queries.SourceAPI).GetSourceId(..DomainID, tExternalId)
+				set tTitle = ..GetTitle(tSourceId)
 				set tDate = ..GetDate(tExternalId, "PostDate")
 				set tTime = ..GetTime(tExternalId, "PostTime")
 				set tUnixtime = ..GetUnixtime(tExternalId, "PostDate", "PostTime")
@@ -306,9 +304,6 @@
 				set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainEmotionalColoringCounter).#EmotionalColoringField, tExternalId)
 				set tRow = ##class(%ArrayOfDataTypes).%New()
 				set tQuery = $piece($piece(tExternalId,":::",1),":",3)
-				if ('..CheckCoordinateBox(tLatitude, tLongitude, latTL, longTL, latBR, longBR)) {
-					continue
-				}
 				do tRow.SetAt(tSourceId ,"sourceId")
 				do tRow.SetAt(tTitle ,"title")
 				do tRow.SetAt(tLatitude ,"latitude")
