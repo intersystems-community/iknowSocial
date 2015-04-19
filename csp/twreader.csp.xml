@@ -66,8 +66,11 @@
      	showSourceId()
 	});
 	
-    function redrawTableByPage(pageNum, pageSize) {
-    	#call(TWReader.UIBroker.DrawTable("0","['sourceId','title', 'date', 'time', 'city', 'EC', 'latitude', 'longitude']","#main-table",pageNum,pageSize))#
+    function redrawTableByPage(pageNum, customPageSize) {
+	    if (customPageSize === undefined) {
+	    	customPageSize = pageSize;
+	    }
+    	#call(TWReader.UIBroker.DrawTable("0", "['sourceId','title', 'date', 'time', 'city', 'EC', 'latitude', 'longitude']", "#main-table", pageNum, customPageSize))#
     }
         
 </script>
@@ -145,7 +148,7 @@
             <table class="table" id="main-table">
               <tbody>
               	 <script language="JavaScript">
-              	 		redrawTableByPage("1","8");
+              	 		redrawTableByPage("1");
                </script>
               </tbody>
             </table>
@@ -153,7 +156,7 @@
         </div>
 		<div class="col-md-9 col-md-offset-2" id="page-selection"></div>
 			<script language="JavaScript">
-              	#call(TWReader.UIBroker.RedrawTable("8"))#
+              	#call(TWReader.UIBroker.RedrawTable())#
     		</script>	   	  
 	   	  
       </div>

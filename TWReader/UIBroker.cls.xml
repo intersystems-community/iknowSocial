@@ -68,7 +68,7 @@
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
 <Implementation><![CDATA[
 	do ..SaveMorePostsByCoords(shouldClearDomain, numberOfSources, lat, long)
-	do ..DrawTable()
+	do ..RedrawTable()
 	&js<
 		$("#add-tweets-by-trends-modal").modal('hide');
 	   	$("#add-tweets-by-trends-modal .progress").css("display", "none");
