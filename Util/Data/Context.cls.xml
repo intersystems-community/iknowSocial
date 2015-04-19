@@ -63,6 +63,7 @@
 	do ..AddMetadataFieldIfNotExists("AuthorCountry")
 	do ..AddMetadataFieldIfNotExists("AuthorDOB")
 	do ..AddMetadataFieldIfNotExists("AuthorSex")
+	do ..AddMetadataFieldIfNotExists("Query")
 	do ..AddMetadataFieldIfNotExists(##class(Misc.DomainEmotionalColoringCounter).%GetParameter("EmotionalColoringField"), $$$MDDTNUMBER)
 		
 	#dim cfg as %iKnow.Configuration

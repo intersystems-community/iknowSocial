@@ -75,6 +75,10 @@
 	    	}
     	}
     	
+    	function redrawTableByPage(pageNum, pageSize) {
+    		#call(TWReader.UIBroker.DrawTable("0","['sourceId','title', 'date', 'time', 'city', 'EC', 'latitude', 'longitude']","#main-table",pageNum,pageSize))#
+    	}
+    	
     	L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
       		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       		maxZoom: 18
@@ -86,6 +90,13 @@
     	});
     	map.on('moveend', function() {
 	    	redrawMapbox(map);
+    	});
+    	
+    	$('#trends-chart-mutual').on('click', function() {
+	    	var hoverLabel = $("#trends-chart-mutual .detail div.item.active").text();
+	    	var time = $("#trends-chart-mutual .x_label").text();
+	    	$('#chart-tweets-modal').modal('show');
+	    	
     	});
     	
 	});
@@ -103,26 +114,7 @@
   </nav>
   <div class="container">
     <div class="row" style="margin-top:10px">
-      <!---<div class="col-md-3">
-        <div class="panel panel-default">
-          <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th class="trends-source">Trends</th>
-                </tr>
-              </thead>
-          </table>
-          <div class="table-content big-content-wrapper">
-            <table class="table table-striped" id="trends-table">
-              <tbody>
-              	 <script language="JavaScript">
-              	 	#call(TWReader.UIBroker.DrawTrends("['sourceId']","#trends-table","46.4846","30.7326"))#
-               </script>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>--->
+    
       <div class="col-md-6">
       	<div class="panel panel-default">
         	<div id="map" class="panel-body big-content-wrapper"></div>
@@ -162,6 +154,49 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-dismiss="modal">Got it!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="chart-tweets-modal" tabindex="-1" role="dialog" aria-labelledby="latest-tweets-for-trend" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Placeholder</h4>
+        </div>
+        <div class="modal-body">
+          <div class="panel panel-default">
+            <table class="table" id="modal-table-header">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Tweet</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>City</th>
+                  <th>EC</th>
+                  <th>Lat</th>
+                  <th>Long</th>
+                </tr>
+              </thead>
+          	</table>
+          	<div class="table-content big-content-wrapper">
+              <table class="table" id="modal-table">
+                <tbody>
+              	  <!--<script language="JavaScript">
+              	 		redrawTableByPage("1","8");
+                 </script>-->
+                </tbody>
+              </table>
+	   	    </div>
+          </div>
+		  <div id="page-selection"></div>
+			<!--<script language="JavaScript">
+              	#call(TWReader.UIBroker.RedrawTable("8"))#
+    	   </script>-->
+          </div>
         </div>
       </div>
     </div>
