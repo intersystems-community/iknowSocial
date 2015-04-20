@@ -70,7 +70,8 @@
 	    if (customPageSize === undefined) {
 	    	customPageSize = pageSize;
 	    }
-    	#call(TWReader.UIBroker.DrawTable("0", "['sourceId','title', 'date', 'time', 'city', 'EC', 'latitude', 'longitude']", "#main-table", pageNum, customPageSize))#
+	    console.log(pageNum, customPageSize);
+    	#call(TWReader.UIBroker.DrawTable("", "['sourceId','title', 'date', 'time', 'city', 'EC', 'latitude', 'longitude']", "#main-table", pageNum, customPageSize))#
     }
         
 </script>

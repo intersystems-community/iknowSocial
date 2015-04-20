@@ -265,7 +265,7 @@
 </Method>
 
 <Method name="GetPostsJSON">
-<FormalSpec>shouldCountEC:%String="",pageNum:%Integer=0,pageSize:%Integer=100,latTL="",longTL="",latBR="",longBR=""</FormalSpec>
+<FormalSpec>shouldCountEC:%String="",pageNum:%Integer=0,pageSize:%Integer=100,latTL="",longTL="",latBR="",longBR="",trend="",timeFrom="",timeTo=""</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	set totalResult = ""
@@ -277,10 +277,23 @@
     set:(pageNum = 0) i = 1
 	
 	set coordFilter = ..CoordinateBoxFilter(latTL, longTL, latBR, longBR)
-		
+	set trendFilter = ""
+	if ($length(trend) > 0) {
+		set trendFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "Query", "=", trend)
+	}
+	set totalFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "AND", 0)
+	if (coordFilter '= "") {
+		do totalFilter.AddSubFilter(coordFilter)
+	}
+	if (trendFilter '= "") {
+		do totalFilter.AddSubFilter(trendFilter)
+	}
+	if ((coordFilter = "") && (trendFilter = "")) {
+		set totalFilter = ""
+	}
 	for {
 		kill result		
-		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize, coordFilter)
+		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize, totalFilter)
 		if ($data(result) = 0) {
 			set totalResult = "{ 'posts' : [ " _ totalResult _ " ]}"
 			return totalResult
