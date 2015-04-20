@@ -109,5 +109,27 @@
 	>
 ]]></Implementation>
 </Method>
+
+<Method name="SaveUniqueTrends">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	set query = "select name from TWReader_Data.Trend group by name"
+	set statement = ##class(%SQL.Statement).%New()
+	set status = statement.%Prepare(query)
+	set result = statement.%Execute()
+	set response = "["
+	while result.%Next() {
+		if (response '= "[") {
+			set response = response _ ","
+		}
+		set response = response _ ##class(%CSP.Page).QuoteJS(result.name)
+	}
+	set response = response _ "]"
+	&js<
+		uniqueTrends = #(response)#
+		uniqueTrendCallback();
+	>
+]]></Implementation>
+</Method>
 </Class>
 </Export>

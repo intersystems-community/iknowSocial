@@ -5,10 +5,13 @@ var pageSize = 8;
 var posts = {}
 var geoPosts = {}
 var trendsMutualData = {}
+var uniqueTrends = {}
 
 function postCallback() {}
 
 function trendCallback() {}
+
+function uniqueTrendCallback() {}
 
 function wrap(contents, tag) {
 	return "<" + tag + ">" + contents + "</" + tag + ">";
