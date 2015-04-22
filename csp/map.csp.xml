@@ -41,19 +41,24 @@
   	
   	$(document).ready(function() {
 	  	var map = L.map('map');
+	  	var trend = 'All trends';
     	map.on('load', function() {
 	    	redrawMapbox(map, 'load');
     	});
     	map.setView([49, 32], 5);
     	
     	postCallback = function(event) {
-  			posts = GeoPost.getFromPosts(posts);
-  			console.log(posts);
-    		drawEmotionalCircles(emotionalCircles, posts, map);
-  			drawPostsMarkers(postsMarkers, posts, map);
-    		if (event === 'load') {
-    			redrawGraph(composeWindowedECData(3600 * 24, posts), "#trends-chart", "#preview");
-    		}
+	    	if (event === 'showTrendTable') {
+		    	drawTable("#modal-table", posts, ['sourceId', 'title', 'date', 'time', 'city', 'EC'])
+	    	} else {
+  				geoPosts = GeoPost.getFromPosts(posts);
+  				console.log(geoPosts);
+    			drawEmotionalCircles(emotionalCircles, geoPosts, map);
+  				drawPostsMarkers(postsMarkers, geoPosts, map);
+    			if (event === 'load') {
+    				redrawGraph(composeWindowedECData(3600 * 24, geoPosts), "#trends-chart", "#preview");
+    			}
+	    	}
   		}
   		
   		trendCallback = function() {
@@ -64,12 +69,28 @@
 	  		console.log(trendsMutualData);
 	  		redrawGraph(trendsMutualData, "#trends-chart-mutual", "#preview-mutual");
   		}
+  		
+  		uniqueTrendCallback = function() {
+  			console.log(uniqueTrends);
+  			uniqueTrends.push('All trends');
+  			$("#map-settings-modal .modal-body form").html('');
+  			for (var i in uniqueTrends) {
+	  			var check = (uniqueTrends[i] === trend) ? 'checked="checked"' : '';
+  				$("#map-settings-modal .modal-body form").append($('<div class="radio"><label><input type="radio" name="trend" value="' + uniqueTrends[i] + '"' + check + '>' + uniqueTrends[i] + '</label></div>'))
+  			}
+  		}
     	
-    	function redrawMapbox(map, event) {
+    	function redrawMapbox(map, event, trendToShow) {
+	    	if (trendToShow === undefined) {
+	    		trendToShow = trend;
+	    	}
+	    	if (trendToShow === 'All trends') {
+	    		trendToShow = '';
+	    	}
 	    	var boundsSW = map.getBounds()._southWest;
 	    	var boundsNE = map.getBounds()._northEast;
 	    	console.log(boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng));
-	    	#call(TWReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng), event))#;
+	    	#call(TWReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng), event, trendToShow))#;
 	    	if (event === 'load') {
 	    		#call(TWReader.UIBroker.SaveTrends())#
 	    	}
@@ -88,6 +109,25 @@
 	    	redrawMapbox(map);
     	});
     	
+    	$('#map-settings-btn').on('click', function() {
+	    	#call(TWReader.UIBroker.SaveUniqueTrends())#
+    	});
+    	
+    	$('#map-settings-modal .btn-primary').on('click', function() {
+	    	trend = $("input:radio[name ='trend']:checked").val();
+	    	redrawMapbox(map);
+    	});
+    	
+    	$('#trends-chart-mutual').on('click', function() {
+	    	var hoverLabel = $("#trends-chart-mutual .detail div.item.active").text();
+	    	var trendText = hoverLabel.split(' ')[0].slice(0, -1)
+	    	var time = $("#trends-chart-mutual .x_label").text();
+	    	console.log(Date.parse(time) / 1000);
+	    	$("#chart-tweets-modal .modal-title").html(trendText);
+	    	$('#chart-tweets-modal').modal('show');
+	    	#call(TWReader.UIBroker.SavePosts("","1","100", '', '', '', '', 'showTrendTable', trendText))#;
+    	});
+    	
 	});
   </script>
 </head>
@@ -103,30 +143,14 @@
   </nav>
   <div class="container">
     <div class="row" style="margin-top:10px">
-      <!---<div class="col-md-3">
-        <div class="panel panel-default">
-          <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th class="trends-source">Trends</th>
-                </tr>
-              </thead>
-          </table>
-          <div class="table-content big-content-wrapper">
-            <table class="table table-striped" id="trends-table">
-              <tbody>
-              	 <script language="JavaScript">
-              	 	#call(TWReader.UIBroker.DrawTrends("['sourceId']","#trends-table","46.4846","30.7326"))#
-               </script>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>--->
+    
       <div class="col-md-6">
       	<div class="panel panel-default">
         	<div id="map" class="panel-body big-content-wrapper"></div>
-        	<div class="panel-footer"><a data-toggle="modal" data-target="#what-are-circles-modal">What are these circles?</a></div>
+        	<div class="panel-footer">
+        		<a data-toggle="modal" data-target="#what-are-circles-modal">What are these circles?</a>
+        		<a id="map-settings-btn" data-toggle="modal" data-target="#map-settings-modal"><span class="glyphicon glyphicon-wrench pull-right" aria-hidden="true"></span></a>
+        	</div>
         </div>
       </div>
       
@@ -162,6 +186,65 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-dismiss="modal">Got it!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="map-settings-modal" tabindex="-1" role="dialog" aria-labelledby="map-settings" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Map settings</h4>
+        </div>
+        <div class="modal-body">
+        <form>
+        </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="chart-tweets-modal" tabindex="-1" role="dialog" aria-labelledby="latest-tweets-for-trend" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Placeholder</h4>
+        </div>
+        <div class="modal-body">
+          <div class="panel panel-default">
+            <table class="table" id="modal-table-header">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Tweet</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>City</th>
+                  <th>EC</th>
+                </tr>
+              </thead>
+          	</table>
+          	<div class="table-content big-content-wrapper">
+              <table class="table" id="modal-table">
+                <tbody>
+              	  <!--<script language="JavaScript">
+              	 		redrawTableByPage("1","8");
+                 </script>-->
+                </tbody>
+              </table>
+	   	    </div>
+          </div>
+		  <div id="page-selection"></div>
+			<!--<script language="JavaScript">
+              	#call(TWReader.UIBroker.RedrawTable("8"))#
+    	   </script>-->
+          </div>
         </div>
       </div>
     </div>

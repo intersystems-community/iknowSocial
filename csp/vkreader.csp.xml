@@ -9,6 +9,7 @@
   <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
   <script src="custom.js"></script>
+  <script src="jquery.bootpag.js"></script>
   <script language="JavaScript">
   	var posts = {}
   	
@@ -50,7 +51,12 @@
      	showSourceId()
 	});
 	
-	
+	function redrawTableByPage(pageNum, customPageSize) {
+	    if (customPageSize === undefined) {
+	    	customPageSize = pageSize;
+	    }
+    	#call(VKReader.UIBroker.DrawTable("0", "['sourceId','title', 'date', 'time', 'city', 'EC']", "#main-table", pageNum, customPageSize))#
+    }
   </script>
 </head>
 <body>
@@ -103,12 +109,17 @@
             <table class="table" id="main-table">
               <tbody>
               	 <script language="JavaScript">
-              	 	#call(VKReader.UIBroker.DrawTable())#
+              	 		redrawTableByPage("1");
                </script>
               </tbody>
             </table>
           </div>
-        </div>
+          </div>
+		<div class="col-md-9 col-md-offset-2" id="page-selection"></div>
+			<script language="JavaScript">
+              	#call(TWReader.UIBroker.RedrawTable())#
+    		</script>  
+      	</div>
       </div>
     </div>
   </div>
