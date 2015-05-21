@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="HTMLReader.Requests.SiteAnalyzer">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63470,45984.335131</TimeCreated>
+
+<Method name="RetrieveHTMLOtzyvuaNet">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*comments:%ListOfObjects,listparams:%List</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(Util.Requests.RequestSender).SendSimpleHttpRequest("www.otzyvua.net", "/novaya-pochta-nova-poshta.html?page="_$lg(listparams,2), .responseText)
+	quit:$$$ISERR(status) status
+	
+	s start = 1
+	s count = 0
+	
+	while (start'=0) {
+		s comment = ##class(HTMLReader.Data.Comment).%New()
+		
+		s postIdStart = $find(responseText,"<div class=""commentbox hreview"" id=""comment",start)
+		s comment.Id = $EXTRACT(responseText,postIdStart,$find(responseText,""">", postIdStart)-3)
+		
+		s titleStart = $find(responseText,"<h2>",start)
+		s comment.Title = $EXTRACT(responseText,$find(responseText,""">", titleStart),$find(responseText,"</a>", titleStart)-5)
+		
+		s authorStart = $find(responseText,"<span class=""reviewer"">",start)
+		s comment.Author = $EXTRACT(responseText,authorStart,$find(responseText,"</span>",authorStart)-8)
+		
+		s locationStart = $find(responseText,"<span class=""user_location"" title=""Местоположение пользователя"">",start)
+		s comment.Location = $EXTRACT(responseText,locationStart,$find(responseText,"</span>",locationStart)-8)
+		
+		s dateStart = $find(responseText,"<span class=""value-title"" title=""",$find(responseText,"<span class=""dtreviewed"">",authorStart))
+		s comment.Date = $EXTRACT(responseText,dateStart,$find(responseText,""" ></span>",dateStart)-11)
+		
+		s cityStart = $find(responseText,"<span class=""locality"">",dateStart)
+		s:(cityStart'=0) comment.City = $EXTRACT(responseText,cityStart,$find(responseText,"</span>",cityStart)-8)
+	
+		s:(cityStart'=0) adressStart = $find(responseText,"<span class=""street-address"">",dateStart)
+		s:(cityStart'=0) comment.Adress = $EXTRACT(responseText,adressStart,$find(responseText,"</span>",adressStart)-8)
+		
+		s textStart = $find(responseText,"<span class=""comment description +"">",start)
+		s comment.Text = $EXTRACT(responseText,textStart,$find(responseText,"</span>",textStart)-8)
+		s:($find(comment.Text,"Читать отзыв</a>")'=0) comment.Text = ..CommentTextOtzyvuaNet(comment.Id)
+		
+		s ratingStart = $find(responseText,"<span class=""rating""><span class=""value-title"" title=""",start)
+		s comment.Rating = $EXTRACT(responseText,ratingStart,ratingStart)
+		w "rating = "_comment.Rating,!
+		d:(comment.Rating'="") comments.Insert(comment)
+		
+		s start=$find(responseText,"<span class=""rating""><span class=""value-title"" title=""",ratingStart)
+		s:(comment.Rating'="") count=count+1
+	}
+	
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="CommentTextOtzyvuaNet">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>commentId:%Integer</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(Util.Requests.RequestSender).SendSimpleHttpRequest("www.otzyvua.net", "/novaya-pochta-nova-poshta/review-"_commentId, .responseText)
+	quit:$$$ISERR(status) status
+	w "commentId ="_commentId,!	
+	s textStart = $find(responseText,"<span class=""comment description"">")
+	s text = $EXTRACT(responseText,textStart,$find(responseText,"</span>",textStart)-8)
+
+	quit text
+]]></Implementation>
+</Method>
+
+<Method name="CountHTMLOtzyvuaNet">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*totalCount:%Integer,*listSize:%Integer</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ##class(Util.Requests.RequestSender).SendSimpleHttpRequest("www.otzyvua.net", "/novaya-pochta-nova-poshta.html", .responseText)
+	quit:$$$ISERR(status) status
+	
+	s start = 1
+	
+	s totalCount = 0
+	s totalCountStart = $find(responseText,"</i><span>Отзывы (",start)
+	s totalCount = $EXTRACT(responseText,totalCountStart,$find(responseText,")</span></a>",totalCountStart)-13)
+
+	s listSize = 0
+	while (start'=0) {
+		s ratingStart = $find(responseText,"<span class=""rating""><span class=""value-title"" title=""",start)
+		s rating = $EXTRACT(responseText,ratingStart,ratingStart)
+		s start=$find(responseText,"<span class=""rating""><span class=""value-title"" title=""",ratingStart)
+		s:(rating'="") listSize=listSize+1
+	}
+
+	quit status
+]]></Implementation>
+</Method>
+</Class>
+</Export>

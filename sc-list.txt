@@ -8,6 +8,7 @@
 <cspapp>/twreader.csp
 <cspapp>/vkreader.CSP
 FBReader.PKG
+HTMLReader.PKG
 Misc.PKG
 TWReader.PKG
 TwitterReader.PKG

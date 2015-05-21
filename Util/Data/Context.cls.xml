@@ -54,6 +54,10 @@
 		quit:$$$ISERR(status) status
 	}
 	
+	do ..AddMetadataFieldIfNotExists("PostCity")
+	do ..AddMetadataFieldIfNotExists("PostAdress")
+	do ..AddMetadataFieldIfNotExists("PostRating", $$$MDDTNUMBER)
+	do ..AddMetadataFieldIfNotExists("PostTitle")
 	do ..AddMetadataFieldIfNotExists("PostLatitude", $$$MDDTNUMBER)
 	do ..AddMetadataFieldIfNotExists("PostLongitude", $$$MDDTNUMBER)
 	do ..AddMetadataFieldIfNotExists("PostDate")
@@ -98,9 +102,10 @@
 </Method>
 
 <Method name="CalculateEmotionalColoring">
+<FormalSpec>filter:%iKnow.Filters.Filter=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ##class(Misc.DomainEmotionalColoringCounter).CalcSourcesEmotionalColoring(..#DomainName)
+	set status = ##class(Misc.DomainEmotionalColoringCounter).CalcSourcesEmotionalColoring(..#DomainName, filter)
 	quit status
 ]]></Implementation>
 </Method>

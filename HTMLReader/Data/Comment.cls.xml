@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="HTMLReader.Data.Comment">
+<Super>%Persistent</Super>
+<TimeCreated>63475,60435.629485</TimeCreated>
+
+<Property name="Id">
+<Type>%Integer</Type>
+<Required>1</Required>
+<Parameter name="MINVAL" value="0"/>
+</Property>
+
+<Property name="Title">
+<Type>%String</Type>
+</Property>
+
+<Property name="Author">
+<Type>%String</Type>
+</Property>
+
+<Property name="Location">
+<Type>%String</Type>
+</Property>
+
+<Property name="Date">
+<Type>%String</Type>
+</Property>
+
+<Property name="City">
+<Type>%String</Type>
+</Property>
+
+<Property name="Adress">
+<Type>%String</Type>
+</Property>
+
+<Property name="Text">
+<Type>%String</Type>
+</Property>
+
+<Property name="Rating">
+<Type>%Integer</Type>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^HTMLReader.Data.CommentD</DataLocation>
+<DefaultData>CommentDefaultData</DefaultData>
+<IdLocation>^HTMLReader.Data.CommentD</IdLocation>
+<IndexLocation>^HTMLReader.Data.CommentI</IndexLocation>
+<StreamLocation>^HTMLReader.Data.CommentS</StreamLocation>
+<Data name="CommentDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Id</Value>
+</Value>
+<Value name="3">
+<Value>Title</Value>
+</Value>
+<Value name="4">
+<Value>Author</Value>
+</Value>
+<Value name="5">
+<Value>Location</Value>
+</Value>
+<Value name="6">
+<Value>Date</Value>
+</Value>
+<Value name="7">
+<Value>City</Value>
+</Value>
+<Value name="8">
+<Value>Adress</Value>
+</Value>
+<Value name="9">
+<Value>Text</Value>
+</Value>
+<Value name="10">
+<Value>Rating</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
