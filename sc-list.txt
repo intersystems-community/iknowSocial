@@ -6,6 +6,7 @@
 <cspapp>/jquery.bootpag.js
 <cspapp>/map.csp
 <cspapp>/scaffold.csp
+<cspapp>/table.css
 <cspapp>/twreader.csp
 <cspapp>/vkreader.csp
 FBReader.pkg
