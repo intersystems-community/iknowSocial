@@ -8,7 +8,7 @@
 <XMLNamespace>http://www.intersystems.com/iknow</XMLNamespace>
 <Data><![CDATA[
 <domain name="VKReaderRus">
-<configuration name="VKReaderRus" languages="ru" stemming="DEFAULT" />
+<configuration name="VKReaderRus" languages="ru" />
 <parameter name="$$$IKPSTEMMING" value="1" />
 
 <metadata>
