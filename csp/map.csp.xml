@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="map.CSP" application="/csp/iknowsocial/" default="1"><![CDATA[
+<CSP name="map.csp" application="/csp/vkfb/" default="1"><![CDATA[
 <html>
 <head>
   <title>Map Colorer</title>

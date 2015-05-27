@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="geo.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+<CSP name="geo.js" application="/csp/vkfb/" default="1"><![CDATA[
 var METERS_IN_KILOMETER = 1000;
 var GRADUSES_IN_PI = 180;
 

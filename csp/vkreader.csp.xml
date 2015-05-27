@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="vkreader.CSP" application="/csp/iknowsocial/" default="1"><![CDATA[
+<CSP name="vkreader.csp" application="/csp/vkfb/" default="1"><![CDATA[
 <html>
 <head>
   <title>VKReader</title>
