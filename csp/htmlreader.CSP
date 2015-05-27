@@ -1,0 +1,171 @@
+<html>
+<head>
+  <title>HTMLReader</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="table.css">
+  <link rel="stylesheet" href="custom.css">
+  <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  <script src="custom.js"></script>
+  <script src="jquery.bootpag.js"></script>
+  <script language="JavaScript">
+  	var posts = {}
+  	
+    $(document).ready(function() {
+     	setSearch("#main-table");
+     	$(".ec-link").click(function() {
+	   		$(this).slideUp(400, function() {
+		    	$(this).html("Calculating...").fadeIn(200, function() {
+		    		showEC();
+		    	});
+	    	});
+    	});
+    });
+    
+    function addSources() {
+	    var shouldClear = $("#should-clear").is(':checked')
+	    var query = $("#query-form").val()
+	    var count = $("#count-form").val()
+	    console.log([shouldClear, query, count]);
+	    $("#add-sources-modal .progress").show(400);
+	    $("#add-sources-button").prop('disabled', true);
+	    #call(HTMLReader.UIBroker.AddMorePostsWithinContext(shouldClear, count, query))# 
+    }
+    
+    function showSourceId() {
+	    var sourceId = $("#source-id-form").val();
+	    $("#show-source-id-modal .progress").show(400);
+	    $("#show-source-id-button").prop('disabled', true);
+	    #call(HTMLReader.UIBroker.ShowFullSourceById(sourceId))#
+    }
+    
+    function showEC() {
+	    #call(HTMLReader.UIBroker.ShowEC())#
+    }
+    
+    $(document).on("click", ".link-to-full-source", function () {
+     	var sourceId = $(this).text();
+     	$("#source-id-form").val(sourceId);
+     	showSourceId()
+	});
+	
+	function redrawTableByPage(pageNum, customPageSize) {
+	    if (customPageSize === undefined) {
+	    	customPageSize = pageSize;
+	    }
+    	#call(HTMLReader.UIBroker.DrawTable("0", "['sourceId', 'author','comment', 'date', 'city', 'rating', 'EC']", "#main-table", pageNum, customPageSize))#
+    }
+  </script>
+</head>
+<body>
+  <nav id="html-nav" class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Анализ сайтов</a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li data-toggle="modal" data-target="#add-sources-modal"><a href="#"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Добавить новые отзывы</a></li>
+          <li><a class="ec-link" href="#"><span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Пересчитать окрас</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div id="html-table">
+      <div class="col-md-12" align="center">
+        <div class="panel panel-default">
+          <table class="table" id="main-table-header">
+              <thead>
+                <tr>
+                  <th class="tableRow0">№</th>
+                  <th class="tableRow1">Автор</th>
+                  <th class="tableRow2">Отзыв</th>
+                  <th class="tableRow3">Дата</th>
+                  <th class="tableRow4">Город</th>
+                  <th class="tableRow5">Рейтинг</th>
+                  <th class="tableRow6">Окрас</th>
+                </tr>
+              </thead>
+          </table>
+          <div class="table-content big-content-wrapper">
+            <table class="table" id="main-table">
+              <tbody>
+              	 <script language="JavaScript">
+              	 		redrawTableByPage("1");
+               </script>
+              </tbody>
+            </table>
+          </div>
+          </div>
+		<div class="col-md-12" id="page-selection" align="center"></div>
+			<script language="JavaScript">
+              	#call(HTMLReader.UIBroker.RedrawTable())#
+    		</script>  
+      	</div>
+      </div>
+</div>
+<div class="modal fade" id="add-sources-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Add more posts to domain</h4>
+        </div>
+        <div class="modal-body">
+          <form>
+          	<div class="form-group form-inline">
+              <label for="query-form" class="control-label">Website:</label>
+              <input type="text" class="form-control" id="query-form" value="otzyvua.net">
+          	</div>
+          	<div class="form-group form-inline">
+              <label for="count-form" class="control-label">PageNum:</label>
+              <input type="number" class="form-control" id="count-form" min="1" max="1000" value="1">
+          	</div>
+          	<div class="form-group form-inline">
+              <label for="should-clear" class="control-label">Clear Domain:</label>
+          	  <input type="checkbox" class="form-control" id="should-clear">
+          	</div>
+          </form>
+          <div class="progress">
+		    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+    		  <span class="sr-only">100% Complete</span>
+  		    </div>
+		  </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="add-sources-button" onclick="addSources();">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<div class="modal fade" id="show-source-id-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Show source with given id</h4>
+        </div>
+        <div class="modal-body">
+          <form class="form form-inline form-multiline" role="form" align="center">
+          	<div class="form-group">
+              <label for="source-id-form" class="control-label">SourceId:</label>
+              <input type="number" class="form-control" id="source-id-form" value="0">
+          	</div>
+          </form>
+          <p style="display:none;"> </p>
+          <div class="progress">
+		    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+    		  <span class="sr-only">100% Complete</span>
+  		    </div>
+		  </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="show-source-id-button" onclick="showSourceId();">Show</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

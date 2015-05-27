@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="HTMLReader.UIBroker">
+<Super>Util.UIBroker</Super>
+<TimeCreated>63623,17389.188202</TimeCreated>
+
+<Parameter name="ContextType">
+<Type>%String</Type>
+<Default>HTML</Default>
+</Parameter>
+</Class>
+</Export>

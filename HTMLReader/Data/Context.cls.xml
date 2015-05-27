@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="HTMLReader.Data.Context">
+<IncludeCode>%IKPublic</IncludeCode>
+<Super>Util.Data.Context</Super>
+<TimeCreated>63489,67555.308498</TimeCreated>
+
+<Parameter name="ConfigurationName">
+<Type>%String</Type>
+<Default>HTMLAPIConfiguration</Default>
+</Parameter>
+
+<Parameter name="DomainName">
+<Type>%String</Type>
+<Default>HTMLAPIDomain</Default>
+</Parameter>
+
+<Parameter name="TitleMaxLength">
+<Type>Integer</Type>
+<Default>200</Default>
+</Parameter>
+
+<Method name="AddMorePosts">
+<FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set lister = ##class(HTMLReader.Lister).%New(..DomainID)
+	set status = lister.ProcessList(query, count, checkExists)
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="GetPostsJSON">
+<FormalSpec>shouldCountEC:%String="",pageNum:%Integer=0,pageSize:%Integer=100,latTL="",longTL="",latBR="",longBR="",trend="",timeFrom="",timeTo=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set totalResult = ""
+	
+	if ($length(shouldCountEC) > 0) {
+		do ..CalculateEmotionalColoring()
+	}
+	set i = pageNum
+    set:(pageNum = 0) i = 1
+	
+	set coordFilter = ..CoordinateBoxFilter(latTL, longTL, latBR, longBR)
+	set trendFilter = ""
+	if ($length(trend) > 0) {
+		set trendFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "Query", "=", trend)
+	}
+	set totalFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "AND", 0)
+	if (coordFilter '= "") {
+		do totalFilter.AddSubFilter(coordFilter)
+	}
+	if (trendFilter '= "") {
+		do totalFilter.AddSubFilter(trendFilter)
+	}
+	if ((coordFilter = "") && (trendFilter = "")) {
+		set totalFilter = ""
+	}
+	for {
+		kill result		
+		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize, totalFilter)
+		if ($data(result) = 0) {
+			set totalResult = "{ 'posts' : [ " _ totalResult _ " ]}"
+			return totalResult
+		}
+		set p = ""
+		for {
+			set p = $order(result(p))	
+			if (p '= "") {
+				set tExternalId = $list(result(p), 2)
+				set tSourceId = ##class(%iKnow.Queries.SourceAPI).GetSourceId(..DomainID, tExternalId)
+				
+				//set tComment = ..GetTitle(tSourceId)
+				//do ##class(%iKnow.Queries.SourceAPI).GetSummary(.tSentences, ..DomainID, tSourceId, 500)
+
+				do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, ..DomainID, tSourceId, 1, 1)
+				set tComment = $lg($g(tSentences(1)), 2)
+				set tTitle = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostTitle", tExternalId)
+				set tDate = ..GetDate(tExternalId, "PostDate")
+				set tUnixtime = ..GetUnixtime(tExternalId, "PostDate", "PostTime")
+				set tAutorCity = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorCity", tExternalId)
+				set tAutorCountry = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorCountry", tExternalId)
+				set tCity = ..GetDate(tExternalId, "PostCity")
+				set tAdress = ..GetSex(tExternalId, "PostAdress")
+				set tId = $piece($piece(tExternalId,":::",2),"#",2)
+				set tAuthor = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorID", tExternalId)
+				set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainEmotionalColoringCounter).#EmotionalColoringField, tExternalId)
+				set tQuery = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "Query", tExternalId)
+				set tRating = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostRating", tExternalId)
+				
+				set tRow = ##class(%ArrayOfDataTypes).%New()
+				do tRow.SetAt(tSourceId ,"sourceId")
+				do tRow.SetAt(tTitle ,"title")
+				do tRow.SetAt(tComment ,"comment")
+				//do tRow.SetAt(tLatitude ,"latitude")
+				//do tRow.SetAt(tLongitude ,"longitude")
+				do tRow.SetAt(tDate ,"date")
+				//do tRow.SetAt(tTime ,"time")
+				do tRow.SetAt(tUnixtime, "unixtime")
+				do tRow.SetAt(tAutorCity, "city")
+				do tRow.SetAt(tAutorCountry ,"country")
+				//do tRow.SetAt(tDOB ,"bdate")
+				//do tRow.SetAt(tSex ,"sex")
+				do tRow.SetAt(tId, "id")
+				do tRow.SetAt(tAuthor, "author")
+				do tRow.SetAt(tRating, "rating")
+				do tRow.SetAt(tEC, "EC")
+				do tRow.SetAt(tQuery, "query")
+				
+				set postJSON = ..GetJSONFromArray(tRow)
+				if ($length(totalResult) > 0) {
+					set totalResult = totalResult _ ", "
+				}
+				set totalResult = totalResult _ postJSON
+			} else {
+				quit
+			}
+		}
+		return:(pageNum '= 0) "{ 'posts' : [ " _ totalResult _ " ]}"
+		set i = i + 1
+	}
+]]></Implementation>
+</Method>
+</Class>
+</Export>

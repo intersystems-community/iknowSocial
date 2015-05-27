@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="HTMLReader.Lister">
+<Super>%iKnow.Source.Lister</Super>
+<TimeCreated>63492,10251.170023</TimeCreated>
+
+<Method name="ExpandList">
+<FormalSpec>listparams:%List</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set query = $li(listparams, 1)
+	set comments = ##class(%ListOfObjects).%New()
+	set status = ##class(HTMLReader.Requests.SiteAnalyzer).RetrieveHTMLOtzyvuaNet(.comments, listparams)
+	quit:$$$ISERR(status) status
+	
+	do ..RegisterMetadataKeys($lb("Query", "PostDate", "AuthorID", "AuthorCity", "AuthorCountry", "PostTitle", "PostRating", "PostCity","PostAdress"))
+	
+	for i = 1:1:comments.Count() {
+		#dim comment = ##class(HTMLReader.Data.Comment).%New()
+		s comment = comments.GetAt(i)
+		set tID = comment.Id
+		set tOwnerID = comment.Author
+
+		set tPostDate = $zdh(comment.Date,3)
+		set tPostTime= ""
+		//#dim tTextStream as %String
+		set tTextStream = comment.Text
+			
+		set tAuthorCity = $replace($piece(comment.Location,",",2),")","")
+		set tAuthorCountry = $replace($piece(comment.Location,",",1),"(","")
+		set tTitle = comment.Title
+		set tRating = comment.Rating
+		set tCity = comment.City
+		set tAdress = comment.Adress
+		set tLocalRef = tOwnerID_"#"_tID
+
+		set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
+		/*
+		do tTextStream.Rewind()
+		if (tTextStream.Size = 0) {
+			continue
+		}
+		set len = 32000
+		while (len = 32000) {
+			do ..StoreTemp(tRef, tTextStream.Read(.len))
+		}
+		*/
+		do ..StoreTemp(tRef, tTextStream)
+
+		do ..SetMetadataValues(tRef, $lb(query, tPostDate, tOwnerID, tAuthorCity, tAuthorCountry, tTitle, tRating, tCity, tAdress))
+	}
+
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetAlias">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    Quit "HTMLAPI"
+]]></Implementation>
+</Method>
+
+<Method name="SplitFullRef">
+<Description><![CDATA[
+<p>Identifies the ":::" separator and takes whatever comes before as the group name and
+the second part as local reference.</p>
+<p>See also <method class="%iKnow.Source.Lister">SplitFullRef</method> in <class>%iKnow.Source.Lister</class>.</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%Integer,fullRef:%String,*groupName:%String,*localRef:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set delim = ":::"
+	set localRef = $piece(fullRef, delim, $l(fullRef, delim))
+	set groupName = $e(fullRef, 1, *-$l(localRef)-$l(delim))
+    Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="BuildFullRef">
+<Description><![CDATA[
+<p>Builds the full ref by appending the group name and local reference, adding a triple colon in between.</p>
+<p>See also <method class="%iKnow.Source.Lister">BuildFullRef</method> in <class>%iKnow.Source.Lister</class>.</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainId:%Integer,groupName:%String,localRef:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    quit groupName_":::"_localRef
+]]></Implementation>
+</Method>
+
+<Method name="DefaultProcessor">
+<Description><![CDATA[
+<p>This Lister uses <class>%iKnow.Source.Temp.Processor</class>, as all VK API content here won't be saved
+to database, but will be saved locally through <method>StoreTemp</method> calls.</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    Quit "%iKnow.Source.Temp.Processor"
+]]></Implementation>
+</Method>
+</Class>
+</Export>

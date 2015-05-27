@@ -1,0 +1,27 @@
+#html-nav {
+	background-color : #ff392e;
+	border-color : white;
+}
+
+#html-nav .navbar-brand {
+	color : white;
+}
+
+#html-table table th {
+	color : grey;
+	border-bottom : 0px;
+}
+
+#html-table a {
+	color : #ff392e;
+}
+
+#html-table .active a {
+	background-color: #9d9d9d;
+	border-color : #9d9d9d;
+}
+
+.tableRow2 {
+	width: 500px;
+}
+

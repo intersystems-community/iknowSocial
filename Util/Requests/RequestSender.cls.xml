@@ -67,6 +67,37 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
 	} else {
 		set responseText = ""
 	}
+	w responseText ,!
+	quit status
+]]></Implementation>
+</Method>
+
+<Method name="SendSimpleHttpRequest">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[server:%String="api.vk.com",location:%String,&responseText:%String(MAXLEN=1000000)]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#dim req as %Net.HttpRequest = ##class(%Net.HttpRequest).%New()
+	set req.Server = server
+	
+	#dim k as %String = ""
+	#dim v as %String = ""
+	
+	#dim status as %Status = $$$OK
+	set status = req.Get(location)
+
+	if ($$$ISOK(status)) {
+		#dim response as %String = ""
+		#dim res as %Net.HttpResponse = req.HttpResponse
+			
+		#dim responseLength as %Integer = 1000000
+		set response = res.Data.Read(.responseLength)
+		
+		set responseText = response
+	} else {
+		set responseText = ""
+	}
+		
 	quit status
 ]]></Implementation>
 </Method>
