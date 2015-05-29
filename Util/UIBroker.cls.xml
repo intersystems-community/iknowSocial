@@ -187,22 +187,6 @@ fields must be appropriate js-array</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="SaveEmotionalMarkers">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>FileName:%String</FormalSpec>
-<Implementation><![CDATA[
-    #dim query As %String = "select * from Misc.EmotionalMarker group by %exact(entity)"
-    #dim statement As %SQL.Statement = ##class(%SQL.Statement).%New()
-    #dim status As %Status = statement.%Prepare(query)
-    #dim result As %SQL.StatementResult = statement.%Execute()
-    open FileName:("NRW") use FileName
-    while result.%Next() {
-        write $fn(result.Weight,"+"),"#",result.Entity,!
-    }
-    close FileName
-]]></Implementation>
-</Method>
-
 <Method name="PrintEmotionalsMarkers">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[

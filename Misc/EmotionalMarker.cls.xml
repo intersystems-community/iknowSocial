@@ -17,9 +17,9 @@
 <FormalSpec>entity:%String,weight:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set ..Entity = entity
-	set ..Weight = weight
-	quit $$$OK
+    set ..Entity = entity
+    set ..Weight = weight
+    quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -28,50 +28,68 @@
 <FormalSpec><![CDATA[entity:%String,weigth:%String,&approved:Misc.EmotionalMarker]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set approved = ##class(Misc.EmotionalMarker).%New(entity, weigth)
-	set status = approved.%Save()
-	quit status
+    set approved = ##class(Misc.EmotionalMarker).%New(entity, weigth)
+    set status = approved.%Save()
+    quit status
 ]]></Implementation>
 </Method>
 
 <Method name="ApproveMarkersFromFile">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>filename</FormalSpec>
+<FormalSpec>filename:%String,reset:%Boolean=1</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set stream = ##class(%Stream.FileCharacter).%New()
-	set sc = stream.LinkToFile(filename)
-	quit:$$$ISERR(sc) sc
-	
-	set status = $$$OK
-	
-	set i = 0
-	while 'stream.AtEnd {		
-		set line = stream.ReadLine()
-		
-		if ($extract(line, 1) = "!") {
-			continue
-		}
-		
-		set weight = $piece(line, "#", 1)
-		set i = i + 1
-		
-		set words = $listfromstring($piece(line, "#", 2), ",")
-		set j = 1
-		while ($listdata(words, j) '= 0) {
-			
-			set entity = $list(words, j)
-			//w entity, weight, !
-			set localStatus = ##class(Misc.EmotionalMarker).DirectlyApproveMarker(entity, weight)
-			if ($$$ISOK(localStatus)) {
-				w "Successfully proposed", !
-			}
-			set status = $$$ADDSC(status, localStatus)
-			set j = j + 1
-		}
-	}
-	
-	quit status
+    if reset {
+        do ..%DeleteExtent()
+    }
+    set stream = ##class(%Stream.FileCharacter).%New()
+    set sc = stream.LinkToFile(filename)
+    quit:$$$ISERR(sc) sc
+    
+    set status = $$$OK
+    
+    set i = 0
+    while 'stream.AtEnd {
+        set line = stream.ReadLine()
+        
+        if ($extract(line, 1) = "!") {
+            continue
+        }
+        
+        set weight = $piece(line, "#", 1)
+        set i = i + 1
+        
+        set words = $listfromstring($piece(line, "#", 2), ",")
+        set j = 1
+        while ($listdata(words, j) '= 0) {
+            
+            set entity = $list(words, j)
+            set localStatus = ##class(Misc.EmotionalMarker).DirectlyApproveMarker(entity, weight)
+            if ($$$ISOK(localStatus)) {
+                w "Added ",entity, !
+            }
+            set status = $$$ADDSC(status, localStatus)
+            set j = j + 1
+        }
+    }
+    
+    quit status
+]]></Implementation>
+</Method>
+
+<Method name="SaveMarkers">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>FileName:%String</FormalSpec>
+<Implementation><![CDATA[
+    #dim query As %String = "select * from Misc.EmotionalMarker group by %exact(entity)"
+    #dim statement As %SQL.Statement = ##class(%SQL.Statement).%New()
+    #dim status As %Status = statement.%Prepare(query)
+    #dim result As %SQL.StatementResult = statement.%Execute()
+    open FileName:("NRW") use FileName
+    while result.%Next() {
+        write $fn(result.Weight,"+"),"#",result.Entity,!
+    }
+    close FileName
 ]]></Implementation>
 </Method>
 
@@ -80,16 +98,16 @@
 <FormalSpec>dictionary:%ArrayOfDataTypes</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set current = ""
-	set status = $$$OK
-	for {
-		set current = dictionary.Next(current)
-		if (current = "") {
-			return status
-		}
-		set status = $$$ADDSC(status, ##class(Misc.EmotionalMarker).DirectlyApproveMarker(current, dictionary.GetAt(current)))
-	}
-	quit status
+    set current = ""
+    set status = $$$OK
+    for {
+        set current = dictionary.Next(current)
+        if (current = "") {
+            return status
+        }
+        set status = $$$ADDSC(status, ##class(Misc.EmotionalMarker).DirectlyApproveMarker(current, dictionary.GetAt(current)))
+    }
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -98,24 +116,24 @@
 <FormalSpec>stringifiedDict:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(stringifiedDict, , .dict)
-	#dim dict as %ZEN.proxyObject
-	set current = ""
-	set result = ""
-	for {
-		set current = $o(dict.%data(current))
-		if (current = "") {
-			quit
-		}
-		kill marker
-		set status = ##class(Misc.EmotionalMarker).DirectlyApproveMarker(current, dict.%data(current), .marker)
-		if ($$$ISERR(status)) {
-			continue
-		}
-		set result = result _ ", """ _ current _ """: """ _ marker.%Id() _ """"
-	}
-	set result = "{" _ $extract(result, 2, $length(result)) _ "}"
-	quit result
+    do ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(stringifiedDict, , .dict)
+    #dim dict as %ZEN.proxyObject
+    set current = ""
+    set result = ""
+    for {
+        set current = $o(dict.%data(current))
+        if (current = "") {
+            quit
+        }
+        kill marker
+        set status = ##class(Misc.EmotionalMarker).DirectlyApproveMarker(current, dict.%data(current), .marker)
+        if ($$$ISERR(status)) {
+            continue
+        }
+        set result = result _ ", """ _ current _ """: """ _ marker.%Id() _ """"
+    }
+    set result = "{" _ $extract(result, 2, $length(result)) _ "}"
+    quit result
 ]]></Implementation>
 </Method>
 
@@ -131,26 +149,26 @@
 <FormalSpec>entity:%String,weight:%String,domainId:%String</FormalSpec>
 <ReturnType>%ArrayOfDataTypes</ReturnType>
 <Implementation><![CDATA[
-	set arr = ##class(%ArrayOfDataTypes).%New()
-	kill similarResult
-	do ##class(%iKnow.Queries.EntityAPI).GetSimilar(.similarResult, domainId, entity, 1, 0, , ,$$$USEWORDS)
-	
-	if '($data(similarResult(1))) { 
-		quit arr
-	}
-				
-	set j = 1
-	while $data(similarResult(j)) {
-				
-		set similarEntityId = $list(similarResult(j), 1)
-		set similarEntity = ##class(%iKnow.Queries.EntityAPI).GetValue(domainId, similarEntityId)
-				
-		if (similarEntity '= entity) {
-			do arr.SetAt(weight, similarEntity)
-		}
-		set j = j + 1
-	}
-	quit arr
+    set arr = ##class(%ArrayOfDataTypes).%New()
+    kill similarResult
+    do ##class(%iKnow.Queries.EntityAPI).GetSimilar(.similarResult, domainId, entity, 1, 0, , ,$$$USEWORDS)
+    
+    if '($data(similarResult(1))) { 
+        quit arr
+    }
+                
+    set j = 1
+    while $data(similarResult(j)) {
+                
+        set similarEntityId = $list(similarResult(j), 1)
+        set similarEntity = ##class(%iKnow.Queries.EntityAPI).GetValue(domainId, similarEntityId)
+                
+        if (similarEntity '= entity) {
+            do arr.SetAt(weight, similarEntity)
+        }
+        set j = j + 1
+    }
+    quit arr
 ]]></Implementation>
 </Method>
 
@@ -159,26 +177,26 @@
 <FormalSpec>stringifiedList:%String,domainId:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set result = ""
-	set len = $length(stringifiedList, ",")
-	for i = 0: 1: len {
-		kill arr
-		set marker = ##class(Misc.EmotionalMarker).%OpenId($piece(stringifiedList, ",", i + 1))
-		if (marker = "") {
-			continue
-		}
-		set arr = ..ProposeClosureForMarkerWithinDomain(marker.Entity, marker.Weight, domainId)
-		set current = ""
-		for {
-			set current = arr.Next(current)
-			if (current = "") {
-				quit
-			}
-			set result = result _ ", """ _ current _ """: """ _ arr.GetAt(current) _ """"
-		}
-	}
-	set result = "{" _ $extract(result, 2, $length(result)) _ "}"
-	quit result
+    set result = ""
+    set len = $length(stringifiedList, ",")
+    for i = 0: 1: len {
+        kill arr
+        set marker = ##class(Misc.EmotionalMarker).%OpenId($piece(stringifiedList, ",", i + 1))
+        if (marker = "") {
+            continue
+        }
+        set arr = ..ProposeClosureForMarkerWithinDomain(marker.Entity, marker.Weight, domainId)
+        set current = ""
+        for {
+            set current = arr.Next(current)
+            if (current = "") {
+                quit
+            }
+            set result = result _ ", """ _ current _ """: """ _ arr.GetAt(current) _ """"
+        }
+    }
+    set result = "{" _ $extract(result, 2, $length(result)) _ "}"
+    quit result
 ]]></Implementation>
 </Method>
 
