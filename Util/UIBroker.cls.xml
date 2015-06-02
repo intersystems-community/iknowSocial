@@ -31,7 +31,7 @@ Ewwww</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>sourceId:%String</FormalSpec>
 <Implementation><![CDATA[
-    set context = ..InstantiateContext()
+    #dim context As Util.Data.Context = ..InstantiateContext()
     do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, context.DomainID, sourceId, 0, 0)
     
     kill result
@@ -63,7 +63,7 @@ Ewwww</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>shouldCountEC:%String="",pageNum,pageSize,latTL,longTL,latBR,longBR,event="",trend="",timeFrom="",timeTo=""</FormalSpec>
 <Implementation><![CDATA[
-    set context = ..InstantiateContext()
+    #dim context As Util.Data.Context = ..InstantiateContext()
     set totalResult = context.GetPostsJSON(shouldCountEC, pageNum, pageSize, latTL, longTL, latBR, longBR, trend, timeFrom, timeTo)
     &js<
         posts = (#(totalResult)#).posts;
@@ -97,7 +97,7 @@ fields must be appropriate js-array</Description>
         if (numberOfSources > ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
             set numberOfSources = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
         }
-        set context = ..InstantiateContext(shouldClearDomain)
+        #dim context As Util.Data.Context = ..InstantiateContext(shouldClearDomain)
         do context.AddMorePosts(query, numberOfSources)
     } else {
         &js<console.log("Incorrect value for number of posts.")>
@@ -114,7 +114,7 @@ fields must be appropriate js-array</Description>
 <Method name="ShowEC">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-    set context = ..InstantiateContext()
+    #dim context As Util.Data.Context = ..InstantiateContext()
     do context.CalculateEmotionalColoring()
     do ..RedrawTable()
     &js<
@@ -207,18 +207,18 @@ fields must be appropriate js-array</Description>
 <Method name="RedrawTable">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-    set context = ..InstantiateContext()
+    #dim context As Util.Data.Context = ..InstantiateContext()
     set totalCount = ##class(%iKnow.Queries.SourceAPI).GetCountByDomain(context.DomainID)
     &js<
-                $('#page-selection').bootpag({
-                    total: ((#(totalCount)#) - (#(totalCount)#) % (pageSize)) / (pageSize)+1,
-                    page: 1,
-                    maxVisible: 10,
-                    }).on('page', function(event, num){
-                        console.log(((#(totalCount)#) - (#(totalCount)#) % (pageSize)) / (pageSize));
-                        redrawTableByPage(num);
-                    });
-                redrawTableByPage(1);
+        $('#page-selection').bootpag({
+            total: ((#(totalCount)#) - (#(totalCount)#) % (pageSize)) / (pageSize)+1,
+            page: 1,
+            maxVisible: 10,
+            }).on('page', function(event, num){
+                console.log(((#(totalCount)#) - (#(totalCount)#) % (pageSize)) / (pageSize));
+                redrawTableByPage(num);
+            });
+        redrawTableByPage(1);
     >
 ]]></Implementation>
 </Method>

@@ -5,17 +5,36 @@
 <head>
   <title>HTMLReader</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" >
   <link rel="stylesheet" href="table.css">
   <link rel="stylesheet" href="custom.css">
+  <style>
+    #map {
+        height: 40vh;
+    }
+  </style>
   <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script src="custom.js"></script>
+  <script src="geo.js"></script>
   <script src="jquery.bootpag.js"></script>
   <script language="JavaScript">
+    var emotionalCircles = L.layerGroup([]);
+    var postsMarkers = L.layerGroup([]);
     var posts = {}
     
     $(document).ready(function() {
         setSearch("#main-table");
+
+        var map = L.map('map');
+        map.on('load', function() {
+            redrawMapbox(map, 'load');
+        });
+        map.setView([49, 32], 5);
+
         $(".ec-link").click(function() {
             $(this).slideUp(400, function() {
                 $(this).html("Calculating...").fadeIn(200, function() {
@@ -23,6 +42,45 @@
                 });
             });
         });
+
+        function redrawMapbox(map, event, trendToShow) {
+            /* if (trendToShow === undefined) {
+                trendToShow = trend;
+            }
+            if (trendToShow === 'All trends') {
+                trendToShow = '';
+            } */
+            var boundsSW = map.getBounds()._southWest;
+            var boundsNE = map.getBounds()._northEast;
+            console.log(boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng));
+            #call(HTMLReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng), event, trendToShow))#;
+            /* if (event === 'load') {
+                #call(TWReader.UIBroker.SaveTrends())#
+            } */
+        }
+        
+        L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+            maxZoom: 18
+        }).addTo(map);
+        
+        // event listeners are separated, because otherwise setView fires them all
+        map.on('zoomend', function() {
+            redrawMapbox(map);
+        });
+        map.on('moveend', function() {
+            redrawMapbox(map);
+        });
+        
+        /* $('#map-settings-btn').on('click', function() {
+            #call(TWReader.UIBroker.SaveUniqueTrends())#
+        });
+        $('#map-settings-modal .btn-primary').on('click', function() {
+            trend = $("input:radio[name ='trend']:checked").val();
+            redrawMapbox(map);
+        });
+        */
+
     });
     
     function addSources() {
@@ -105,7 +163,19 @@
                 #call(HTMLReader.UIBroker.RedrawTable())#
             </script>  
         </div>
+
+  <div class="container">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+            <div id="map" class="panel-body big-content-wrapper"></div>
+            <div class="panel-footer">
+                <a data-toggle="modal" data-target="#what-are-circles-modal">What are these circles?</a>
+                <a id="map-settings-btn" data-toggle="modal" data-target="#map-settings-modal"><span class="glyphicon glyphicon-wrench pull-right" aria-hidden="true"></span></a>
+            </div>
+        </div>
       </div>
+  </div>
+  
 </div>
 <div class="modal fade" id="add-sources-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
