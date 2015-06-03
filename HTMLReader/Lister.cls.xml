@@ -17,14 +17,16 @@
     quit ""
 
 knownCity(city)
+    set city = $zstrip(city,"<>","W "_$C(9))
     for i=1:1 {
-        set tCity = $Piece($Text(CITIES+i),";",3)
+        set tCity = $Piece($Text(CITIES+i),";",3) quit:tCity=""
         if tCity '="" {
             if $zcvt(tCity,"u") = $zcvt(city,"u") {
-                return $piece($Text(CITIES+i),";",4,5)
+                return $piece($Text(CITIES+i),";",4,5) ; "longitude;latitude"
             }
         }
     }
+    quit ""
     
 CITIES
     ;;Черкассы;38.72615;52.69593
@@ -52,7 +54,7 @@ CITIES
     set status = ##class(HTMLReader.Requests.SiteAnalyzer).RetrieveHTMLOtzyvuaNet(.comments, listparams)
     quit:$$$ISERR(status) status
     
-    do ..RegisterMetadataKeys($lb("Query", "PostDate", "AuthorID", "AuthorCity", "AuthorCountry", "PostTitle", "PostRating", "PostCity","PostAdress"))
+    do ..RegisterMetadataKeys($lb("Query", "PostLatitude", "PostLongitude", "PostDate", "AuthorID", "AuthorCity", "AuthorCountry", "PostTitle", "PostRating", "PostCity","PostAdress"))
     
     for i = 1:1:comments.Count() {
         #dim comment = ##class(HTMLReader.Data.Comment).%New()
@@ -74,6 +76,16 @@ CITIES
         set tLocalRef = tOwnerID_"#"_tID
 
         set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
+        
+        set tGeo = ..GetGeoPos(tAuthorCity, tAuthorCountry, tCity, tAdress)
+        set tPostLongitude = $piece(tGeo, ";", 1)
+        set tPostLatitude = $piece(tGeo, ";", 2)
+        set comment.Longitude = tPostLongitude
+        set comment.Latitude = tPostLatitude
+        //zw $lb(tAuthorCity, tAuthorCountry, tCity, tAdress)
+        set sc = comment.%Save() ; FIXME - remove
+        if $$$ISERR(sc) zw sc
+        kill comment
         /*
         do tTextStream.Rewind()
         if (tTextStream.Size = 0) {
@@ -86,7 +98,7 @@ CITIES
         */
         do ..StoreTemp(tRef, tTextStream)
 
-        do ..SetMetadataValues(tRef, $lb(query, tPostDate, tOwnerID, tAuthorCity, tAuthorCountry, tTitle, tRating, tCity, tAdress))
+        do ..SetMetadataValues(tRef, $lb(query, tPostLatitude, tPostLongitude, tPostDate, tOwnerID, tAuthorCity, tAuthorCountry, tTitle, tRating, tCity, tAdress))
     }
 
     quit $$$OK
