@@ -4,51 +4,90 @@
 <Super>%iKnow.Source.Lister</Super>
 <TimeCreated>63492,10251.170023</TimeCreated>
 
+<Method name="GetGeoPos">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>aurhorCity:%String,authorCountry:%String,officeCity:%String,officeAddress:%String</FormalSpec>
+<ProcedureBlock>0</ProcedureBlock>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    new (aurhorCity, authorCountry, officeCity, officeAddress)
+    set geo = $$knownCity(officeCity)  quit:geo'="" geo
+    set geo = $$knownCity(aurhorCity)  quit:geo'="" geo
+    ; TODO - make dynamic rquest to api.geonames.org/searchJSON?name=%%f&username=iknowSocial"
+    quit ""
+
+knownCity(city)
+    for i=1:1 {
+        set tCity = $Piece($Text(CITIES+i),";",3)
+        if tCity '="" {
+            if $zcvt(tCity,"u") = $zcvt(city,"u") {
+                return $piece($Text(CITIES+i),";",4,5)
+            }
+        }
+    }
+    
+CITIES
+    ;;Черкассы;38.72615;52.69593
+    ;;Київ;30.5238;50.45466
+    ;;Одесса;30.73262;46.47747
+    ;;Запоріжжя;35.19031;47.82289
+    ;;Одеса;30.73262;46.47747
+    ;;Харьков;36.25272;49.98081
+    ;;Днепропетровск;34.98333;48.45
+    ;;Львов;24.02324;49.83826
+    ;;Черкаси;32.06207;49.42854
+    ;;Суми;34.80029;50.9216
+    ;;Мариуполь;37.54131;47.09514
+    ;;Калуш;24.37308;49.01187
+    ;;Літин;28.08094;49.32509
+]]></Implementation>
+</Method>
+
 <Method name="ExpandList">
 <FormalSpec>listparams:%List</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set query = $li(listparams, 1)
-	set comments = ##class(%ListOfObjects).%New()
-	set status = ##class(HTMLReader.Requests.SiteAnalyzer).RetrieveHTMLOtzyvuaNet(.comments, listparams)
-	quit:$$$ISERR(status) status
-	
-	do ..RegisterMetadataKeys($lb("Query", "PostDate", "AuthorID", "AuthorCity", "AuthorCountry", "PostTitle", "PostRating", "PostCity","PostAdress"))
-	
-	for i = 1:1:comments.Count() {
-		#dim comment = ##class(HTMLReader.Data.Comment).%New()
-		s comment = comments.GetAt(i)
-		set tID = comment.Id
-		set tOwnerID = comment.Author
+    set query = $li(listparams, 1)
+    set comments = ##class(%ListOfObjects).%New()
+    set status = ##class(HTMLReader.Requests.SiteAnalyzer).RetrieveHTMLOtzyvuaNet(.comments, listparams)
+    quit:$$$ISERR(status) status
+    
+    do ..RegisterMetadataKeys($lb("Query", "PostDate", "AuthorID", "AuthorCity", "AuthorCountry", "PostTitle", "PostRating", "PostCity","PostAdress"))
+    
+    for i = 1:1:comments.Count() {
+        #dim comment = ##class(HTMLReader.Data.Comment).%New()
+        s comment = comments.GetAt(i)
+        set tID = comment.Id
+        set tOwnerID = comment.Author
 
-		set tPostDate = $zdh(comment.Date,3)
-		set tPostTime= ""
-		//#dim tTextStream as %String
-		set tTextStream = comment.Text
-			
-		set tAuthorCity = $replace($piece(comment.Location,",",2),")","")
-		set tAuthorCountry = $replace($piece(comment.Location,",",1),"(","")
-		set tTitle = comment.Title
-		set tRating = comment.Rating
-		set tCity = comment.City
-		set tAdress = comment.Adress
-		set tLocalRef = tOwnerID_"#"_tID
+        set tPostDate = $zdh(comment.Date,3)
+        set tPostTime= ""
+        //#dim tTextStream as %String
+        set tTextStream = comment.Text
+            
+        set tAuthorCity = $replace($piece(comment.Location,",",2),")","")
+        set tAuthorCountry = $replace($piece(comment.Location,",",1),"(","")
+        set tTitle = comment.Title
+        set tRating = comment.Rating
+        set tCity = comment.City
+        set tAdress = comment.Adress
+        set tLocalRef = tOwnerID_"#"_tID
 
-		set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
-		/*
-		do tTextStream.Rewind()
-		if (tTextStream.Size = 0) {
-			continue
-		}
-		set len = 32000
-		while (len = 32000) {
-			do ..StoreTemp(tRef, tTextStream.Read(.len))
-		}
-		*/
-		do ..StoreTemp(tRef, tTextStream)
+        set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
+        /*
+        do tTextStream.Rewind()
+        if (tTextStream.Size = 0) {
+            continue
+        }
+        set len = 32000
+        while (len = 32000) {
+            do ..StoreTemp(tRef, tTextStream.Read(.len))
+        }
+        */
+        do ..StoreTemp(tRef, tTextStream)
 
-		do ..SetMetadataValues(tRef, $lb(query, tPostDate, tOwnerID, tAuthorCity, tAuthorCountry, tTitle, tRating, tCity, tAdress))
-	}
+        do ..SetMetadataValues(tRef, $lb(query, tPostDate, tOwnerID, tAuthorCity, tAuthorCountry, tTitle, tRating, tCity, tAdress))
+    }
 
     quit $$$OK
 ]]></Implementation>
@@ -71,9 +110,9 @@ the second part as local reference.</p>
 <Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set delim = ":::"
-	set localRef = $piece(fullRef, delim, $l(fullRef, delim))
-	set groupName = $e(fullRef, 1, *-$l(localRef)-$l(delim))
+    set delim = ":::"
+    set localRef = $piece(fullRef, delim, $l(fullRef, delim))
+    set groupName = $e(fullRef, 1, *-$l(localRef)-$l(delim))
     Quit $$$OK
 ]]></Implementation>
 </Method>
