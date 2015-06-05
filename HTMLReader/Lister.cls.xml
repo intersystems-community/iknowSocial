@@ -25,7 +25,7 @@ knownCity(city)
             }
         }
     }
-    ; TODO - make dynamic rquest to api.geonames.org/searchJSON?name=%%f&username=iknowSocial"
+    ; TODO - make dynamic request to api.geonames.org/searchJSON?name=%%f&username=iknowSocial"
     set o = ##class(Util.Requests.RequestSender).GetJSON("api.geonames.org","/searchJSON?username=iknowSocial&name="_$tr(city," ","+"))
     quit:$isobject(o.geonames.GetAt(1)) o.geonames.GetAt(1).lng_";"_o.geonames.GetAt(1).lat
     quit ""

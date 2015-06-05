@@ -83,7 +83,7 @@ fields must be appropriate js-array</Description>
         set fields = "['sourceId', 'title', 'date', 'time', 'city', 'EC']"
     }
     &js<
-        //postCallback();
+        postCallback();
         drawTable('#(tableName)#', posts, #(fields)#);
     >
 ]]></Implementation>

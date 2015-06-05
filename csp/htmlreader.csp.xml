@@ -43,6 +43,20 @@
             });
         });
 
+        postCallback = function(event) {
+            if (event === 'showTrendTable') {
+                drawTable("#modal-table", posts, ['sourceId', 'title', 'date', 'time', 'city', 'EC'])
+            } else {
+                geoPosts = GeoPost.getFromPosts(posts);
+                console.log(geoPosts);
+                drawEmotionalCircles(emotionalCircles, geoPosts, map);
+                drawPostsMarkers(postsMarkers, geoPosts, map);
+                /* if (event === 'load') {
+                    redrawGraph(composeWindowedECData(3600 * 24, geoPosts), "#trends-chart", "#preview");
+                } */
+            }
+        }
+
         function redrawMapbox(map, event, trendToShow) {
             /* if (trendToShow === undefined) {
                 trendToShow = trend;
@@ -90,6 +104,7 @@
         console.log([shouldClear, query, count]);
         $("#add-sources-modal .progress").show(400);
         $("#add-sources-button").prop('disabled', true);
+        console.log([shouldClear, count, query]);
         #call(HTMLReader.UIBroker.AddMorePostsWithinContext(shouldClear, count, query))# 
     }
     
