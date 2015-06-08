@@ -1,3 +1,4 @@
+<cspapp>
 <cspapp>/chart.js
 <cspapp>/custom.css
 <cspapp>/custom.js

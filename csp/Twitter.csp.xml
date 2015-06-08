@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="Twitter.csp" application="/csp/vkfb/" default="1"><![CDATA[
+<html>
+<head>
+
+<title>Twitter</title>
+
+</head>
+
+<body>
+
+ <script language="cache" runat="server">
+  Set subject=$get(%request.Data("subject",1))
+  set hideFrame=1
+  If subject '="" {
+	set currentIO=$I
+	use $System.Device.GetNullDevice()
+  	Do ^Twitter(subject)
+  	set domainId=##class(%iKnow.Domain).Open("Twitter").Id
+  	use currentIO
+  	set hideFrame=0
+  }
+</script>
+  <form action="Twitter.csp">
+    Subject <input type='text' name='subject'/>
+    <input type='image' src="images/twitter.png" height=50 width=50 name='submit'/>    
+  </form>
+  <csp:if condition="hideFrame=0">
+    <iFrame height=1000 width=1250 src="%25iKnow.UI.KnowledgePortal.cls?domain=#(domainId)#&$NAMESPACE=#($ZNSPACE)#"></iFrame>
+  </csp:if>
+</body>
+</html>
+]]></CSP>
+</Export>
