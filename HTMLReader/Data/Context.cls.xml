@@ -48,6 +48,7 @@
         set trendFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "Query", "=", trend)
     }
     set totalFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "AND", 0)
+#if 0
     if (coordFilter '= "") {
         do totalFilter.AddSubFilter(coordFilter)
     }
@@ -57,6 +58,9 @@
     if ((coordFilter = "") && (trendFilter = "")) {
         set totalFilter = ""
     }
+#else
+    set totalFilter = ""
+#endif
     for {
         kill result     
         do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize, totalFilter)
@@ -72,8 +76,11 @@
                 set tLatitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLatitude", tExternalId)
                 set tLongitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLongitude", tExternalId)
                 set tSourceId = ##class(%iKnow.Queries.SourceAPI).GetSourceId(..DomainID, tExternalId)
+                #if 0 
+                // FIXME - disable sending comments for a while due to performance problems
                 do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, ..DomainID, tSourceId, 1, 1)
                 set tComment = $lg($g(tSentences(1)), 2)
+                #endif
                 set tTitle = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostTitle", tExternalId)
                 set tDate = ..GetDate(tExternalId, "PostDate")
                 set tUnixtime = ..GetUnixtime(tExternalId, "PostDate", "PostTime")
@@ -90,7 +97,9 @@
                 set tRow = ##class(%ArrayOfDataTypes).%New()
                 do tRow.SetAt(tSourceId ,"sourceId")
                 do tRow.SetAt(tTitle ,"title")
+                #if 0
                 do tRow.SetAt(tComment ,"comment")
+                #endif
                 do tRow.SetAt(tLatitude ,"latitude")
                 do tRow.SetAt(tLongitude ,"longitude")
                 do tRow.SetAt(tDate ,"date")

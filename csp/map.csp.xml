@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="map.csp" application="/csp/vkfb/" default="1"><![CDATA[
+<CSP name="map.CSP" application="/csp/vkfb/" default="1"><![CDATA[
 <html>
 <head>
   <title>Map Colorer</title>
@@ -10,17 +10,17 @@
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" >
   <link rel="stylesheet" href="custom.css">
   <style>
-  	.graph-list {
-	  	list-style-type: none;
-  	}
-  	
-  	.graph-list li {
-	  	margin-bottom: 10px;
-  	}
-  	
-  	#map {
-	  	height: 80vh;
-  	}
+    .graph-list {
+        list-style-type: none;
+    }
+    
+    .graph-list li {
+        margin-bottom: 10px;
+    }
+    
+    #map {
+        height: 80vh;
+    }
   </style>
   <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
   <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
@@ -32,103 +32,103 @@
   <script src="geo.js"></script>
   <script src="chart.js"></script>
   <script language="JavaScript">
-  	var emotionalCircles = L.layerGroup([]);
+    var emotionalCircles = L.layerGroup([]);
     var postsMarkers = L.layerGroup([]);
     
     $(document).on("click", "#trends-table .link-to-full-source", function () {
-	    #call(TWReader.UIBroker.AddMorePostsWithinContext(0, 100, $(this).text(), 1, "['title', 'EC']", "#map-table"))#
-	});
-  	
-  	$(document).ready(function() {
-	  	var map = L.map('map');
-	  	var trend = 'All trends';
-    	map.on('load', function() {
-	    	redrawMapbox(map, 'load');
-    	});
-    	map.setView([49, 32], 5);
-    	
-    	postCallback = function(event) {
-	    	if (event === 'showTrendTable') {
-		    	drawTable("#modal-table", posts, ['sourceId', 'title', 'date', 'time', 'city', 'EC'])
-	    	} else {
-  				geoPosts = GeoPost.getFromPosts(posts);
-  				console.log(geoPosts);
-    			drawEmotionalCircles(emotionalCircles, geoPosts, map);
-  				drawPostsMarkers(postsMarkers, geoPosts, map);
-    			if (event === 'load') {
-    				redrawGraph(composeWindowedECData(3600 * 24, geoPosts), "#trends-chart", "#preview");
-    			}
-	    	}
-  		}
-  		
-  		trendCallback = function() {
-	  		var palette = new Rickshaw.Color.Palette();
-	  		for (var i in trendsMutualData) {
-	  			trendsMutualData[i].color = palette.color();
-	  		}
-	  		console.log(trendsMutualData);
-	  		redrawGraph(trendsMutualData, "#trends-chart-mutual", "#preview-mutual");
-  		}
-  		
-  		uniqueTrendCallback = function() {
-  			console.log(uniqueTrends);
-  			uniqueTrends.push('All trends');
-  			$("#map-settings-modal .modal-body form").html('');
-  			for (var i in uniqueTrends) {
-	  			var check = (uniqueTrends[i] === trend) ? 'checked="checked"' : '';
-  				$("#map-settings-modal .modal-body form").append($('<div class="radio"><label><input type="radio" name="trend" value="' + uniqueTrends[i] + '"' + check + '>' + uniqueTrends[i] + '</label></div>'))
-  			}
-  		}
-    	
-    	function redrawMapbox(map, event, trendToShow) {
-	    	if (trendToShow === undefined) {
-	    		trendToShow = trend;
-	    	}
-	    	if (trendToShow === 'All trends') {
-	    		trendToShow = '';
-	    	}
-	    	var boundsSW = map.getBounds()._southWest;
-	    	var boundsNE = map.getBounds()._northEast;
-	    	console.log(boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng));
-	    	#call(TWReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng), event, trendToShow))#;
-	    	if (event === 'load') {
-	    		#call(TWReader.UIBroker.SaveTrends())#
-	    	}
-    	}
-    	
-    	L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-      		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-      		maxZoom: 18
-    	}).addTo(map);
-    	
-    	// event listeners are separated, because otherwise setView fires them all
-    	map.on('zoomend', function() {
-	    	redrawMapbox(map);
-    	});
-    	map.on('moveend', function() {
-	    	redrawMapbox(map);
-    	});
-    	
-    	$('#map-settings-btn').on('click', function() {
-	    	#call(TWReader.UIBroker.SaveUniqueTrends())#
-    	});
-    	
-    	$('#map-settings-modal .btn-primary').on('click', function() {
-	    	trend = $("input:radio[name ='trend']:checked").val();
-	    	redrawMapbox(map);
-    	});
-    	
-    	$('#trends-chart-mutual').on('click', function() {
-	    	var hoverLabel = $("#trends-chart-mutual .detail div.item.active").text();
-	    	var trendText = hoverLabel.split(' ')[0].slice(0, -1)
-	    	var time = $("#trends-chart-mutual .x_label").text();
-	    	console.log(Date.parse(time) / 1000);
-	    	$("#chart-tweets-modal .modal-title").html(trendText);
-	    	$('#chart-tweets-modal').modal('show');
-	    	#call(TWReader.UIBroker.SavePosts("","1","100", '', '', '', '', 'showTrendTable', trendText))#;
-    	});
-    	
-	});
+        #call(TWReader.UIBroker.AddMorePostsWithinContext(0, 100, $(this).text(), 1, "['title', 'EC']", "#map-table"))#
+    });
+    
+    $(document).ready(function() {
+        var map = L.map('map');
+        var trend = 'All trends';
+        map.on('load', function() {
+            redrawMapbox(map, 'load');
+        });
+        map.setView([49, 32], 5);
+        
+        postCallback = function(event) {
+            if (event === 'showTrendTable') {
+                drawTable("#modal-table", posts, ['sourceId', 'title', 'date', 'time', 'city', 'EC'])
+            } else {
+                geoPosts = GeoPost.getFromPosts(posts);
+                console.log(geoPosts);
+                drawEmotionalCircles(emotionalCircles, geoPosts, map);
+                drawPostsMarkers(postsMarkers, geoPosts, map);
+                if (event === 'load') {
+                    redrawGraph(composeWindowedECData(3600 * 24, geoPosts), "#trends-chart", "#preview");
+                }
+            }
+        }
+        
+        trendCallback = function() {
+            var palette = new Rickshaw.Color.Palette();
+            for (var i in trendsMutualData) {
+                trendsMutualData[i].color = palette.color();
+            }
+            console.log(trendsMutualData);
+            redrawGraph(trendsMutualData, "#trends-chart-mutual", "#preview-mutual");
+        }
+        
+        uniqueTrendCallback = function() {
+            console.log(uniqueTrends);
+            uniqueTrends.push('All trends');
+            $("#map-settings-modal .modal-body form").html('');
+            for (var i in uniqueTrends) {
+                var check = (uniqueTrends[i] === trend) ? 'checked="checked"' : '';
+                $("#map-settings-modal .modal-body form").append($('<div class="radio"><label><input type="radio" name="trend" value="' + uniqueTrends[i] + '"' + check + '>' + uniqueTrends[i] + '</label></div>'))
+            }
+        }
+        
+        function redrawMapbox(map, event, trendToShow) {
+            if (trendToShow === undefined) {
+                trendToShow = trend;
+            }
+            if (trendToShow === 'All trends') {
+                trendToShow = '';
+            }
+            var boundsSW = map.getBounds()._southWest;
+            var boundsNE = map.getBounds()._northEast;
+            console.log(boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng));
+            #call(TWReader.UIBroker.SavePosts("","0","100", boundsNE.lat, getCutLong(boundsSW.lng), boundsSW.lat, getCutLong(boundsNE.lng), event, trendToShow))#;
+            if (event === 'load') {
+                #call(TWReader.UIBroker.SaveTrends())#
+            }
+        }
+        
+        L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and <a href="http://geonames.org/">GeoNames</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+            maxZoom: 18
+        }).addTo(map);
+        
+        // event listeners are separated, because otherwise setView fires them all
+        map.on('zoomend', function() {
+            redrawMapbox(map);
+        });
+        map.on('moveend', function() {
+            redrawMapbox(map);
+        });
+        
+        $('#map-settings-btn').on('click', function() {
+            #call(TWReader.UIBroker.SaveUniqueTrends())#
+        });
+        
+        $('#map-settings-modal .btn-primary').on('click', function() {
+            trend = $("input:radio[name ='trend']:checked").val();
+            redrawMapbox(map);
+        });
+        
+        $('#trends-chart-mutual').on('click', function() {
+            var hoverLabel = $("#trends-chart-mutual .detail div.item.active").text();
+            var trendText = hoverLabel.split(' ')[0].slice(0, -1)
+            var time = $("#trends-chart-mutual .x_label").text();
+            console.log(Date.parse(time) / 1000);
+            $("#chart-tweets-modal .modal-title").html(trendText);
+            $('#chart-tweets-modal').modal('show');
+            #call(TWReader.UIBroker.SavePosts("","1","100", '', '', '', '', 'showTrendTable', trendText))#;
+        });
+        
+    });
   </script>
 </head>
 <body>
@@ -145,30 +145,30 @@
     <div class="row" style="margin-top:10px">
     
       <div class="col-md-6">
-      	<div class="panel panel-default">
-        	<div id="map" class="panel-body big-content-wrapper"></div>
-        	<div class="panel-footer">
-        		<a data-toggle="modal" data-target="#what-are-circles-modal">What are these circles?</a>
-        		<a id="map-settings-btn" data-toggle="modal" data-target="#map-settings-modal"><span class="glyphicon glyphicon-wrench pull-right" aria-hidden="true"></span></a>
-        	</div>
+        <div class="panel panel-default">
+            <div id="map" class="panel-body big-content-wrapper"></div>
+            <div class="panel-footer">
+                <a data-toggle="modal" data-target="#what-are-circles-modal">What are these circles?</a>
+                <a id="map-settings-btn" data-toggle="modal" data-target="#map-settings-modal"><span class="glyphicon glyphicon-wrench pull-right" aria-hidden="true"></span></a>
+            </div>
         </div>
       </div>
       
       <div class="col-md-6">
-      	<ul class="graph-list">
-      		<li>
-      			<div class="panel panel-info graph-panel">
-      				<div id="trends-chart"> </div>
-      			</div>
-      			<div id="preview"></div>
-      		</li>
-      		<li>
-      			<div class="panel panel-info graph-panel">
-      				<div id="trends-chart-mutual"> </div>
-      			</div>
-      			<div id="preview-mutual"></div>
-      		</li>
-      	</ul>
+        <ul class="graph-list">
+            <li>
+                <div class="panel panel-info graph-panel">
+                    <div id="trends-chart"> </div>
+                </div>
+                <div id="preview"></div>
+            </li>
+            <li>
+                <div class="panel panel-info graph-panel">
+                    <div id="trends-chart-mutual"> </div>
+                </div>
+                <div id="preview-mutual"></div>
+            </li>
+        </ul>
       </div>
     </div>
     </div>
@@ -229,21 +229,21 @@
                   <th>EC</th>
                 </tr>
               </thead>
-          	</table>
-          	<div class="table-content big-content-wrapper">
+            </table>
+            <div class="table-content big-content-wrapper">
               <table class="table" id="modal-table">
                 <tbody>
-              	  <!--<script language="JavaScript">
-              	 		redrawTableByPage("1","8");
+                  <!--<script language="JavaScript">
+                        redrawTableByPage("1","8");
                  </script>-->
                 </tbody>
               </table>
-	   	    </div>
+            </div>
           </div>
-		  <div id="page-selection"></div>
-			<!--<script language="JavaScript">
-              	#call(TWReader.UIBroker.RedrawTable("8"))#
-    	   </script>-->
+          <div id="page-selection"></div>
+            <!--<script language="JavaScript">
+                #call(TWReader.UIBroker.RedrawTable("8"))#
+           </script>-->
           </div>
         </div>
       </div>
