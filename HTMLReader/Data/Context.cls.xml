@@ -76,7 +76,7 @@
                 set tLatitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLatitude", tExternalId)
                 set tLongitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLongitude", tExternalId)
                 set tSourceId = ##class(%iKnow.Queries.SourceAPI).GetSourceId(..DomainID, tExternalId)
-                #if 0 
+                #if 1 
                 // FIXME - disable sending comments for a while due to performance problems
                 do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, ..DomainID, tSourceId, 1, 1)
                 set tComment = $lg($g(tSentences(1)), 2)
@@ -97,7 +97,8 @@
                 set tRow = ##class(%ArrayOfDataTypes).%New()
                 do tRow.SetAt(tSourceId ,"sourceId")
                 do tRow.SetAt(tTitle ,"title")
-                #if 0
+                #if 1
+                // FIXME
                 do tRow.SetAt(tComment ,"comment")
                 #endif
                 do tRow.SetAt(tLatitude ,"latitude")
