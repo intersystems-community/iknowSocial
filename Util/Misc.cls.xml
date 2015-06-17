@@ -214,5 +214,17 @@ Runs all tests across the project.</Description>
 	quit status
 ]]></Implementation>
 </Method>
+
+<Method name="InstallAll">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
+	set context = ##class(HTMLReader.Data.Context).%New(1)
+	set context = ##class(TWReader.Data.Context).%New(1)
+	set context = ##class(VKReader.Data.Context).%New(1)
+	quit status
+]]></Implementation>
+</Method>
 </Class>
 </Export>
