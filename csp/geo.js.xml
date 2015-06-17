@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="geo.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+<CSP name="geo.js" application="/csp/vkfb/" default="1"><![CDATA[
 var METERS_IN_KILOMETER = 1000;
 var GRADUSES_IN_PI = 180;
 
 function GeoPoint(latitude, longitude) {
-	this.latitude = latitude;
-	this.longitude = longitude;
+    this.latitude = latitude;
+    this.longitude = longitude;
 }
 
 function toRadians(degree) {
@@ -14,225 +14,225 @@ function toRadians(degree) {
 }
 
 function CalcHaversineDistance(lat1, lat2, lon1, lon2) {
-	var lat1 = toRadians(lat1);
-	var lon1 = toRadians(lon1);
-	var lat2 = toRadians(lat2);
-	var lon2 = toRadians(lon2);
+    var lat1 = toRadians(lat1);
+    var lon1 = toRadians(lon1);
+    var lat2 = toRadians(lat2);
+    var lon2 = toRadians(lon2);
     var R = 6372.8; // Earth radius, km
     var dLat = lat2 - lat1;
     var dLon = lon2 - lon1;
     var a = Math.sin(dLat / 2) * Math.sin(dLat /2) + Math.sin(dLon / 2) * Math.sin(dLon /2) * Math.cos(lat1) * Math.cos(lat2);
     var c = 2 * Math.asin(Math.sqrt(a));
-	return R * c;
+    return R * c;
 }
 
 GeoPoint.prototype.getDistance = function(anotherGeoPoint) {
-	if (anotherGeoPoint instanceof GeoPoint) {
-		return CalcHaversineDistance(this.latitude, anotherGeoPoint.latitude, this.longitude, anotherGeoPoint.longitude)
-	} else {
-		return undefined;
-	}
+    if (anotherGeoPoint instanceof GeoPoint) {
+        return CalcHaversineDistance(this.latitude, anotherGeoPoint.latitude, this.longitude, anotherGeoPoint.longitude)
+    } else {
+        return undefined;
+    }
 }
 
 GeoPoint.prototype.toTuple = function() {
-	return [this.latitude, this.longitude];
+    return [this.latitude, this.longitude];
 }
 
 // map is leafletjs object here,
 // callback accepts data from request
 GeoPoint.getGeonamesCities = function(map, callback) {
-	var bounds = map.getBounds();
-	var geonamesUsername = 'iknowsocial';
-	$.ajax({
-		url : 'http://api.geonames.org/citiesJSON',
-		dataType : 'jsonp',
-		data : {
-			north : bounds._northEast.lat,
-			south : bounds._southWest.lat,
-			east : bounds._northEast.lng,
-			west : bounds._southWest.lng,
-			username : geonamesUsername
-		},
-		success : function(data) {
-			var centers = {};
-			data = data.geonames;
-			for (var i = 0; i < data.length; i++) {
-				centers[data[i].name] = new GeoPoint(data[i].lat, data[i].lng);
-			}
-			callback(centers);
-		},
-		error : function(xhr, textStatus) {
-			console.log(xhr, textStatus);
-		}
-	})
+    var bounds = map.getBounds();
+    var geonamesUsername = 'iknowsocial';
+    $.ajax({
+        url : 'http://api.geonames.org/citiesJSON',
+        dataType : 'jsonp',
+        data : {
+            north : bounds._northEast.lat,
+            south : bounds._southWest.lat,
+            east : bounds._northEast.lng,
+            west : bounds._southWest.lng,
+            username : geonamesUsername
+        },
+        success : function(data) {
+            var centers = {};
+            data = data.geonames;
+            for (var i = 0; i < data.length; i++) {
+                centers[data[i].name] = new GeoPoint(data[i].lat, data[i].lng);
+            }
+            callback(centers);
+        },
+        error : function(xhr, textStatus) {
+            console.log(xhr, textStatus);
+        }
+    })
 }
 
 GeoPoint.getMinimumPairwiseDistance = function(centers) {
-	var keys = Object.keys(centers);
-	var result = Infinity;
-	for (var i = 0; i < keys.length; i++) {
-		for (var j = i + 1; j < keys.length; j++) {
-			result = Math.min(result, centers[keys[i]].getDistance(centers[keys[j]]));
-		}
-	}
-	return result
+    var keys = Object.keys(centers);
+    var result = Infinity;
+    for (var i = 0; i < keys.length; i++) {
+        for (var j = i + 1; j < keys.length; j++) {
+            result = Math.min(result, centers[keys[i]].getDistance(centers[keys[j]]));
+        }
+    }
+    return result
 }
 
 GeoPoint.clusterize = function(points, centers) {
-	// this is very inefficient
-	
-	var clusters = {}
-	for (var key in centers) {
-		clusters[key] = [];
-	}
-	
-	for (var i = 0; i < points.length; i++) {
-		var minDist = Infinity;
-		var closestCenter = undefined;
-		for (var key in centers) {
-			var distToCenter = points[i].getDistance(centers[key]);
-			if (minDist > distToCenter) {
-				minDist = distToCenter;
-				closestCenter = key;
-			}
-		}
-		clusters[closestCenter].push(points[i]);
-	}
-	
-	return clusters;
+    // this is very inefficient
+    
+    var clusters = {}
+    for (var key in centers) {
+        clusters[key] = [];
+    }
+    
+    for (var i = 0; i < points.length; i++) {
+        var minDist = Infinity;
+        var closestCenter = undefined;
+        for (var key in centers) {
+            var distToCenter = points[i].getDistance(centers[key]);
+            if (minDist > distToCenter) {
+                minDist = distToCenter;
+                closestCenter = key;
+            }
+        }
+        clusters[closestCenter].push(points[i]);
+    }
+    
+    return clusters;
 }
 
 function GeoPost(rawObject) {
-	GeoPoint.call(this, rawObject.latitude, rawObject.longitude)
-	for (key in rawObject) {
-		if (key != "latitude" && key != "longitude") {
-			this[key] = rawObject[key];
-		}
-	}
-	this.EC = parseInt(this.EC);
-	this.unixtime = parseInt(this.unixtime);
+    GeoPoint.call(this, rawObject.latitude, rawObject.longitude)
+    for (key in rawObject) {
+        if (key != "latitude" && key != "longitude") {
+            this[key] = rawObject[key];
+        }
+    }
+    this.EC = parseInt(this.EC);
+    this.unixtime = parseInt(this.unixtime);
 }
 
 GeoPost.prototype = new GeoPoint();
 
 GeoPost.getFromPosts = function(posts) {
-	var array = []
-	for (var i = 0; i < posts.length; i++) {
-		if (posts[i].latitude != "" && posts[i].longitude != "") {
-			array.push(new GeoPost(posts[i]));
-		}
-	}
-	return array;
+    var array = []
+    for (var i = 0; i < posts.length; i++) {
+        if (posts[i].latitude != "" && posts[i].longitude != "") {
+            array.push(new GeoPost(posts[i]));
+        }
+    }
+    return array;
 }
 
 // initial value is 1 to avoid zero and to make non-emotional cities happier, gonna change this later
 GeoPost.getTotalAbsoluteEC = function(array) {
-	return array.reduce(function(previous, current) {
-		return Math.abs(parseInt(current.EC)) + previous;
-	}, 1);
+    return array.reduce(function(previous, current) {
+        return Math.abs(parseInt(current.EC)) + previous;
+    }, 1);
 }
 
 // here we don't need this
 GeoPost.getTotalEC = function(array) {
-	return array.reduce(function(previous, current) {
-		return parseInt(current.EC) + previous;
-	}, 0);
+    return array.reduce(function(previous, current) {
+        return parseInt(current.EC) + previous;
+    }, 0);
 }
 
 GeoPost.getECMin = function(clusters) {
-	var keys = Object.keys(clusters);
-	var min = Infinity;
-	for (var i = 0; i < keys.length; i++) {
-		min = Math.min(min, GeoPost.getTotalEC(clusters[keys[i]]));
-	}
-	return min;
+    var keys = Object.keys(clusters);
+    var min = Infinity;
+    for (var i = 0; i < keys.length; i++) {
+        min = Math.min(min, GeoPost.getTotalEC(clusters[keys[i]]));
+    }
+    return min;
 }
 
 GeoPost.getECAmplitude = function(clusters) {
-	var keys = Object.keys(clusters);
-	var max = -Infinity;
-	var min = Infinity;
-	for (var i = 0; i < keys.length; i++) {
-		max = Math.max(max, GeoPost.getTotalEC(clusters[keys[i]]));
-		min = Math.min(min, GeoPost.getTotalEC(clusters[keys[i]]));
-	}
-	return max - min;
+    var keys = Object.keys(clusters);
+    var max = -Infinity;
+    var min = Infinity;
+    for (var i = 0; i < keys.length; i++) {
+        max = Math.max(max, GeoPost.getTotalEC(clusters[keys[i]]));
+        min = Math.min(min, GeoPost.getTotalEC(clusters[keys[i]]));
+    }
+    return max - min;
 }
 
 GeoPost.getECRelations = function(clusters) {
-	var relations = {};
-	var ampl = GeoPost.getECAmplitude(clusters);
-	var min = GeoPost.getECMin(clusters);
-	
-	for (var key in clusters) {
-		relations[key] = (GeoPost.getTotalEC(clusters[key]) - min) / (ampl + 1);
-	}
-	return relations;
+    var relations = {};
+    var ampl = GeoPost.getECAmplitude(clusters);
+    var min = GeoPost.getECMin(clusters);
+    
+    for (var key in clusters) {
+        relations[key] = (GeoPost.getTotalEC(clusters[key]) - min) / (ampl + 1);
+    }
+    return relations;
 }
 
 GeoPost.getECDistanceUnit = function(points, centers) {
-	var total = GeoPost.getTotalAbsoluteEC(points);
-	var pairwiseDistance = GeoPoint.getMinimumPairwiseDistance(centers) * METERS_IN_KILOMETER;
-	return pairwiseDistance / total; 
+    var total = GeoPost.getTotalAbsoluteEC(points);
+    var pairwiseDistance = GeoPoint.getMinimumPairwiseDistance(centers) * METERS_IN_KILOMETER;
+    return pairwiseDistance / total; 
 }
 
 var UkraineCities = {
-  	"Lviv" 			: new GeoPoint(49.8397, 24.0297),
-  	"Donetsk" 		: new GeoPoint(48.0159, 37.8029),
-  	"Kyiv" 			: new GeoPoint(50.4501, 30.5234),
-  	"Odesa"		 	: new GeoPoint(46.4846, 30.7326),
-  	"Sumy" 			: new GeoPoint(50.9077, 34.7981),
-  	"Kharkiv" 		: new GeoPoint(49.9935, 36.2304)
+    "Lviv"          : new GeoPoint(49.8397, 24.0297),
+    "Donetsk"       : new GeoPoint(48.0159, 37.8029),
+    "Kyiv"          : new GeoPoint(50.4501, 30.5234),
+    "Odesa"         : new GeoPoint(46.4846, 30.7326),
+    "Sumy"          : new GeoPoint(50.9077, 34.7981),
+    "Kharkiv"       : new GeoPoint(49.9935, 36.2304)
 }
-  	
+    
 function bindGeoPostMarker(markersGroup, rowObj) {
-	var anchor = '#' + 'map-table-row-' + rowObj.sourceId;
-   	var marker = L.marker(rowObj.toTuple())
-   	var color = (rowObj.EC > 0) ? "green" : "red";
-   	if (rowObj.EC === 0) {
-	   	color = "black";
-   	}
-   	marker.bindPopup("<b><font color=" + color + ">" + rowObj.EC + "</font></b>:" + rowObj.title);
-   	marker.on('click', function() {
-    	console.log(marker.getLatLng());
+    var anchor = '#' + 'map-table-row-' + rowObj.sourceId;
+    var marker = L.marker(rowObj.toTuple())
+    var color = (rowObj.EC > 0) ? "green" : "red";
+    if (rowObj.EC === 0) {
+        color = "black";
+    }
+    marker.bindPopup("<b><font color=" + color + ">" + rowObj.EC + "</font></b>:" + rowObj.title);
+    marker.on('click', function() {
+        console.log(marker.getLatLng());
     });
     markersGroup.addLayer(marker);
 }
  
 function drawPostsMarkers(markersGroup, posts, map) {
-	markersGroup.clearLayers();
-	for (var key in posts) {
-		bindGeoPostMarker(markersGroup, posts[key]);
+    markersGroup.clearLayers();
+    for (var key in posts) {
+        bindGeoPostMarker(markersGroup, posts[key]);
     }
     markersGroup.addTo(map);
 }
-  	
+    
 function drawEmotionalCircles(circlesGroup, posts, map) {
-	boxCities = GeoPoint.getGeonamesCities(map, function(cities) {
-		circlesGroup.clearLayers();
-    	var clusters = GeoPoint.clusterize(posts, cities);
-    	var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, cities);
-    	var gradient = generateGYRGradient();
-    	var relations = GeoPost.getECRelations(clusters);
-    	for (var key in cities) {
-	    	var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
-    		circlesGroup.addLayer(L.circle(cities[key].toTuple(), radius, {
-    			color : gradient[Math.max(Math.floor(relations[key] * gradient.length) - 1, 0)]
-    		}));
-    	}
-    	circlesGroup.addTo(map);
-	});
+    boxCities = GeoPoint.getGeonamesCities(map, function(cities) {
+        circlesGroup.clearLayers();
+        var clusters = GeoPoint.clusterize(posts, cities);
+        var ECDistanceUnit = GeoPost.getECDistanceUnit(posts, cities);
+        var gradient = generateGYRGradient();
+        var relations = GeoPost.getECRelations(clusters);
+        for (var key in cities) {
+            var radius = GeoPost.getTotalAbsoluteEC(clusters[key]) * ECDistanceUnit;
+            circlesGroup.addLayer(L.circleMarker(cities[key].toTuple(), radius, {
+                color : gradient[Math.max(Math.floor(relations[key] * gradient.length) - 1, 0)]
+            }));
+        }
+        circlesGroup.addTo(map);
+    });
 }
 
 function getCutLong(long) {
-	var res = long;
-	res %= 360;
-	if (res > 180) {
-		res -= 360;	
-	}
-	if (long < -180) {
-		res += 360;
-	}
-	return res;
+    var res = long;
+    res %= 360;
+    if (res > 180) {
+        res -= 360; 
+    }
+    if (long < -180) {
+        res += 360;
+    }
+    return res;
 }]]></CSP>
 </Export>

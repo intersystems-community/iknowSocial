@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="custom.css" application="/csp/iknowsocial/" default="1"><![CDATA[
+<CSP name="custom.css" application="/csp/vkfb/" default="1"><![CDATA[
 body {
-  	padding-top: 70px;
+    padding-top: 70px;
 }
 
 .highlighted-row {
-	background-color: #87B5DC;
+    background-color: #87B5DC;
 }
 
 .table-content {
-	overflow-y: auto;	
+    overflow-y: auto;   
 }
 
 #main-table tr:hover {
-	background-color: #FAFAFA;
+    background-color: #FAFAFA;
 }
 
 table {
-	table-layout: fixed;
+    table-layout: fixed;
 }
 
 table td div {
-	overflow-x: auto;
+    overflow-x: auto;
 }
 
 .small-content-wrapper td:nth-child(3) {
-	text-align: center;
+    text-align: center;
 }
 
 .big-content-wrapper td:nth-child(8), .big-content-wrapper td:nth-child(10) {
-	text-align: center;
+    text-align: center;
 }
 
 .form-multiline .form-group {
@@ -43,19 +43,23 @@ table td div {
 }
 
 .progress {
-	display: none;
+    display: none;
 }
 
 .big-content-wrapper {
-	height: 68vh;
+    /* height: 68vh; */
+    height: 40vh; 
 }
-
+.panel, .pagination {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 .small-content-wrapper {
-	height: 60vh;
+    height: 60vh;
 }
 
 #trends-chart {
-	height: 40vh;
+    height: 40vh;
 }
 ]]></CSP>
 </Export>

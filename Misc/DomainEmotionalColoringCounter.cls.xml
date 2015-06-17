@@ -14,8 +14,8 @@
 <FormalSpec>domainId:%Integer,externalId:%String,value:%Numeric</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+value))
-	quit status
+    set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+value))
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -24,11 +24,11 @@
 <FormalSpec>domainId:%Integer,externalId:%String,value:%Numeric</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set current = ##class(%iKnow.Queries.MetadataAPI).GetValue(domainId, ..#EmotionalColoringField, externalId, .status)
-	quit:$$$ISERR(status) status
-	set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+current) + (+value))
-	//do $system.Status.DisplayError(status)
-	quit status
+    set current = ##class(%iKnow.Queries.MetadataAPI).GetValue(domainId, ..#EmotionalColoringField, externalId, .status)
+    quit:$$$ISERR(status) status
+    set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+current) + (+value))
+    //do $system.Status.DisplayError(status)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -37,55 +37,55 @@
 <FormalSpec>entity:%String,domainId:%Integer,value:%Numeric</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set similarList = ##class(%iKnow.Queries.EntityAPI).GetSimilarCounts(domainId, entity)
-	// Here we extract the number of similar concepts
-	set number = $list(similarList, 1)
-	//w number, !
-	if (number = 0) {
-		quit $$$OK
-	}
-	
-	kill similarResult
-	// 1 page with `number` results
-	set st = ##class(%iKnow.Queries.EntityAPI).GetSimilar(.similarResult, domainId, entity, 1, number)	
-	if (st '= 1) { 
-		// should think what to do here
-		quit $$$OK
-	}
-	
-	set k1 = 1
-	set p1 = ""
-	for {	// cycling through similar concepts
-		set p1 = $order(similarResult(p1))
-		quit:(p1 = "")
-		set similarEntityId = $list(similarResult(k1), 1)				
-		set numberOfArticlesWithSE = $list(similarResult(k1),3)
+    set similarList = ##class(%iKnow.Queries.EntityAPI).GetSimilarCounts(domainId, entity)
+    // Here we extract the number of similar concepts
+    set number = $list(similarList, 1)
+    //w number, !
+    if (number = 0) {
+        quit $$$OK
+    }
+    
+    kill similarResult
+    // 1 page with `number` results
+    set st = ##class(%iKnow.Queries.EntityAPI).GetSimilar(.similarResult, domainId, entity, 1, number)  
+    if (st '= 1) { 
+        // should think what to do here
+        quit $$$OK
+    }
+    
+    set k1 = 1
+    set p1 = ""
+    for {   // cycling through similar concepts
+        set p1 = $order(similarResult(p1))
+        quit:(p1 = "")
+        set similarEntityId = $list(similarResult(k1), 1)               
+        set numberOfArticlesWithSE = $list(similarResult(k1),3)
 
-		kill result
-		set st = ##class(%iKnow.Queries.SourceAPI).GetByEntityIds(.result, domainId, $lb(similarEntityId), 1, numberOfArticlesWithSE)
-		if ($$$ISERR(st)) {
-			continue
-		}
-		
-		set k2 = 1
-		set p2 = ""
-		for {					// cycling through entities, containing the concept
-			set p2 = $order(result(p2))	
-			quit:(p2 = "")
-			
-			set externalId = $list(result(k2), 2)
-			//w externalId, !
-			set status = ..AddToEmotionalColoringField(domainId, externalId, value)
-			if ($$$ISERR(status)) {
-				continue
-			}
-			
-			set k2 = k2 + 1
-		}	// for
-		
-		set k1 = k1 + 1		
-	}	// for
-	quit $$$OK
+        kill result
+        set st = ##class(%iKnow.Queries.SourceAPI).GetByEntityIds(.result, domainId, $lb(similarEntityId), 1, numberOfArticlesWithSE)
+        if ($$$ISERR(st)) {
+            continue
+        }
+        
+        set k2 = 1
+        set p2 = ""
+        for {                   // cycling through entities, containing the concept
+            set p2 = $order(result(p2)) 
+            quit:(p2 = "")
+            
+            set externalId = $list(result(k2), 2)
+            //w externalId, !
+            set status = ..AddToEmotionalColoringField(domainId, externalId, value)
+            if ($$$ISERR(status)) {
+                continue
+            }
+            
+            set k2 = k2 + 1
+        }   // for
+        
+        set k1 = k1 + 1     
+    }   // for
+    quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -94,67 +94,67 @@
 <FormalSpec>domName:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if (##class(%iKnow.Domain).Exists(domName)) {
-		set domainId = ##class(%iKnow.Domain).GetOrCreateId(domName)
-	} else {
-		set status = $system.Status.Error(5001, "No such domain.")
-		quit status
-	}
-	set i = 1
-	set pageSize = 10
-	for {
-		kill result
-		set status = ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, domainId, i, pageSize)
-		if ($$$ISERR(status)) {
-			return status
-		}
-		if ($data(result) = 0) {
-			return $$$OK
-		}
-		set p = ""
-		for {
-			set p = $order(result(p))	
-			if (p '= "") {
-				set status = ..SetEmotionalColoringField(domainId, $list(result(p), 2), "0")
-				if ($$$ISERR(status)) {
-					return status
-				}
-			} else {
-				quit
-			}
-		}
-		set i = i + 1
-	}
-	return $$$OK
+    if (##class(%iKnow.Domain).Exists(domName)) {
+        set domainId = ##class(%iKnow.Domain).GetOrCreateId(domName)
+    } else {
+        set status = $system.Status.Error(5001, "No such domain.")
+        quit status
+    }
+    set i = 1
+    set pageSize = 10
+    for {
+        kill result
+        set status = ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, domainId, i, pageSize)
+        if ($$$ISERR(status)) {
+            return status
+        }
+        if ($data(result) = 0) {
+            return $$$OK
+        }
+        set p = ""
+        for {
+            set p = $order(result(p))   
+            if (p '= "") {
+                set status = ..SetEmotionalColoringField(domainId, $list(result(p), 2), "0")
+                if ($$$ISERR(status)) {
+                    return status
+                }
+            } else {
+                quit
+            }
+        }
+        set i = i + 1
+    }
+    return $$$OK
 ]]></Implementation>
 </Method>
 
 <Method name="CalcSourcesEmotionalColoring">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>domName:%String</FormalSpec>
+<FormalSpec>domName:%String,filter:%iKnow.Filters.Filter=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ..ClearSourcesEmotionalColoring(domName)
-	quit:$$$ISERR(status) status
-	
-	if (##class(%iKnow.Domain).Exists(domName)) {
-		set domainId = ##class(%iKnow.Domain).GetOrCreateId(domName)
-	} else {
-		set status = $system.Status.Error(5001, "No such domain.")
-		quit status
-	}	
-	
-	set query = "select distinct * from Misc.EmotionalMarker"
-	set statement = ##class(%SQL.Statement).%New()
-	set status = statement.%Prepare(query)
-	quit:$$$ISERR(status) status
-	set result = statement.%Execute()
-	while result.%Next() {
-		set localStatus = ..ProcessOneEntity(result.Entity, domainId, result.Weight)
-		set status = $$$ADDSC(status, localStatus)
-	} 
-	
-	quit status
+    set status = ..ClearSourcesEmotionalColoring(domName)
+    quit:$$$ISERR(status) status
+    
+    if (##class(%iKnow.Domain).Exists(domName)) {
+        set domainId = ##class(%iKnow.Domain).GetOrCreateId(domName)
+    } else {
+        set status = $system.Status.Error(5001, "No such domain.")
+        quit status
+    }   
+    
+    set query = "select distinct * from Misc.EmotionalMarker"
+    set statement = ##class(%SQL.Statement).%New()
+    set status = statement.%Prepare(query)
+    quit:$$$ISERR(status) status
+    set result = statement.%Execute()
+    while result.%Next() {
+        set localStatus = ..ProcessOneEntity(result.Entity, domainId, result.Weight)
+        set status = $$$ADDSC(status, localStatus)
+    } 
+    
+    quit status
 ]]></Implementation>
 </Method>
 </Class>

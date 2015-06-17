@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="table.css" application="/csp/vkfb/" default="1"><![CDATA[
 #html-nav {
 	background-color : #ff392e;
 	border-color : white;
@@ -25,3 +28,5 @@
 	width: 500px;
 }
 
+]]></CSP>
+</Export>

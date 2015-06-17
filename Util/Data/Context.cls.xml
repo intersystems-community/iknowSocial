@@ -82,7 +82,9 @@
     	set status = $$$ADDSC(status, ..Domain.SetParameter($$$IKPSTEMMING, 1))
     }
     set status = $$$ADDSC(status, ..Domain.%Save())
+    #if 0
     set cfg.StemmingConfig = "DEFAULT"
+    #endif
     set status =$$$ADDSC(status, cfg.%Save())
     quit status
 ]]></Implementation>

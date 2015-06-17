@@ -28,47 +28,47 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
 <FormalSpec><![CDATA[server:%String="api.vk.com",location:%String,parameters:%ArrayOfDataTypes,&responseText:%String(MAXLEN=1000000),requestType:%Integer="",authorization:%String=""]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if (requestType = "") {
-		set requestType = ..#RequestTest
-	}
-	#dim req as %Net.HttpRequest = ##class(%Net.HttpRequest).%New()
-	set req.Server = server
-	set req.Https = 1
-	set req.SSLConfiguration = ..#SSLConfigurationName
-	if (authorization '= "")
-	{
-		set req.Authorization = authorization
-	}
-	
-	#dim k as %String = ""
-	#dim v as %String = ""
-	
-	#dim status as %Status = $$$OK
-	set status = req.Get(##class(Util.Requests.RequestMaker).RequestArrayToQueryString(location, parameters), requestType # 3)
-	
-	if ($$$ISOK(status)) {
-		#dim response as %String = ""
-		if (requestType '= 1) {
-			#dim res as %Net.HttpResponse = req.HttpResponse
-			
-			if (($data(res)) &&  (requestType '= 3)) {
-				write "Response: ", res.StatusCode, ", ", res.StatusLine, ", ", res.ReasonPhrase, !
-			}
-			if ($$$ISOK(status)) {
-				#dim responseLength as %Integer = 1000000
-				set response = res.Data.Read(.responseLength)
-				if (requestType '= 3) {
-					write "Response type: ", $classname(res.Data), !
-					write "Response length: ", $length(response), ", ", responseLength, !
-				}
-			}
-		}
-		set responseText = response
-	} else {
-		set responseText = ""
-	}
-	w responseText ,!
-	quit status
+    if (requestType = "") {
+        set requestType = ..#RequestTest
+    }
+    #dim req as %Net.HttpRequest = ##class(%Net.HttpRequest).%New()
+    set req.Server = server
+    set req.Https = 1
+    set req.SSLConfiguration = ..#SSLConfigurationName
+    if (authorization '= "")
+    {
+        set req.Authorization = authorization
+    }
+    
+    #dim k as %String = ""
+    #dim v as %String = ""
+    
+    #dim status as %Status = $$$OK
+    set status = req.Get(##class(Util.Requests.RequestMaker).RequestArrayToQueryString(location, parameters), requestType # 3)
+    
+    if ($$$ISOK(status)) {
+        #dim response as %String = ""
+        if (requestType '= 1) {
+            #dim res as %Net.HttpResponse = req.HttpResponse
+            
+            if (($data(res)) &&  (requestType '= 3)) {
+                write "Response: ", res.StatusCode, ", ", res.StatusLine, ", ", res.ReasonPhrase, !
+            }
+            if ($$$ISOK(status)) {
+                #dim responseLength as %Integer = 1000000
+                set response = res.Data.Read(.responseLength)
+                if (requestType '= 3) {
+                    write "Response type: ", $classname(res.Data), !
+                    write "Response length: ", $length(response), ", ", responseLength, !
+                }
+            }
+        }
+        set responseText = response
+    } else {
+        set responseText = ""
+    }
+    w responseText ,!
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -77,28 +77,43 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
 <FormalSpec><![CDATA[server:%String="api.vk.com",location:%String,&responseText:%String(MAXLEN=1000000)]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	#dim req as %Net.HttpRequest = ##class(%Net.HttpRequest).%New()
-	set req.Server = server
-	
-	#dim k as %String = ""
-	#dim v as %String = ""
-	
-	#dim status as %Status = $$$OK
-	set status = req.Get(location)
+    #dim req as %Net.HttpRequest = ##class(%Net.HttpRequest).%New()
+    set req.Server = server
+    
+    #dim k as %String = ""
+    #dim v as %String = ""
+    
+    #dim status as %Status = $$$OK
+    set status = req.Get(location)
 
-	if ($$$ISOK(status)) {
-		#dim response as %String = ""
-		#dim res as %Net.HttpResponse = req.HttpResponse
-			
-		#dim responseLength as %Integer = 1000000
-		set response = res.Data.Read(.responseLength)
-		
-		set responseText = response
-	} else {
-		set responseText = ""
-	}
-		
-	quit status
+    if ($$$ISOK(status)) {
+        #dim response as %String = ""
+        #dim res as %Net.HttpResponse = req.HttpResponse
+            
+        #dim responseLength as %Integer = 1000000
+        set response = res.Data.Read(.responseLength)
+        
+        set responseText = response
+    } else {
+        set responseText = ""
+    }
+        
+    quit status
+]]></Implementation>
+</Method>
+
+<Method name="GetJSON">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>server:%String="api.vk.com",location:%String</FormalSpec>
+<ReturnType>%RegisteredObject</ReturnType>
+<Implementation><![CDATA[
+    #dim responseText As %String
+    set status = ..SendSimpleHttpRequest(server, location, .responseData)
+    quit:$$$ISERR(status) ""
+    
+    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+    quit:$$$ISERR(status) "" 
+    quit response
 ]]></Implementation>
 </Method>
 </Class>

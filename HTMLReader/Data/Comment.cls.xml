@@ -12,6 +12,7 @@
 
 <Property name="Title">
 <Type>%String</Type>
+<Parameter name="MAXLEN" value="300"/>
 </Property>
 
 <Property name="Author">
@@ -36,10 +37,19 @@
 
 <Property name="Text">
 <Type>%String</Type>
+<Parameter name="MAXLEN" value="3000"/>
 </Property>
 
 <Property name="Rating">
 <Type>%Integer</Type>
+</Property>
+
+<Property name="Longitude">
+<Type>%Numeric</Type>
+</Property>
+
+<Property name="Latitude">
+<Type>%Numeric</Type>
 </Property>
 
 <Storage name="Default">
@@ -50,8 +60,6 @@
 <IndexLocation>^HTMLReader.Data.CommentI</IndexLocation>
 <StreamLocation>^HTMLReader.Data.CommentS</StreamLocation>
 <Data name="CommentDefaultData">
-<Structure>listnode</Structure>
-<Subscript/>
 <Value name="1">
 <Value>%%CLASSNAME</Value>
 </Value>
@@ -81,6 +89,12 @@
 </Value>
 <Value name="10">
 <Value>Rating</Value>
+</Value>
+<Value name="11">
+<Value>Longitude</Value>
+</Value>
+<Value name="12">
+<Value>Latitude</Value>
 </Value>
 </Data>
 </Storage>

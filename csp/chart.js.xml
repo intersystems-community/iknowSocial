@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="chart.js" application="/csp/iknowsocial/" default="1"><![CDATA[
+<CSP name="chart.js" application="/csp/vkfb/" default="1"><![CDATA[
 function composeWindowedECDataForTrend(timeWindow, posts) {
 	posts.sort(function(a, b) {
 		if (a.query !== b.query) {
