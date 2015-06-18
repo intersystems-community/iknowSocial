@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="twreader.csp" application="/csp/vkfb/" default="1"><![CDATA[
+<CSP name="twreader.csp" application="/csp/iknow/" default="1"><![CDATA[
 <html>
 <head>
   <title>TWReader</title>
@@ -67,6 +67,7 @@
 	});
 	
     function redrawTableByPage(pageNum, customPageSize) {
+	    console.log("redrawTable");
 	    if (customPageSize === undefined) {
 	    	customPageSize = pageSize;
 	    }
@@ -148,9 +149,6 @@
           <div class="table-content big-content-wrapper">
             <table class="table" id="main-table">
               <tbody>
-              	 <script language="JavaScript">
-              	 		redrawTableByPage("1");
-               </script>
               </tbody>
             </table>
 	   	  </div>
