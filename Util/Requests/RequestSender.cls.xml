@@ -67,7 +67,7 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
     } else {
         set responseText = ""
     }
-    w responseText ,!
+    //w responseText ,!
     quit status
 ]]></Implementation>
 </Method>
