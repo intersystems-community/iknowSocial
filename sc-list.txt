@@ -17,3 +17,4 @@ TWReader.pkg
 TwitterReader.pkg
 Util.pkg
 VKReader.pkg
+VKReader.prj
