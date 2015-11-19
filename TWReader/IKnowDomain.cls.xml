@@ -8,7 +8,7 @@
 <XMLNamespace>http://www.intersystems.com/iknow</XMLNamespace>
 <Data><![CDATA[
 <domain name="TWReaderRus">
-<configuration name="TWReaderRus" languages="ru" stemming="DEFAULT" />
+<configuration name="TWReaderRus" languages="ru"/>
 <parameter name="$$$IKPSTEMMING" value="1" />
 
 <metadata>
