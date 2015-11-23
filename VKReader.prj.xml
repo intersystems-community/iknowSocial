@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2015-11-23 15:07:35.324092" Target="##class(TWReader.UIBroker).AddMorePostsWithinContext(&quot;0&quot;,&quot;100&quot;,&quot;Сен-Дени&quot;,&quot;&quot;,&quot;&quot;,&quot;#main-table&quot;)" TargetType="0">
+<Project name="VKReader" LastModified="2015-11-24 01:50:47.913154" Target="##class(TWReader.UIBroker).AddMorePostsWithinContext(&quot;0&quot;,&quot;100&quot;,&quot;Сен-Дени&quot;,&quot;&quot;,&quot;&quot;,&quot;#main-table&quot;)" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
@@ -19,6 +19,7 @@
     <ProjectItem name="csp/vkfb/htmlreader.CSP" type="CSP"></ProjectItem>
     <ProjectItem name="csp/vkfb/table.css" type="CSP"></ProjectItem>
     <ProjectItem name="sashaBad.MAC" type="MAC"></ProjectItem>
+    <ProjectItem name="csp/vkfb/twitterRegional.CSP" type="CSP"></ProjectItem>
   </Items>
   <BreakPoints>
     <BreakPoint Routine="HTMLReader.Data.Context.CLS" Offset="GetPostsJSON+4"></BreakPoint>

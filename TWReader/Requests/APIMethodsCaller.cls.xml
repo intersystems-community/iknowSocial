@@ -116,7 +116,6 @@
 	set responseData = ""
 	#dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData, , authHeader)
 	//write responseData,!
-	//set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
 	quit status
 ]]></Implementation>
 </Method>

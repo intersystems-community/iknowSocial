@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="twitterRegional.CSP" application="/csp/vkfb/" default="1"><![CDATA[
+<html>
+<head>
+  <title>Twitter Regional Analysis</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/css/bootstrap-modal.min.css">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+
+  <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modalmanager.min.js"></script>
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+</head>
+<body>
+
+<div class="btn-toolbar" role="toolbar">
+    <a href="#myModal" role="button" class="btn btn-default dropdown-toggle" data-toggle="modal">Launch demo modal</a>
+</div>
+     
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Modal header</h3>
+    </div>
+    <div class="modal-body">
+    <p><div id="map" style="height:280px"></div></p>
+    </div>
+    <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary">Save changes</button>
+    </div>
+    </div> 
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <script language="JavaScript">
+  
+    $(window).load(function() {
+
+        var map = L.map('map').setView([49, 32], 5);
+        L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: false
+        }).addTo(map);
+
+        var marker;
+
+        map.on('click', function(e) {
+            if( !marker ) {
+                
+                marker = L.marker(e.latlng).addTo(map);
+                      
+            }
+        });
+        $('#myModal').on('shown',function(){
+            L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container);
+        });
+
+        $('#myModal').on('hidden',function(){
+            if( marker ) {
+                map.removeLayer(marker);
+                marker = null;
+            }
+        });
+    });
+
+
+  </script>
+</body>
+</html>
+]]></CSP>
+</Export>
