@@ -47,7 +47,7 @@
     </div>
     <div class="modal-footer">
         <button type="button" data-dismiss="modal" class="btn">Cancel</button>
-        <button type="button" data-dismiss="modal" class="btn btn-primary">OK</button>
+        <button type="button" data-dismiss="modal" class="btn btn-primary btn-danger">OK</button>
     </div>
     </div> 
     
@@ -83,20 +83,21 @@
             }
             lastPosition = e.latlng;
             console.log(lastPosition);
-            geocodeService.reverse().latlng(lastPosition).run(
+            /* geocodeService.reverse().latlng(lastPosition).run(
                 function(error, result) {
                     if (!error) {
                         console.log(result.latlng);
                         console.log(result.address.Match_addr);
                     }
                 }
-            );
+            ); */
         });
         $('#myModal').on('shown',function(){
             L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container);
         });
 
         $('#myModal').on('hidden',function(){
+            alert(lastPosition);
             if( marker ) {
                 map.removeLayer(marker);
                 marker = null;

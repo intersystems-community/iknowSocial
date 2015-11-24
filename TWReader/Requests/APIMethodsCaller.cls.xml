@@ -42,25 +42,25 @@
 <FormalSpec>*response:%ZEN.proxyObject,listparams:%List</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	#dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
-	do a.SetAt($li(listparams, 1), "q")
-	do a.SetAt("recent", "result_type")
-	do a.SetAt($li(listparams, 2), "count")
-	do:($li(listparams, 2)="") a.SetAt(15, "count")
-	//do ..AddParameter(a, "since_id", sinceId)
-	//do ..AddParameter(a, "until", ..DateToString(until))
-	
-	#dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiSearchUrl
-	#dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
-	
-	#dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiSearchUrl, a, .responseData, , authHeader)
-	if (($length(responseData) > 0) && ($extract(responseData, 1) '= "["))
-	{
-		set responseData = "[" _ responseData _ "]"
-	}
-	
-	set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
-	quit status
+    #dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
+    do a.SetAt($li(listparams, 1), "q")
+    do a.SetAt("recent", "result_type")
+    do a.SetAt($li(listparams, 2), "count")
+    do:($li(listparams, 2)="") a.SetAt(15, "count")
+    //do ..AddParameter(a, "since_id", sinceId)
+    //do ..AddParameter(a, "until", ..DateToString(until))
+    
+    #dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiSearchUrl
+    #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
+    
+    #dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiSearchUrl, a, .responseData, , authHeader)
+    if (($length(responseData) > 0) && ($extract(responseData, 1) '= "["))
+    {
+        set responseData = "[" _ responseData _ "]"
+    }
+    
+    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -69,17 +69,17 @@
 <FormalSpec>*response:%ZEN.proxyObject,lat:%Float,long:%Float</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	#dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
-	do a.SetAt(lat, "lat")
-	do a.SetAt(long, "long")
-	
-	#dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsClosestUrl
-	#dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
-	set responseData = ""
-	#dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsClosestUrl, a, .responseData, , authHeader)
-	//write responseData,!
-	set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
-	quit status
+    #dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
+    do a.SetAt(lat, "lat")
+    do a.SetAt(long, "long")
+    
+    #dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsClosestUrl
+    #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
+    set responseData = ""
+    #dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsClosestUrl, a, .responseData, , authHeader)
+    //write responseData,!
+    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -88,17 +88,17 @@
 <FormalSpec>*response:%ZEN.proxyObject,id:%Integer=1,exclude:%String=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	#dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
-	do a.SetAt(id, "id")
-	do:(exclude'="") a.SetAt(exclude, "exclude")
-	
-	#dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsPlaceUrl
-	#dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
-	set responseData = ""
-	#dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData, , authHeader)
-	//write responseData,!
-	set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
-	quit status
+    #dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
+    do a.SetAt(id, "id")
+    do:(exclude'="") a.SetAt(exclude, "exclude")
+    
+    #dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsPlaceUrl
+    #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
+    set responseData = ""
+    #dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData, , authHeader)
+    //write responseData,!
+    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -107,16 +107,16 @@
 <FormalSpec>*responseData:%String,id:%Integer=1,exclude:%String=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	#dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
-	do a.SetAt(id, "id")
-	do:(exclude'="") a.SetAt(exclude, "exclude")
-	
-	#dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsPlaceUrl
-	#dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
-	set responseData = ""
-	#dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData, , authHeader)
-	//write responseData,!
-	quit status
+    #dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
+    do a.SetAt(id, "id")
+    do:(exclude'="") a.SetAt(exclude, "exclude")
+    
+    #dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsPlaceUrl
+    #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
+    set responseData = ""
+    #dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData, , authHeader)
+    //write responseData,!
+    quit status
 ]]></Implementation>
 </Method>
 </Class>
