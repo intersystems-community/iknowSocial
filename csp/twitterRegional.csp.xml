@@ -25,6 +25,8 @@
   <script src="lib/bootstrap-modalmanager.min.js"></script>
   <!-- script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script -->
   <script src="lib/leaflet.js"></script>
+
+  <script src="custom.js"></script>
   
   
   <!-- link rel="stylesheet" href="//cdn.jsdelivr.net/leaflet.esri.geocoder/1.0.2/esri-leaflet-geocoder.css" -->
@@ -49,9 +51,21 @@
         <button type="button" data-dismiss="modal" class="btn">Cancel</button>
         <button type="button" data-dismiss="modal" class="btn btn-primary btn-danger">OK</button>
     </div>
-    </div> 
+</div> 
+
+<div class="hidden" id="trends-table"> 
+    <table class="table table-striped"> 
+    <thead>
+        <tr>
+            <th>Trend</th> 
+        </tr>
+     </thead>
+     <tbody>
+     </tbody>
+    </table>
+</div>
     
-    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <!-- script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script -->
     <script src="//cdn.jsdelivr.net/leaflet.esri/1.0.0/esri-leaflet.js"></script>
     <script src="//cdn.jsdelivr.net/leaflet.esri.geocoder/1.0.2/esri-leaflet-geocoder.js"></script>
     <script language="JavaScript">
@@ -82,7 +96,6 @@
                 marker = L.marker(e.latlng).addTo(map);
             }
             lastPosition = e.latlng;
-            console.log(lastPosition);
             /* geocodeService.reverse().latlng(lastPosition).run(
                 function(error, result) {
                     if (!error) {
@@ -97,7 +110,9 @@
         });
 
         $('#myModal').on('hidden',function(){
-            alert(lastPosition);
+            $("#trends-table").removeClass('hidden');
+            #call(TWReader.UIBroker.DrawTrends("['sourceId']","#trends-table", lastPosition.lat, lastPosition.lng))#
+
             if( marker ) {
                 map.removeLayer(marker);
                 marker = null;
