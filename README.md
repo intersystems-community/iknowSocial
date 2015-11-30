@@ -14,12 +14,15 @@ As for **now** `iknowSocial` provides following:
   * `iknowSocial` only runs on Cache 2015.2 and later, due to iKnow stemming usage.
 
 ###Installation
-To install `iknowSocial`, import code from this repo to your namespace with a user who has access to `%SYS` and SSL configurations editing, and run the following line in terminal:
+To install `iknowSocial`, import code from this repo to your namespace with a user who has access 
+to `%SYS` and SSL configurations editing, and run the following line in terminal:
 
     set status = ##class(Util.Misc).Install()
 
 In case all went smooth, you'll get your status `$$$OK`.
-Under the hood this method creates an empty SSL configuration with name defined by parameter `SSLConfigurationName` from class `Util.Requests.RequestSender`. It also creates iKnow domain with russian iKnow configuration and sets stemming for this domain.
+Under the hood this method creates an empty SSL configuration with name defined by 
+parameter `SSLConfigurationName` from class `Util.Requests.RequestSender`. It also creates iKnow 
+domain with russian iKnow configuration and sets stemming for this domain.
 
 
 ###LoadingTask
