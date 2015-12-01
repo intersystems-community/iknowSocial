@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2015-11-24 18:11:32.104267" Target="##class(TWReader.UIBroker).AddMorePostsWithinContext(&quot;0&quot;,&quot;100&quot;,&quot;Сен-Дени&quot;,&quot;&quot;,&quot;&quot;,&quot;#main-table&quot;)" TargetType="0">
+<Project name="VKReader" LastModified="2015-12-01 19:43:53.570676" Target="##class(TWReader.UIBroker).AddMorePostsWithinContext(&quot;0&quot;,&quot;100&quot;,&quot;Сен-Дени&quot;,&quot;&quot;,&quot;&quot;,&quot;#main-table&quot;)" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
@@ -17,13 +17,13 @@
     <ProjectItem name="csp/vkfb/htmlCluster.csp" type="CSP"></ProjectItem>
     <ProjectItem name="csp/vkfb/htmlclusteredview.csp" type="CSP"></ProjectItem>
     <ProjectItem name="csp/vkfb/htmlreader.CSP" type="CSP"></ProjectItem>
-    <ProjectItem name="csp/vkfb/table.css" type="CSP"></ProjectItem>
-    <ProjectItem name="sashaBad.MAC" type="MAC"></ProjectItem>
-    <ProjectItem name="csp/vkfb/twitterRegional.CSP" type="CSP"></ProjectItem>
     <ProjectItem name="csp/vkfb/lib" type="DIR"></ProjectItem>
     <ProjectItem name="csp/vkfb/lib/images" type="DIR"></ProjectItem>
-    <ProjectItem name="csp/vkfb/lib/leaflet-src.js" type="CSP"></ProjectItem>
     <ProjectItem name="csp/vkfb/lib/img" type="DIR"></ProjectItem>
+    <ProjectItem name="csp/vkfb/lib/leaflet-src.js" type="CSP"></ProjectItem>
+    <ProjectItem name="csp/vkfb/table.css" type="CSP"></ProjectItem>
+    <ProjectItem name="csp/vkfb/twitterRegional.CSP" type="CSP"></ProjectItem>
+    <ProjectItem name="csp/vkfb/twitterApiStatus.CSP" type="CSP"></ProjectItem>
   </Items>
   <BreakPoints>
     <BreakPoint Routine="HTMLReader.Data.Context.CLS" Offset="GetPostsJSON+4"></BreakPoint>

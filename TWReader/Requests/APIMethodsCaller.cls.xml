@@ -83,6 +83,18 @@
 ]]></Implementation>
 </Method>
 
+<Method name="CallApiArgs">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[apiServer:%String,api:%String,arrayArgs:%ArrayOfDataTypes,&responseText:%String]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim url = "https://" _ apiServer _ "/" _ api
+    #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, arrayArgs)
+    set responseText = ""
+    quit ##class(Util.Requests.RequestSender).SendHttpRequest(apiServer, api, arrayArgs, .responseText, , authHeader)
+]]></Implementation>
+</Method>
+
 <Method name="GetTrendsByPlace">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*response:%ZEN.proxyObject,id:%Integer=1,exclude:%String=""</FormalSpec>
@@ -91,11 +103,15 @@
     #dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
     do a.SetAt(id, "id")
     do:(exclude'="") a.SetAt(exclude, "exclude")
-    
+#if 0
     #dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsPlaceUrl
     #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
     set responseData = ""
     #dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData, , authHeader)
+#else
+    #dim responseData As %String 
+    #dim status as %Status = ..CallApiArgs(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData)
+#endif
     //write responseData,!
     set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
     quit status
@@ -110,11 +126,15 @@
     #dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
     do a.SetAt(id, "id")
     do:(exclude'="") a.SetAt(exclude, "exclude")
+#if 0
     
     #dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsPlaceUrl
     #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
     set responseData = ""
     #dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData, , authHeader)
+#else
+    #dim status as %Status = ..CallApiArgs(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData)
+#endif
     //write responseData,!
     quit status
 ]]></Implementation>
