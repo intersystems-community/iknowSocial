@@ -9,23 +9,75 @@
 <Default>TW</Default>
 </Parameter>
 
+<Method name="StringIterator">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>prefix:%String="",o:%ZEN.proxyObject</FormalSpec>
+<Implementation><![CDATA[
+    #dim retValue As %String = ""
+    #dim index As %String = ""
+    for  {
+        set index = $order(o.%data(index))
+        quit:index=""
+        if $isobject(o.%data(index)) {
+            set $piece(retValue,",",*+1) = ..StringIterator(prefix _"|"_index, o.%data(index))
+        } else {
+            if index = "reset" {
+                #dim unixTime As %integer = o.%data(index)
+                #dim date As %Integer
+                #dim time As %Numeric
+                do ##class(Util.Misc).ConvertUnixTimeToHorolog(unixTime, .date, .time)
+                #dim dateString As %String = $zdt(date _","_ time, 1, 5)
+
+                set $piece(retValue,",",*+1) = {"title":$zcvt(prefix,"I","JSON"),"name":index,"value":dateString}.$toJSON()
+            } else {
+                set $piece(retValue,",",*+1) = {"title":$zcvt(prefix,"I","JSON"),"name":index,"value":o.%data(index)}.$toJSON()
+            }
+        }
+    }
+    return retValue
+]]></Implementation>
+</Method>
+
+<Method name="DrawTwitterApiStatus">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>tableName:%String="#trends-table"</FormalSpec>
+<Implementation><![CDATA[
+    #dim response As %String = ""
+    do ##class(TWReader.Requests.APIMethodsCaller).GetRateLimits(.response)
+    #dim apiStatus As %String = ..StringIterator( , response)
+    if $extract(apiStatus,1) = "," {
+        set $extract(apiStatus,1) = ""
+    }
+    if $extract(apiStatus,*) = "," {
+        set $extract(apiStatus,*) = ""
+    }
+    
+    &js<
+        apiStatus = [#(apiStatus)#];
+        console.log(apiStatus);
+        drawSimpleTable('#(tableName)#', apiStatus, ['title', 'name', 'value']);
+    >
+]]></Implementation>
+</Method>
+
 <Method name="DrawTrends">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>fields:%String="",tableName:%String="#trends-table",lat:%String,long:%String</FormalSpec>
 <Implementation><![CDATA[
-	s response=""
-	do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place,lat,long)
-	set woeid = place.GetAt(1)."woeid"
-	do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlaceJSON(.response,woeid)
-	
-	set response = $replace(response,"[{","{",1,1)
-	set response = $replace(response,"}]}]","}]}")
-	set response = $replace(response,"name","sourceId")
-	
-	&js<
-		trends = (#(response)#).trends;
-		drawTable('#(tableName)#', trends, #(fields)#,'#');
-	>
+    s response=""
+    do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place,lat,long)
+    set woeid = place.GetAt(1)."woeid"
+    do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlaceJSON(.response,woeid)
+    
+    set response = $replace(response,"[{","{",1,1)
+    set response = $replace(response,"}]}]","}]}")
+    set response = $replace(response,"name","sourceId")
+    
+    &js<
+        trends = (#(response)#).trends;
+        drawTable('#(tableName)#', trends, #(fields)#,'#');
+    >
 ]]></Implementation>
 </Method>
 
@@ -33,33 +85,33 @@
 <ClassMethod>1</ClassMethod>
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
 <Implementation><![CDATA[
-	if (##class(Util.Misc).IsInteger(numberOfSources)) {
-		if (numberOfSources > ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
-			set numberOfSources = ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")
-		}
-		set context = ##class(TWReader.Data.Context).%New(shouldClearDomain)
-		///Get Place object by coordinates
-		do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place,lat,long)
-		///A WOEID is a Yahoo! Where On Earth ID.
-		set woeid = place.GetAt(1)."woeid"
-		///Get trends by woeid (set 3 param equal to hashtags will remove all hashtags from the trends list.)
-		do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlace(.response,woeid,"")
-		set trends = ##class(%ArrayOfObjects).%New()
-		set trends = response.GetAt(1)."trends"
-		set dt = $zdt($h, 3)
-		for i = 1:1:trends.Count() {
-			set trend = ##class(TWReader.Data.Trend).%New()
-			set trend.name = trends.GetAt(i)."name"
-			set trend.date = dt
-			set trend.rank = i
-			d trend.%Save()
-			
-			do context.AddMorePosts(trend.name, numberOfSources)
-		}
-		do context.CalculateEmotionalColoring()
-	} else {
-		&js<console.log("Incorrect value for number of posts.")>
-	}
+    if (##class(Util.Misc).IsInteger(numberOfSources)) {
+        if (numberOfSources > ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
+            set numberOfSources = ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")
+        }
+        set context = ##class(TWReader.Data.Context).%New(shouldClearDomain)
+        ///Get Place object by coordinates
+        do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place,lat,long)
+        ///A WOEID is a Yahoo! Where On Earth ID.
+        set woeid = place.GetAt(1)."woeid"
+        ///Get trends by woeid (set 3 param equal to hashtags will remove all hashtags from the trends list.)
+        do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlace(.response,woeid,"")
+        set trends = ##class(%ArrayOfObjects).%New()
+        set trends = response.GetAt(1)."trends"
+        set dt = $zdt($h, 3)
+        for i = 1:1:trends.Count() {
+            set trend = ##class(TWReader.Data.Trend).%New()
+            set trend.name = trends.GetAt(i)."name"
+            set trend.date = dt
+            set trend.rank = i
+            d trend.%Save()
+            
+            do context.AddMorePosts(trend.name, numberOfSources)
+        }
+        do context.CalculateEmotionalColoring()
+    } else {
+        &js<console.log("Incorrect value for number of posts.")>
+    }
 ]]></Implementation>
 </Method>
 
@@ -67,68 +119,68 @@
 <ClassMethod>1</ClassMethod>
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
 <Implementation><![CDATA[
-	do ..SaveMorePostsByCoords(shouldClearDomain, numberOfSources, lat, long)
-	do ..RedrawTable()
-	&js<
-		$("#add-tweets-by-trends-modal").modal('hide');
-	   	$("#add-tweets-by-trends-modal .progress").css("display", "none");
-	    $("#add-tweets-button").prop('disabled', false);
-	>
+    do ..SaveMorePostsByCoords(shouldClearDomain, numberOfSources, lat, long)
+    do ..RedrawTable()
+    &js<
+        $("#add-tweets-by-trends-modal").modal('hide');
+        $("#add-tweets-by-trends-modal .progress").css("display", "none");
+        $("#add-tweets-button").prop('disabled', false);
+    >
 ]]></Implementation>
 </Method>
 
 <Method name="SaveTrends">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-	set query = "select * from TWReader_Data.Trend order by name"
-	set statement = ##class(%SQL.Statement).%New()
-	set status = statement.%Prepare(query)
-	set result = statement.%Execute()
-	if ('result.%Next()) {
-		quit
-	}
-	set prevName = result.name
-	set tUnixtime = ##class(Util.Misc).ConvertTrendsDateTimeToUnixTime(result.date)
-	set trends = "[{""name"":""" _ prevName _ """, ""data"":[" _ "{""x"":" _ tUnixtime _ ", ""y"":" _ (11 - result.rank) _ "}"
-	while result.%Next() {
-		set name = result.name
-		if (name '= prevName) {
-			set prevName = name
-			set trends = trends _ "]}, {""name"":""" _ prevName _ """, ""data"":["
-		} else {
-			set trends = trends _ ","
-		}
-		set tUnixtime = ##class(Util.Misc).ConvertTrendsDateTimeToUnixTime(result.date)
-		set trends = trends _ "{""x"":" _ tUnixtime _ ", ""y"":" _ (11 - result.rank) _ "}"
-		
-	}
-	set trends = trends _ "]}]"
-	&js<
-		trendsMutualData = #(trends)#
-		trendCallback();
-	>
+    set query = "select * from TWReader_Data.Trend order by name"
+    set statement = ##class(%SQL.Statement).%New()
+    set status = statement.%Prepare(query)
+    set result = statement.%Execute()
+    if ('result.%Next()) {
+        quit
+    }
+    set prevName = result.name
+    set tUnixtime = ##class(Util.Misc).ConvertTrendsDateTimeToUnixTime(result.date)
+    set trends = "[{""name"":""" _ prevName _ """, ""data"":[" _ "{""x"":" _ tUnixtime _ ", ""y"":" _ (11 - result.rank) _ "}"
+    while result.%Next() {
+        set name = result.name
+        if (name '= prevName) {
+            set prevName = name
+            set trends = trends _ "]}, {""name"":""" _ prevName _ """, ""data"":["
+        } else {
+            set trends = trends _ ","
+        }
+        set tUnixtime = ##class(Util.Misc).ConvertTrendsDateTimeToUnixTime(result.date)
+        set trends = trends _ "{""x"":" _ tUnixtime _ ", ""y"":" _ (11 - result.rank) _ "}"
+        
+    }
+    set trends = trends _ "]}]"
+    &js<
+        trendsMutualData = #(trends)#
+        trendCallback();
+    >
 ]]></Implementation>
 </Method>
 
 <Method name="SaveUniqueTrends">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-	set query = "select name from TWReader_Data.Trend group by name"
-	set statement = ##class(%SQL.Statement).%New()
-	set status = statement.%Prepare(query)
-	set result = statement.%Execute()
-	set response = "["
-	while result.%Next() {
-		if (response '= "[") {
-			set response = response _ ","
-		}
-		set response = response _ ##class(%CSP.Page).QuoteJS(result.name)
-	}
-	set response = response _ "]"
-	&js<
-		uniqueTrends = #(response)#
-		uniqueTrendCallback();
-	>
+    set query = "select name from TWReader_Data.Trend group by name"
+    set statement = ##class(%SQL.Statement).%New()
+    set status = statement.%Prepare(query)
+    set result = statement.%Execute()
+    set response = "["
+    while result.%Next() {
+        if (response '= "[") {
+            set response = response _ ","
+        }
+        set response = response _ ##class(%CSP.Page).QuoteJS(result.name)
+    }
+    set response = response _ "]"
+    &js<
+        uniqueTrends = #(response)#
+        uniqueTrendCallback();
+    >
 ]]></Implementation>
 </Method>
 </Class>
