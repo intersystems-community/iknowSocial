@@ -38,17 +38,12 @@
     //do ..AddParameter(a, "since_id", sinceId)
     //do ..AddParameter(a, "until", ..DateToString(until))
     
-    #dim url = "https://" _ ..#ApiServer _ "/" _ "1.1/search/tweets.json"
-    #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
-    
-    #dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, "1.1/search/tweets.json", a, .responseData, , authHeader)
+    #dim status as %Status = ..CallApiArgs(..#ApiServer, "1.1/search/tweets.json", a, .responseData)
     if (($length(responseData) > 0) && ($extract(responseData, 1) '= "["))
     {
         set responseData = "[" _ responseData _ "]"
     }
-    
-    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
-    quit status
+    quit ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
 ]]></Implementation>
 </Method>
 
