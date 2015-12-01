@@ -96,6 +96,7 @@
                 marker = L.marker(e.latlng).addTo(map);
             }
             lastPosition = e.latlng;
+            console.log(lastPosition)
             /* geocodeService.reverse().latlng(lastPosition).run(
                 function(error, result) {
                     if (!error) {

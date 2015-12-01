@@ -64,26 +64,8 @@
 ]]></Implementation>
 </Method>
 
-<Method name="GetPlaceByCoords">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>*response:%ZEN.proxyObject,lat:%Float,long:%Float</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    #dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
-    do a.SetAt(lat, "lat")
-    do a.SetAt(long, "long")
-    
-    #dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsClosestUrl
-    #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
-    set responseData = ""
-    #dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsClosestUrl, a, .responseData, , authHeader)
-    //write responseData,!
-    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
-    quit status
-]]></Implementation>
-</Method>
-
 <Method name="CallApiArgs">
+<Internal>1</Internal>
 <ClassMethod>1</ClassMethod>
 <FormalSpec><![CDATA[apiServer:%String,api:%String,arrayArgs:%ArrayOfDataTypes,&responseText:%String]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -95,6 +77,20 @@
 ]]></Implementation>
 </Method>
 
+<Method name="GetPlaceByCoords">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*response:%ZEN.proxyObject,lat:%Float,long:%Float</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
+    do a.SetAt(lat, "lat")
+    do a.SetAt(long, "long")
+    
+    #dim status as %Status = ..CallApiArgs(..#ApiServer, ..#ApiTrendsClosestUrl, a, .responseData)
+    quit ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+]]></Implementation>
+</Method>
+
 <Method name="GetTrendsByPlace">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*response:%ZEN.proxyObject,id:%Integer=1,exclude:%String=""</FormalSpec>
@@ -103,18 +99,10 @@
     #dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
     do a.SetAt(id, "id")
     do:(exclude'="") a.SetAt(exclude, "exclude")
-#if 0
-    #dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsPlaceUrl
-    #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
-    set responseData = ""
-    #dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData, , authHeader)
-#else
     #dim responseData As %String 
+
     #dim status as %Status = ..CallApiArgs(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData)
-#endif
-    //write responseData,!
-    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
-    quit status
+    quit ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
 ]]></Implementation>
 </Method>
 
@@ -126,17 +114,8 @@
     #dim a as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
     do a.SetAt(id, "id")
     do:(exclude'="") a.SetAt(exclude, "exclude")
-#if 0
-    
-    #dim url = "https://" _ ..#ApiServer _ "/" _ ..#ApiTrendsPlaceUrl
-    #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, a)
-    set responseData = ""
-    #dim status as %Status = ##class(Util.Requests.RequestSender).SendHttpRequest(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData, , authHeader)
-#else
-    #dim status as %Status = ..CallApiArgs(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData)
-#endif
-    //write responseData,!
-    quit status
+
+    quit ..CallApiArgs(..#ApiServer, ..#ApiTrendsPlaceUrl, a, .responseData)
 ]]></Implementation>
 </Method>
 </Class>
