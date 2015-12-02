@@ -9,10 +9,6 @@
 <Default>100</Default>
 </Parameter>
 
-<Parameter name="BaseSSLURL">
-<Default>https://api.twitter.com</Default>
-</Parameter>
-
 <Parameter name="SslTlsConfig">
 <Default>Twitter</Default>
 </Parameter>
