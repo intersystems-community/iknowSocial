@@ -45,7 +45,17 @@
 <FormalSpec>apiServer:%String,api:%String,arrayArgs:%ArrayOfDataTypes,*responseText:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    #dim url = "https://" _ apiServer _ "/" _ api
+    #dim url As %String = ""
+    if $match(apiServer,"^https?:.*") {
+        set url = apiServer
+    } else {
+        set url = "https://" _ apiServer
+    }
+    if $match(api, "^/.*") {
+        set url = url _ api
+    } else {
+        set url = url _ "/" _ api
+    }
     #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, arrayArgs)
     set responseText = ""
     quit ##class(Util.Requests.RequestSender).SendHttpRequest(apiServer, api, arrayArgs, .responseText, , authHeader)
@@ -118,6 +128,33 @@
     do:(exclude'="") a.SetAt(exclude, "exclude")
 
     quit ..CallApiArgs(..#ApiServer, "1.1/trends/place.json", a, .responseData)
+]]></Implementation>
+</Method>
+
+<Method name="DebugApiCall">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[apiUrl:%String="/1.1/trends/closest.json",apiParams:%String="lat=50.55&long=30.55"]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim array as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
+    #dim param As %String
+    #dim i As %Integer
+    
+    for i=1:1:$length(apiParams,"&") {
+        set param = $piece(apiParams,"&", i)
+        #dim arg As %String     = $piece(param,"=",1)
+        #dim value As %String   = $piece(param,"=",*)
+        do array.SetAt(value, arg)
+    }
+    #dim jsonContent As %String
+    #dim status As %Status = ..CallApiArgs(..#ApiServer, apiUrl, array, .jsonContent)
+    quit:$$$ISERR(status) status
+    
+    #dim proxyObject As %ZEN.proxyObject
+    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(jsonContent, , .proxyObject)
+    quit:$$$ISERR(status) status
+    
+    quit ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(proxyObject)
 ]]></Implementation>
 </Method>
 </Class>
