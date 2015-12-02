@@ -36,7 +36,7 @@
 <body>
 
 <div class="btn-toolbar" role="toolbar">
-    <a href="#myModal" role="button" class="btn btn-default dropdown-toggle" data-toggle="modal">Launch demo modal</a>
+    <a href="#myModal" role="button" class="btn btn-default dropdown-toggle" id="select-geo" data-toggle="modal">Select Geo location...</a>
 </div>
      
 <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

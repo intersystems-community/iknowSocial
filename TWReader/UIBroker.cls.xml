@@ -55,7 +55,6 @@
     
     &js<
         apiStatus = [#(apiStatus)#];
-        console.log(apiStatus);
         drawSimpleTable('#(tableName)#', apiStatus, ['title', 'name', 'value']);
     >
 ]]></Implementation>
@@ -66,16 +65,22 @@
 <FormalSpec>fields:%String="",tableName:%String="#trends-table",lat:%String,long:%String</FormalSpec>
 <Implementation><![CDATA[
     s response=""
-    do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place,lat,long)
+    do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place, lat, long)
     set woeid = place.GetAt(1)."woeid"
-    do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlaceJSON(.response,woeid)
+    do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlaceJSON(.response, woeid)
+    
+    do ##class(TWReader.Requests.APIMethodsCaller).GetReverseGeocodeCity(.responseObject, lat, long)
     
     set response = $replace(response,"[{","{",1,1)
     set response = $replace(response,"}]}]","}]}")
     set response = $replace(response,"name","sourceId")
+    set place    = responseObject.result.places.GetAt(1)."full_name"
     
     &js<
         trends = (#(response)#).trends;
+        place  = '#(place)#';
+        console.log(place);
+        $("#select-geo").text(place);
         drawTable('#(tableName)#', trends, #(fields)#,'#');
     >
 ]]></Implementation>
