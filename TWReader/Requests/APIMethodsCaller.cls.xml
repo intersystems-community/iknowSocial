@@ -83,43 +83,6 @@
 ]]></Implementation>
 </Method>
 
-<Method name="DebugIterator">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>prefix:%String="",o:%ZEN.proxyObject</FormalSpec>
-<Implementation><![CDATA[
-    #dim index As %String = ""
-    for  {
-        set index = $order(o.%data(index))
-        quit:index=""
-        if $isobject(o.%data(index)) {
-            do ..DebugIterator(prefix _"|"_index, o.%data(index))
-        } else {
-            if index = "reset" {
-                #dim unixTime As %integer = o.%data(index)
-                #dim date As %Integer
-                #dim time As %Numeric
-                do ##class(Util.Misc).ConvertUnixTimeToHorolog(unixTime, .date, .time)
-                #dim dateString As %String = $zdt(date _","_ time, 1, 5)
-
-                //write $zcvt(prefix,"I","JSON")_"|" _index_ " = ", dateString,!
-                write {"title":$piece($zcvt(prefix,"I","JSON"),"|",*),"name":index,"value":dateString}.$toJSON(),!
-            } else {
-                //write $zcvt(prefix,"I","JSON")_"|" _index_ " = ", o.%data(index),!
-                write {"title":$piece($zcvt(prefix,"I","JSON"),"|",*),"name":index,"value":o.%data(index)}.$toJSON(),!
-            }
-        }
-    }
-]]></Implementation>
-</Method>
-
-<Method name="Debug">
-<ClassMethod>1</ClassMethod>
-<Implementation><![CDATA[
-    do ##class(TWReader.Requests.APIMethodsCaller).GetRateLimits(.response)
-    do ..DebugIterator( ,response.resources)
-]]></Implementation>
-</Method>
-
 <Method name="GetPlaceByCoords">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*response:%ZEN.proxyObject,lat:%Float,long:%Float</FormalSpec>
