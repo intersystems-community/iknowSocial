@@ -40,6 +40,8 @@
 </Method>
 
 <Method name="CallApiArgs">
+<Description><![CDATA[
+Call Twitter API given <var>api</var> urls and arguments. Return JSON data into <var>responseText</var>]]></Description>
 <Internal>1</Internal>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>apiServer:%String,api:%String,arrayArgs:%ArrayOfDataTypes,*responseText:%String</FormalSpec>
@@ -132,6 +134,11 @@
 </Method>
 
 <Method name="DebugApiCall">
+<Description><![CDATA[
+Handy utility to debug Twitter API calls for any Twitter API 
+<a href="https://dev.twitter.com/rest/public" target="_blank">https://dev.twitter.com/rest/public</a>
+It assumes to use builtin Twitter application signature (see <class>Util.Requests.Authorizer</class>
+for more details about application signature)]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec><![CDATA[apiUrl:%String="/1.1/trends/closest.json",apiParams:%String="lat=50.55&long=30.55"]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -149,11 +156,14 @@
     #dim jsonContent As %String
     #dim status As %Status = ..CallApiArgs(..#ApiServer, apiUrl, array, .jsonContent)
     quit:$$$ISERR(status) status
-    
-    #dim proxyObject As %ZEN.proxyObject
-    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(jsonContent, , .proxyObject)
+
+    // ok - now we have json in text, but it won't be readable much
+    // let's try to parse it to object and then output in readable form
+        #dim proxyObject As %ZEN.proxyObject
+    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(jsonContent, ,.proxyObject)
     quit:$$$ISERR(status) status
     
+    // write indented (in a readable form) to the screen
     quit ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(proxyObject)
 ]]></Implementation>
 </Method>
