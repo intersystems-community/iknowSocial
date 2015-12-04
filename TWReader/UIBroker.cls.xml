@@ -86,6 +86,7 @@
     set place = city _","_country
 #endif
     
+#if 0
     &js<
         trends = (#(response)#).trends;
         place  = '#(place)#';
@@ -93,6 +94,16 @@
         $("#select-geo").text(place);
         drawTable('#(tableName)#', trends, #(fields)#,'#');
     >
+#else
+    &js<
+        trends = (#(response)#).trends;
+        place  = '#(place)#';
+        //console.log(place);
+        $("#select-geo").text(place);
+        console.log(trends);
+        drawList('#(tableName)#', trends, '#');
+    >
+#endif
 ]]></Implementation>
 </Method>
 
