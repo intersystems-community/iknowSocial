@@ -580,7 +580,8 @@ a:active {
 }
 .Tweet-text {
     white-space: pre-wrap;
-    cursor: text
+    cursor: text;
+    font-size: 1.33rem;
 }
 .Tweet.is-deciderHtmlWhitespace .Tweet-text {
     white-space: normal
@@ -599,7 +600,7 @@ a:active {
 }
 .Tweet-alert,
 .Tweet-metadata {
-    font-size: .875rem;
+    font-size: 1.25rem;
     color: #697882
 }
 .Tweet-alert+.Tweet-metadata {
@@ -610,7 +611,8 @@ a:active {
     font-size: .875rem
 }
 .Tweet-actions {
-    margin-top: .525rem
+    margin-top: .525rem;
+    font-size: 1em;
 }
 .Tweet-action {
     display: inline-block
@@ -978,5 +980,7 @@ a:active {
 }
 .tcu-textMute, a.tcu-graylink {
     color: #697882
-}]]></CSP>
+}
+
+]]></CSP>
 </Export>

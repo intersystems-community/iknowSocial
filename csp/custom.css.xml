@@ -61,5 +61,8 @@ table td div {
 #trends-chart {
     height: 40vh;
 }
-]]></CSP>
+
+.u-hiddenVisually {
+    display: none;
+}]]></CSP>
 </Export>

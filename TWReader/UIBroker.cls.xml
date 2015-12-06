@@ -99,7 +99,7 @@
         trends = (#(response)#).trends;
         place  = '#(place)#';
         //console.log(place);
-        $("#select-geo").text(place);
+        $("#select-geo-location").text(place);
         console.log(trends);
         drawList('#(tableName)#', trends, '#');
     >
