@@ -64,5 +64,9 @@ table td div {
 
 .u-hiddenVisually {
     display: none;
+}
+
+#myModal {
+    background:rgba(255, 255, 255, 0.5);
 }]]></CSP>
 </Export>
