@@ -16,9 +16,12 @@
 <Type>%Integer</Type>
 </Property>
 
-<Property name="Ids">
-<Type>%Integer</Type>
-</Property>
+<UDLText name="T">
+<Content><![CDATA[
+// Property Ids As %Integer;
+
+]]></Content>
+</UDLText>
 
 <Property name="IdStr">
 <Type>%String</Type>
@@ -79,41 +82,72 @@
 <ReadOnly>1</ReadOnly>
 </Property>
 
+<Index name="UniqueId">
+<IdKey>1</IdKey>
+<Properties>IdStr</Properties>
+</Index>
+
 <Method name="%OnNew">
 <FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    quit ..Assign(oProxy)
+]]></Implementation>
+</Method>
+
+<Method name="Assign">
+<Internal>1</Internal>
+<FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	#dim status as %Status = $$$OK
-	if (oProxy '= "")
-	{
-		#dim properties As %ListOfObjects
-		do oProxy.%CopyToArray(.properties)
-		if ($data(properties) = 10)
-		{
-			set ..Coordinates = $get(properties("coordinates"))
-			set ..CreatedAt = $get(properties("created_at"))
-			set ..FavoriteCount = $get(properties("favorite_count"))
-			set ..Ids = $get(properties("id"))
-			set ..IdStr = $get(properties("id_str"))
-			set ..InReplyToStatusId = $get(properties("in_reply_to_status_id"))
-			set ..InReplyToUserId = $get(properties("in_reply_to_user_id"))
-			set ..InReplyToScreenName = $get(properties("in_reply_to_screen_name"))
-			set ..Lang = $get(properties("lang"))
-			set ..Place= $get(properties("place"))
-			set ..Retweeted = ##class(Util.Misc).ConvertToBool($get(properties("retweeted")))
-			set ..RetweetCount= $get(properties("retweet_count"))
-			set ..Source = $get(properties("source"))
-			do ..Text.Write(properties("text"))
-			set ..Truncated = ##class(Util.Misc).ConvertToBool($get(properties("truncated")))
-			set ..User = $get(properties("user"))			
-		}
-	}
-	quit status
+    if (oProxy '= "")
+    {
+        #dim properties As %ListOfObjects
+        do oProxy.%CopyToArray(.properties)
+        if ($data(properties) = 10)
+        {
+            set ..Coordinates = $get(properties("coordinates"))
+            set ..CreatedAt = $get(properties("created_at"))
+            set ..FavoriteCount = $get(properties("favorite_count"))
+            //set ..Ids = $get(properties("id"))
+            set ..IdStr = $get(properties("id_str"))
+            set ..InReplyToStatusId = $get(properties("in_reply_to_status_id"))
+            set ..InReplyToUserId = $get(properties("in_reply_to_user_id"))
+            set ..InReplyToScreenName = $get(properties("in_reply_to_screen_name"))
+            set ..Lang = $get(properties("lang"))
+            set ..Place= $get(properties("place"))
+            set ..Retweeted = ##class(Util.Misc).ConvertToBool($get(properties("retweeted")))
+            set ..RetweetCount= $get(properties("retweet_count"))
+            set ..Source = $get(properties("source"))
+            do ..Text.Write(properties("text"))
+            set ..Truncated = ##class(Util.Misc).ConvertToBool($get(properties("truncated")))
+            set ..User = $get(properties("user"))           
+        }
+    }
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CreateOrOpenId">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>id:%String,oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>TWReader.Data.Tweet</ReturnType>
+<Implementation><![CDATA[
+    #dim o As TWReader.Data.Tweet
+    if ..%ExistsId(id) {
+        set o = ..%OpenId(id)
+        do:$isobject(oProxy) o.Assign(oProxy)
+    } else {
+        set o = ..%New(oProxy)
+        set o.IdStr = id
+    }
+    quit o
 ]]></Implementation>
 </Method>
 
 <Method name="IsReplyGet">
-<Implementation><![CDATA[	quit (..InReplyToStatusId '= "") || (..InReplyToUserId '= "") || (..InReplyToScreenName '= "") || (($length(..Text) > 0) && ($extract(..Text, 1) = "@"))
+<Implementation><![CDATA[
+    quit (..InReplyToStatusId '= "") || (..InReplyToUserId '= "") || (..InReplyToScreenName '= "") ||
+         (($length(..Text) > 0) && ($extract(..Text, 1) = "@"))
 ]]></Implementation>
 </Method>
 
@@ -121,10 +155,10 @@
 <FormalSpec>createdAt:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	#dim status as %Status = $$$OK
-	set i%CreatedAt = createdAt
-	set i%CreatedAtDateTime = ..GetFromTwitterTime(createdAt)
-	quit status
+    #dim status as %Status = $$$OK
+    set i%CreatedAt = createdAt
+    set i%CreatedAtDateTime = ..GetFromTwitterTime(createdAt)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -133,26 +167,35 @@
 <FormalSpec>twitterTime:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	#dim mmm as %String = $piece(twitterTime, " ", 2)
-	#dim d as %String = $piece(twitterTime, " ", 3)
-	#dim yyyy as %String = $piece(twitterTime, " ", 6)
-	#dim t as %String = $piece(twitterTime, " ", 4)
-	#dim tz as %String = $piece(twitterTime, " ", 5)
-	#dim dformat as %Integer = 6
-	#dim tformat as %Integer = 5
-	#dim datetime as %String = mmm _ " " _ d _ " " _ yyyy _ "T" _ t _ tz
-	#dim localeopt as %Boolean = 1
-	#dim h as %String = $zdatetimeh(datetime,dformat,tformat,,,,,,,,localeopt)
-	quit h
+#if 0
+    #dim mmm as %String = $piece(twitterTime, " ", 2)
+    #dim d as %String = $piece(twitterTime, " ", 3)
+    #dim yyyy as %String = $piece(twitterTime, " ", 6)
+    #dim t as %String = $piece(twitterTime, " ", 4)
+    #dim tz as %String = $piece(twitterTime, " ", 5)
+#else
+    #dim mmm as %String
+    #dim d as %String
+    #dim yyyy as %String
+    #dim t as %String
+    #dim tz as %String
+    set $lb(,mmm,d,t,tz,yyyy) = $listfromstring(twitterTime," ")
+#endif
+    #dim dformat as %Integer = 6
+    #dim tformat as %Integer = 5
+    #dim datetime as %String = mmm _ " " _ d _ " " _ yyyy _ "T" _ t _ tz
+    #dim localeopt as %Boolean = 1
+    #dim h as %String = $zdatetimeh(datetime,dformat,tformat,,,,,,,,localeopt)
+    quit h
 ]]></Implementation>
 </Method>
 
 <Method name="TestGetFromTwitterTime">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-	#dim twitterTime as %String = "Wed Aug 27 13:08:45 +0000 2008"
-	set h = ..GetFromTwitterTime(twitterTime)
-	write $zdatetime(h), ", ", $piece(h, ",", 1), ", ", $piece(h, ",", 2), !
+    #dim twitterTime as %String = "Wed Aug 27 13:08:45 +0000 2008"
+    set h = ..GetFromTwitterTime(twitterTime)
+    write $zdatetime(h), ", ", $piece(h, ",", 1), ", ", $piece(h, ",", 2), !
 ]]></Implementation>
 </Method>
 

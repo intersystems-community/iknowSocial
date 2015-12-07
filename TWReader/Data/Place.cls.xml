@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.Data.Place">
+<Super>%Persistent</Super>
+<TimeCreated>63894,6154.952866</TimeCreated>
+
+<Property name="IdStr">
+<Type>%String</Type>
+</Property>
+
+<Property name="UrlJson">
+<Type>%String</Type>
+</Property>
+
+<Property name="PlaceType">
+<Type>%String</Type>
+</Property>
+
+<Property name="Name">
+<Type>%String</Type>
+</Property>
+
+<Property name="FullName">
+<Type>%String</Type>
+</Property>
+
+<Property name="CountryCode">
+<Type>%String</Type>
+</Property>
+
+<Property name="Country">
+<Type>%String</Type>
+</Property>
+
+<Index name="UniqueId">
+<IdKey>1</IdKey>
+<Properties>IdStr</Properties>
+</Index>
+
+<Method name="%OnNew">
+<FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    quit ..Assign(oProxy)
+]]></Implementation>
+</Method>
+
+<Method name="Assign">
+<Internal>1</Internal>
+<FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    if (oProxy '= "")
+    {
+        #dim properties As %ListOfObjects
+        do oProxy.%CopyToArray(.properties)
+        if ($data(properties) = 10)
+        {
+            set ..IdStr = $get(properties("id"))
+            set ..UrlJson = $get(properties("url"))
+            set ..PlaceType = $get(properties("place_type"))
+            set ..Name = $get(properties("name"))
+            set ..FullName = $get(properties("full_name"))
+            set ..CountryCode = $get(properties("country_code"))
+            set ..Country = $get(properties("country"))
+        }
+    }
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CreateOrOpenId">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>id:%String,oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>TWReader.Data.User</ReturnType>
+<Implementation><![CDATA[
+    #dim o As TWReader.Data.User
+    if ..%ExistsId(id) {
+        set o = ..%OpenId(id)
+        do:$isobject(oProxy) o.Assign(oProxy)
+    } else {
+        set o = ..%New(oProxy)
+        set o.IdStr = id
+    }
+    quit o
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^TWReader.Data.PlaceD</DataLocation>
+<DefaultData>PlaceDefaultData</DefaultData>
+<IdLocation>^TWReader.Data.PlaceD</IdLocation>
+<IndexLocation>^TWReader.Data.PlaceI</IndexLocation>
+<StreamLocation>^TWReader.Data.PlaceS</StreamLocation>
+<Data name="PlaceDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>UrlJson</Value>
+</Value>
+<Value name="3">
+<Value>PlaceType</Value>
+</Value>
+<Value name="4">
+<Value>Name</Value>
+</Value>
+<Value name="5">
+<Value>FullName</Value>
+</Value>
+<Value name="6">
+<Value>CountryCode</Value>
+</Value>
+<Value name="7">
+<Value>Country</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

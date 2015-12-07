@@ -16,7 +16,7 @@
 <Type>%Integer</Type>
 </Property>
 
-<Property name="Id">
+<Property name="IdStr">
 <Type>%String</Type>
 </Property>
 
@@ -56,11 +56,23 @@
 <Type>%String</Type>
 </Property>
 
+<Index name="UniqueId">
+<IdKey>1</IdKey>
+<Properties>IdStr</Properties>
+</Index>
+
 <Method name="%OnNew">
 <FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    quit ..Assign(oProxy)
+]]></Implementation>
+</Method>
+
+<Method name="Assign">
+<Internal>1</Internal>
+<FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    #dim status as %Status = $$$OK
     if (oProxy '= "")
     {
         #dim properties As %ListOfObjects
@@ -70,7 +82,7 @@
             set ..FavouritesCount = $get(properties("favourites_count"))
             set ..FollowersCount = $get(properties("followers_count"))
             set ..FriendsCount = $get(properties("friends_count"))
-            set ..Id = $get(properties("id"))
+            set ..IdStr = $get(properties("id"))
             set ..Location = $get(properties("location"))
             set ..Name = $get(properties("name"))
             set ..ScreenName = $get(properties("screen_name"))
@@ -81,7 +93,24 @@
             set ..DefaultLanguage = $get(properties("lang"))
         }
     }
-    quit status
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CreateOrOpenId">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>id:%String,oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>TWReader.Data.User</ReturnType>
+<Implementation><![CDATA[
+    #dim o As TWReader.Data.User
+    if ..%ExistsId(id) {
+        set o = ..%OpenId(id)
+        do:$isobject(oProxy) o.Assign(oProxy)
+    } else {
+        set o = ..%New(oProxy)
+        set o.IdStr = id
+    }
+    quit o
 ]]></Implementation>
 </Method>
 
@@ -106,7 +135,7 @@
 <Value>FriendsCount</Value>
 </Value>
 <Value name="5">
-<Value>Id</Value>
+<Value>IdStr</Value>
 </Value>
 <Value name="6">
 <Value>Location</Value>
