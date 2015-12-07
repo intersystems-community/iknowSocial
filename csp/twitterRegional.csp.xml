@@ -230,7 +230,7 @@
 
         $('#myModal').on('hidden',function(){
             $("#trends-table").removeClass('hidden');
-            #call(TWReader.UIBroker.DrawTrends("['sourceId']","#trends-table", lastPosition.lat, lastPosition.lng))#
+            #call(TWReader.UIBroker.DrawTrendsEx("['sourceId']","#trends-table", lastPosition.lat, lastPosition.lng))#
 
             if( marker ) {
                 map.removeLayer(marker);

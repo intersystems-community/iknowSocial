@@ -61,6 +61,43 @@
 </Method>
 
 <Method name="DrawTrends">
+<Description>
+old style trends panel - table</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>fields:%String="",tableName:%String="#trends-table",lat:%String,long:%String</FormalSpec>
+<Implementation><![CDATA[
+    s response=""
+    do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place, lat, long)
+    #dim localtionObject As %ZEN.proxyObject = place.GetAt(1)
+    set woeid = localtionObject.woeid
+    set city = localtionObject.name
+    set country = localtionObject.country
+    do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlaceJSON(.response, woeid)
+    
+    
+    set response = $replace(response,"[{","{",1,1)
+    set response = $replace(response,"}]}]","}]}")
+    set response = $replace(response,"name","sourceId")
+#if 0
+    set place    = responseObject.result.places.GetAt(1)."full_name"
+    // FIXME - there are no cities for Ukraine if we use reversegeocode in twitter
+#else
+    set place = city _","_country
+#endif
+    
+    &js<
+        trends = (#(response)#).trends;
+        place  = '#(place)#';
+        //console.log(place);
+        $("#select-geo").text(place);
+        drawTable('#(tableName)#', trends, #(fields)#,'#');
+    >
+]]></Implementation>
+</Method>
+
+<Method name="DrawTrendsEx">
+<Description>
+simplified trends panel - list instead of table</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>fields:%String="",tableName:%String="#trends-table",lat:%String,long:%String</FormalSpec>
 <Implementation><![CDATA[
@@ -86,15 +123,6 @@
     set place = city _","_country
 #endif
     
-#if 0
-    &js<
-        trends = (#(response)#).trends;
-        place  = '#(place)#';
-        //console.log(place);
-        $("#select-geo").text(place);
-        drawTable('#(tableName)#', trends, #(fields)#,'#');
-    >
-#else
     &js<
         trends = (#(response)#).trends;
         place  = '#(place)#';
@@ -103,7 +131,6 @@
         console.log(trends);
         drawList('#(tableName)#', trends, '#');
     >
-#endif
 ]]></Implementation>
 </Method>
 
