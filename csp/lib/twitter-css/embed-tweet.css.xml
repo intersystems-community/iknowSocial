@@ -239,12 +239,24 @@ td, th {
     white-space: nowrap!important;
     word-wrap: normal!important
 }
+/*
 blockquote, button, h1, h2, h3, h4, h5, h6, iframe, ol, p, ul {
     margin: 0;
     padding: 0;
     list-style: none;
     border: none
 }
+*/
+ul .Tweet-actions {
+    display: inline;
+}
+
+blockquote.Tweet {
+    margin-bottom: 0;
+    border-left: 0;
+    border-bottom: 1px solid #EEE;
+}
+
 b, i {
     font-weight: 400;
     font-style: normal
@@ -981,6 +993,7 @@ a:active {
 .tcu-textMute, a.tcu-graylink {
     color: #697882
 }
+
 
 ]]></CSP>
 </Export>

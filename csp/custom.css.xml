@@ -2,7 +2,7 @@
 <Export generator="Cache" version="25">
 <CSP name="custom.css" application="/csp/vkfb/" default="1"><![CDATA[
 body {
-    padding-top: 70px;
+    padding-top: 1.5rem; /* 70px; */
 }
 
 .highlighted-row {
@@ -68,5 +68,15 @@ table td div {
 
 #myModal {
     background:rgba(255, 255, 255, 0.5);
-}]]></CSP>
+}
+
+.modal-content {
+    background-color: #FFF;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    outline: 0px none;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+}
+]]></CSP>
 </Export>

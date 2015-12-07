@@ -20,8 +20,8 @@
   <!-- link rel="stylesheet" href="lib/jquery-ui.css" -->
   <!-- link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" / -->
   <link rel="stylesheet" href="lib/leaflet.css" />
-  
-  
+
+  <link rel="stylesheet" href="custom.css" />
 
   <!-- script src="https://code.jquery.com/jquery-1.11.2.min.js"></script -->
   <script src="lib/jquery-1.11.2.min.js"></script>
@@ -36,69 +36,72 @@
   <!-- script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script -->
   <script src="lib/leaflet.js"></script>
 
-  <script src="custom.js"></script>
-  
- <!-- script src='http://cdn.ractivejs.org/latest/ractive.min.js'></script -->
- <script src='lib/ractive.min.js'></script>
-  
+ 
   <!-- link rel="stylesheet" href="//cdn.jsdelivr.net/leaflet.esri.geocoder/1.0.2/esri-leaflet-geocoder.css" -->
   <link rel="stylesheet" href="lib/esri-leaflet-geocoder.css">
+
+  <!-- script src='http://cdn.ractivejs.org/latest/ractive.min.js'></script -->
+  <script src='lib/ractive.min.js'></script>
+
+  <script src="custom.js"></script>
+  
 
 </head>
 <body>
 
 <div class="container">
-<!--div class="btn-toolbar" role="toolbar">
-    <a href="#myModal" role="button" class="btn btn-default dropdown-toggle" id="select-geo" data-toggle="modal">Select Geo location...</a>
-</div -->
-<button role="button" class="btn btn-primary" type="button" id="select-geo" data-toggle="modal">
-    Select Geo location<span id="select-geo-location" class="badge">...</span>
-</button>
-     
-<div id="myModal" class="modal fade highlight" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
-        <h3 id="myModalLabel">Modal header</h3>
-    </div>
-    <div class="modal-body">
-        <p><div id="map" style="height:280px"></div></p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-dismiss="modal" class="btn">Cancel</button>
-        <button type="button" data-dismiss="modal" class="btn btn-primary btn-danger">OK</button>
-    </div>
-</div> 
 
-<div class="Trends module trends">
-  <div class="trends-inner flex-module trends-container">
-  <div class="flex-module-inner" >
-    <ul class="trend-items js-trends"  id="trends-table">
-    </ul>
-  </div>
-</div>
-</div>
+    <div id="left-pane" class="col-md-3">
+        <button role="button" class="btn btn-primary" type="button" id="select-geo" data-toggle="modal">
+            Select Geo location<span id="select-geo-location" class="badge">...</span>
+        </button>
+             
+        <div id="myModal" class="modal fade highlight" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                    <h3 id="myModalLabel">Select Geo Location For Trends</h3>
+                </div>
+                <div class="modal-body">
+                    <p><div id="map" style="height:280px"></div></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-primary btn-danger">OK</button>
+                </div>
+            </div>
+        </div> 
 
-<div id="tweets-container"></div>
+        <div class="Trends module trends">
+            <div class="trends-inner flex-module trends-container">
+                <div class="flex-module-inner" >
+                    <ul class="trend-items js-trends"  id="trends-table"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div id="tweets-container" class="col-md-9"></div>
 
 <script id='tweet-template' type='text/ractive'>
-<div class="EmbeddedTweet js-clickToOpenTarget"
+<!-- div class="EmbeddedTweet js-clickToOpenTarget"
      data-dt-full="%{hours12}:%{minutes} %{amPm} - %{day} %{month} %{year}" 
      data-dt-months="Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec" data-dt-am="AM" data-dt-pm="PM" data-dt-now="now" 
      data-dt-s="s" data-dt-m="m" data-dt-h="h" data-dt-second="second" data-dt-seconds="seconds" data-dt-minute="minute" 
      data-dt-minutes="minutes" data-dt-hour="hour" data-dt-hours="hours" data-dt-abbr="%{number}%{symbol}" data-dt-short="%{day} %{month}" 
-     data-dt-long="%{day} %{month} %{year}" data-scribe="page:tweet" id="twitter-widget-0" lang="en" data-twitter-event-id="0">
-
-        <blockquote class="Tweet h-entry js-tweetIdInfo " cite="https://twitter.com/{{name}}/status/{{id}}" data-tweet-id="{{id}}" 
+     data-dt-long="%{day} %{month} %{year}" data-scribe="page:tweet" id="twitter-widget-0" lang="en" data-twitter-event-id="0" -->
+<div class="EmbeddedTweet js-clickToOpenTarget" id="twitter-widget-0" >
+    {{#collection }}
+        <blockquote class="Tweet" cite="https://twitter.com/{{name}}/status/{{id}}" data-tweet-id="{{id}}" 
                     data-scribe="section:subject">
             <div class="Tweet-header u-cf">
-                <div class="Tweet-author u-textTruncate h-card p-author" data-scribe="component:author">
+                <div class="Tweet-author u-textTruncate" data-scribe="component:author">
                     <a class="Tweet-authorLink Identity u-linkBlend" data-scribe="element:user_link" href="https://twitter.com/{{name}}" 
                        aria-label="{{fullName}} (screen name: {{name}})">
                         <span class="Tweet-authorAvatar Identity-avatar">
-                        <img class="Avatar u-photo" data-scribe="element:avatar" 
-                             data-src-2x="{{imgsrc2x}}" alt="" 
-                             data-src-1x="{{imgsrc1x}}" 
-                             src="{{imgsrc2x}}">
+                        <img class="Avatar u-photo" data-scribe="element:avatar" alt="" 
+                             data-src-1x="{{imgsrc1x}}" data-src-2x="{{imgsrc2x}}" 
+                             src="{{imgsrc2x ? imgsrc2x : imgsrc1x}}">
                         </span>
                         <span class="Tweet-authorName Identity-name p-name customisable-highlight" data-scribe="element:name">{{fullName}}</span>
                         <span class="Tweet-authorScreenName Identity-screenName p-nickname" data-scribe="element:screen_name">@{{name}}</span>
@@ -107,11 +110,11 @@
             </div>
             <div class="Tweet-body e-entry-content" data-scribe="component:tweet">
                 <p class="Tweet-text e-entry-title" dir="ltr">{{content}}</p>
-                <div class="Tweet-metadata dateline">
+                <span class="Tweet-metadata dateline">
                     <a class="u-linkBlend u-url customisable-highlight long-permalink" data-datetime="{{dateTime}}" 
                        data-scribe="element:full_timestamp" href="https://twitter.com/{{name}}/status/{{id}}">
                     <time class="dt-updated" datetime="{{ dateTime }}" pubdate="" title="{{ timePosted(dateTime) }}">{{ humanTime(dateTime)}}</time></a>
-                </div>
+                </span>
                 <ul class="Tweet-actions" data-scribe="component:actions" role="menu" aria-label="Tweet actions">
                     <li class="Tweet-action">
                         <a class="TweetAction TweetAction--reply web-intent" href="https://twitter.com/intent/tweet?in_reply_to={{id}}" 
@@ -136,6 +139,7 @@
                 </ul>
             </div>
         </blockquote>
+        {{/collection}}
 </div>
 
 </script>
@@ -192,29 +196,45 @@
             }
         });
 
-    var ractive = new Ractive({
-      el: '#tweets-container',
-      template: '#tweet-template',
-      data: { 
-        name: 'aavst',
-        fullName: 'Alexey Venediktov',
-        id: '672427856786563073',
-        imgsrc1x: 'https://pbs.twimg.com/profile_images/656383287418601472/fz7K4rmo_normal.jpg',
-        imgsrc2x: 'https://pbs.twimg.com/profile_images/656383287418601472/fz7K4rmo_bigger.jpg',
-        content: 'Предположу, что уход Зыгаря "по собственному желанию" связан с недовольством АП и БД книгой Михаила. Собственно, даже и не предположу',
-        dateTime: '2015-12-03T14:51:08+0000',
-        //retweets: 47,
-        //favorits: 12,
-
-        humanTime: function(dateTime) {
-            //return '5:51 PM - 3 Dec 2015';
-            return dateTime;
-        },
-        timePosted: function(dateTime) {
-            return ('Time posted: ' + dateTime);
-        }
-      },
-    });
+        var collection  = [
+            {
+            name: 'aavst',
+            fullName: 'Alexey Venediktov',
+            id: '672427856786563073',
+            imgsrc1x: 'https://pbs.twimg.com/profile_images/656383287418601472/fz7K4rmo_normal.jpg',
+            imgsrc2x: 'https://pbs.twimg.com/profile_images/656383287418601472/fz7K4rmo_bigger.jpg',
+            content: 'Предположу, что уход Зыгаря "по собственному желанию" связан с недовольством АП и БД книгой Михаила. Собственно, даже и не предположу',
+            dateTime: '2015-12-03T14:51:08+0000',
+            //retweets: 47,
+            //favorits: 12,
+            },
+            {
+            name: 'tsafin',
+            fullName: 'Timur Safin (40+)',
+            id: '673646600330153984',
+            imgsrc1x: 'https://pbs.twimg.com/profile_images/660577657583755264/6povP9Nv_normal.jpg',
+            //imgsrc2x: 'https://pbs.twimg.com/profile_images/660577657583755264/6povP9Nv_normal.jpg',
+            content: 'RT @AdamRackis: React Under the Hood is off to a great start. Exactly what I\'ve been looking for. @frangel85  @Swizec https://t.co/0xF9I1gq…',
+            dateTime: '2015-12-03T14:51:08+0000',
+            //retweets: 47,
+            //favorits: 12,
+            }
+        ];
+    
+        var ractive = new Ractive({
+            el: '#tweets-container',
+            template: '#tweet-template',
+            data: {
+                collection: collection,
+                humanTime: function(dateTime) {
+                    //return '5:51 PM - 3 Dec 2015';
+                    return dateTime;
+                },
+                timePosted: function(dateTime) {
+                    return ('Time posted: ' + dateTime);
+                }
+            },
+        });
   </script>
 </body>
 </html>
