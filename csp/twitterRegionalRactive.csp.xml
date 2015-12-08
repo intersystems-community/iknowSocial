@@ -235,6 +235,30 @@
                 }
             },
         });
+        
+        var clearIknowDomain = false;
+        var maximumNumberOfTweets = 100;
+        
+        function fetchSources(query) {
+            #call(TWReader.UIBroker.AddMorePostsWithinContext(clearIknowDomain, maximumNumberOfTweets, query))# 
+        }
+
+        function showSourcesQuery(query) {
+            #call(TWReader.UIBroker.ShowFullSourceById(query))#
+        }
+
+        function showSentimentCounters() {
+            #call(TWReader.UIBroker.ShowEC())#
+        }
+
+        $(document).on("click", "#trends-table .link-to-full-source", function () {
+           fetchSources($(this).text())
+        });
+
+        $(document).on("click", ".link-to-full-source", function () {
+            showSourcesQuery($(this).text())
+        });
+
   </script>
 </body>
 </html>
