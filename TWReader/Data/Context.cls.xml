@@ -29,7 +29,10 @@
 <FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    set status = ##class(TWReader.Requests.APIMethodsCaller).TweetsSearch(.response, listparams)
+    set status = ##class(TWReader.Requests.APIMethodsCaller).TweetsSearch(.response, 
+                                                                          $lb(query, count, checkExists, 
+                                                                              startDate, startTime, 
+                                                                              endDate, endTime))
     quit:$$$ISERR(status) status
     
     set tweets = ##class(%ArrayOfObjects).%New()
@@ -38,26 +41,7 @@
     for i = 1:1:tweets.Count() {
         #dim tweet As TWReader.Data.Tweet = ##class(TWReader.Data.Tweet).%New(tweets.GetAt(i))
         #dim user As TWReader.Data.User   = ##class(TWReader.Data.User).%New(tweet.User)
-        /*
-        write:(tweet.Coordinates'="") "coords = "_tweet.Coordinates ,!
-        
-        s:(tweet.Coordinates'="") ^Test(i) = $system.OBJ.Dump(tweet.Coordinates)
-        write:(tweet.Coordinates'="") "latitude = "_tweet.Coordinates."coordinates".GetAt(1) ,!
-        write:(tweet.Coordinates'="") "longitude = "_tweet.Coordinates."coordinates".GetAt(2) ,!
-        */
-        set tPostDate = $piece(tweet.CreatedAtDateTime,",",1)
-        set tPostTime = $piece(tweet.CreatedAtDateTime,",",2)
-        set tOwnerID = user.IdStr
-        set tID = tweet.IdStr
-        #dim tTextStream as %GlobalCharacterStream
-        set tTextStream = tweet.Text
-            
-        set tAuthorCity = user.Location
-        set tAuthorCountry = user.WithheldInCountries
-        set tLatitude = ""
-        set tLongitude = ""
-        set:(tweet.Coordinates'="") tLatitude = tweet.Coordinates."coordinates".GetAt(2)
-        set:(tweet.Coordinates'="") tLongitude = tweet.Coordinates."coordinates".GetAt(1)
+
         set status = tweet.%Save() quit:$$$ISERR(status)
         set status = user.%Save() quit:$$$ISERR(status)
     }

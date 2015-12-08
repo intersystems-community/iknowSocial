@@ -56,7 +56,7 @@
 </Property>
 
 <Property name="Source">
-<Type>%String</Type>
+<Type>Util.UnlimiteString</Type>
 </Property>
 
 <Property name="Text">

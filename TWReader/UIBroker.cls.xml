@@ -236,5 +236,20 @@ simplified trends panel - list instead of table</Description>
     >
 ]]></Implementation>
 </Method>
+
+<Method name="DebugPersistentPosts">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>query:%String</FormalSpec>
+<Implementation><![CDATA[
+    #dim numberOfSources As %Integer = 100
+    #dim shouldClearDomain As %Boolean = 0
+    #dim maxCount As %Integer = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
+    if (numberOfSources > maxCount) {
+        set numberOfSources = maxCount
+    }
+    #dim context As Util.Data.Context = ..InstantiateContext(shouldClearDomain)
+    do context.AddMorePersistentPosts(query, numberOfSources)
+]]></Implementation>
+</Method>
 </Class>
 </Export>

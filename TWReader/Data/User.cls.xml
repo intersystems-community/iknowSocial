@@ -45,11 +45,11 @@
 </Property>
 
 <Property name="Text">
-<Type>%String</Type>
+<Type>Util.UnlimiteString</Type>
 </Property>
 
 <Property name="ProfileImageUrl">
-<Type>%String</Type>
+<Type>Util.UnlimiteString</Type>
 </Property>
 
 <Property name="DefaultLanguage">

@@ -9,19 +9,19 @@
 </Property>
 
 <Property name="MediaUrl">
-<Type>%String</Type>
+<Type>Util.UnlimiteString</Type>
 </Property>
 
 <Property name="Url">
-<Type>%String</Type>
+<Type>Util.UnlimiteString</Type>
 </Property>
 
 <Property name="DisplayUrl">
-<Type>%String</Type>
+<Type>Util.UnlimiteString</Type>
 </Property>
 
 <Property name="ExpandedUrl">
-<Type>%String</Type>
+<Type>Util.UnlimiteString</Type>
 </Property>
 
 <Property name="Type">
