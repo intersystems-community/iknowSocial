@@ -998,5 +998,19 @@ a:active {
 ul.Tweet-actions {
     display: inline;
 }
-]]></CSP>
+
+.Trends {
+    background-color: #fff;
+    background-clip: inherit;
+    border: 1px solid #e1e8ed;
+    border-radius: 5px;
+    line-height: inherit;
+    padding: 15px;
+}
+
+ol, ul {
+    margin: 0;
+    list-style: none;
+    padding: 0;
+}]]></CSP>
 </Export>

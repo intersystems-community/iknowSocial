@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="TWReader.Data.Place">
+<Class name="TWReader.Data.Media">
 <Super>%Persistent</Super>
-<TimeCreated>63894,6154.952866</TimeCreated>
+<TimeCreated>63894,49681.345472</TimeCreated>
 
 <Property name="IdStr">
 <Type>%String</Type>
 </Property>
 
-<Property name="UrlJson">
+<Property name="MediaUrl">
 <Type>%String</Type>
 </Property>
 
-<Property name="PlaceType">
+<Property name="Url">
 <Type>%String</Type>
 </Property>
 
-<Property name="Name">
+<Property name="DisplayUrl">
 <Type>%String</Type>
 </Property>
 
-<Property name="FullName">
+<Property name="ExpandedUrl">
 <Type>%String</Type>
 </Property>
 
-<Property name="CountryCode">
+<Property name="Type">
 <Type>%String</Type>
 </Property>
 
-<Property name="Country">
+<Property name="Sizes">
 <Type>%String</Type>
+<Collection>list</Collection>
 </Property>
 
 <Index name="UniqueId">
@@ -56,12 +57,12 @@
         if ($data(properties) = 10)
         {
             set ..IdStr = $get(properties("id"))
-            set ..UrlJson = $get(properties("url"))
-            set ..PlaceType = $get(properties("place_type"))
-            set ..Name = $get(properties("name"))
-            set ..FullName = $get(properties("full_name"))
-            set ..CountryCode = $get(properties("country_code"))
-            set ..Country = $get(properties("country"))
+            set ..MediaUrl = $get(properties("media_url"))
+            set ..Url = $get(properties("url"))
+            set ..DisplayUrl = $get(properties("display_url"))
+            set ..ExpandedUrl = $get(properties("expanded_url"))
+            set ..Type = $get(properties("Type"))
+            //set ..Sizes = $get(properties("medium").w)
         }
     }
     quit $$$OK
@@ -71,9 +72,9 @@
 <Method name="CreateOrOpenId">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>id:%String,oProxy:%ZEN.proxyObject=""</FormalSpec>
-<ReturnType>TWReader.Data.Place</ReturnType>
+<ReturnType>TWReader.Data.Media</ReturnType>
 <Implementation><![CDATA[
-    #dim o As TWReader.Data.Place
+    #dim o As TWReader.Data.Media
     if ..%ExistsId(id) {
         set o = ..%OpenId(id)
         do:$isobject(oProxy) o.Assign(oProxy)
@@ -87,32 +88,32 @@
 
 <Storage name="Default">
 <Type>%Library.CacheStorage</Type>
-<DataLocation>^TWReader.Data.PlaceD</DataLocation>
-<DefaultData>PlaceDefaultData</DefaultData>
-<IdLocation>^TWReader.Data.PlaceD</IdLocation>
-<IndexLocation>^TWReader.Data.PlaceI</IndexLocation>
-<StreamLocation>^TWReader.Data.PlaceS</StreamLocation>
-<Data name="PlaceDefaultData">
+<DataLocation>^TWReader.Data.MediaD</DataLocation>
+<DefaultData>MediaDefaultData</DefaultData>
+<IdLocation>^TWReader.Data.MediaD</IdLocation>
+<IndexLocation>^TWReader.Data.MediaI</IndexLocation>
+<StreamLocation>^TWReader.Data.MediaS</StreamLocation>
+<Data name="MediaDefaultData">
 <Value name="1">
 <Value>%%CLASSNAME</Value>
 </Value>
 <Value name="2">
-<Value>UrlJson</Value>
+<Value>MediaUrl</Value>
 </Value>
 <Value name="3">
-<Value>PlaceType</Value>
+<Value>Url</Value>
 </Value>
 <Value name="4">
-<Value>Name</Value>
+<Value>DisplayUrl</Value>
 </Value>
 <Value name="5">
-<Value>FullName</Value>
+<Value>ExpandedUrl</Value>
 </Value>
 <Value name="6">
-<Value>CountryCode</Value>
+<Value>Type</Value>
 </Value>
 <Value name="7">
-<Value>Country</Value>
+<Value>Sizes</Value>
 </Value>
 </Data>
 </Storage>
