@@ -9,7 +9,7 @@
 </Property>
 
 <Property name="UrlJson">
-<Type>Util.UnlimiteString</Type>
+<Type>Util.UnlimitedString</Type>
 </Property>
 
 <Property name="PlaceType">
@@ -21,7 +21,7 @@
 </Property>
 
 <Property name="FullName">
-<Type>Util.UnlimiteString</Type>
+<Type>Util.UnlimitedString</Type>
 </Property>
 
 <Property name="CountryCode">

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.UnlimitedString">
+<Super>%Library.String</Super>
+<TimeCreated>63895,1507.968767</TimeCreated>
+
+<Parameter name="MAXLEN">
+<Type>INTEGER</Type>
+</Parameter>
+</Class>
+</Export>

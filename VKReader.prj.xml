@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2015-12-09 00:30:04.287801" Target="##class(TWReader.UIBroker).DebugPersistentPosts(&quot;Путин&quot;)" TargetType="0">
+<Project name="VKReader" LastModified="2015-12-09 13:36:29.231354" Target="##class(TWReader.UIBroker).DebugPersistentPosts(&quot;Путин&quot;)" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
