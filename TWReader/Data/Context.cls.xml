@@ -29,10 +29,9 @@
 <FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    set status = ##class(TWReader.Requests.APIMethodsCaller).TweetsSearch(.response, 
-                                                                          $lb(query, count, checkExists, 
-                                                                              startDate, startTime, 
-                                                                              endDate, endTime))
+    set status = ##class(TWReader.Requests.Api).TweetsSearch(.response, 
+                                                             $lb(query, count, checkExists, 
+                                                                 startDate, startTime, endDate, endTime))
     quit:$$$ISERR(status) status
     
     set tweets = ##class(%ArrayOfObjects).%New()

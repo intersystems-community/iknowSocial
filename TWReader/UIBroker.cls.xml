@@ -44,7 +44,7 @@
 <FormalSpec>tableName:%String="#trends-table"</FormalSpec>
 <Implementation><![CDATA[
     #dim response As %String = ""
-    do ##class(TWReader.Requests.APIMethodsCaller).GetRateLimits(.response)
+    do ##class(TWReader.Requests.Api).GetRateLimits(.response)
     #dim apiStatus As %String = ..StringIterator( , response)
     if $extract(apiStatus,1) = "," {
         set $extract(apiStatus,1) = ""
@@ -67,12 +67,12 @@ old style trends panel - table</Description>
 <FormalSpec>fields:%String="",tableName:%String="#trends-table",lat:%String,long:%String</FormalSpec>
 <Implementation><![CDATA[
     s response=""
-    do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place, lat, long)
+    do ##class(TWReader.Requests.Api).GetPlaceByCoords(.place, lat, long)
     #dim localtionObject As %ZEN.proxyObject = place.GetAt(1)
     set woeid = localtionObject.woeid
     set city = localtionObject.name
     set country = localtionObject.country
-    do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlaceJSON(.response, woeid)
+    do ##class(TWReader.Requests.Api).GetTrendsByPlaceJSON(.response, woeid)
     
     
     set response = $replace(response,"[{","{",1,1)
@@ -102,15 +102,15 @@ simplified trends panel - list instead of table</Description>
 <FormalSpec>fields:%String="",tableName:%String="#trends-table",lat:%String,long:%String</FormalSpec>
 <Implementation><![CDATA[
     s response=""
-    do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place, lat, long)
+    do ##class(TWReader.Requests.Api).GetPlaceByCoords(.place, lat, long)
     #dim localtionObject As %ZEN.proxyObject = place.GetAt(1)
     set woeid = localtionObject.woeid
     set city = localtionObject.name
     set country = localtionObject.country
-    do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlaceJSON(.response, woeid)
+    do ##class(TWReader.Requests.Api).GetTrendsByPlaceJSON(.response, woeid)
     
 #if 0
-    do ##class(TWReader.Requests.APIMethodsCaller).GetReverseGeocodeCity(.responseObject, lat, long)
+    do ##class(TWReader.Requests.Api).GetReverseGeocodeCity(.responseObject, lat, long)
 #else
     
     set response = $replace(response,"[{","{",1,1)
@@ -139,16 +139,16 @@ simplified trends panel - list instead of table</Description>
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
 <Implementation><![CDATA[
     if (##class(Util.Misc).IsInteger(numberOfSources)) {
-        if (numberOfSources > ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")) {
-            set numberOfSources = ##class(TWReader.Requests.APIMethodsCaller).%GetParameter("MaxEntityQueryCount")
+        if (numberOfSources > ##class(TWReader.Requests.Api).%GetParameter("MaxEntityQueryCount")) {
+            set numberOfSources = ##class(TWReader.Requests.Api).%GetParameter("MaxEntityQueryCount")
         }
         set context = ##class(TWReader.Data.Context).%New(shouldClearDomain)
         ///Get Place object by coordinates
-        do ##class(TWReader.Requests.APIMethodsCaller).GetPlaceByCoords(.place,lat,long)
+        do ##class(TWReader.Requests.Api).GetPlaceByCoords(.place,lat,long)
         ///A WOEID is a Yahoo! Where On Earth ID.
         set woeid = place.GetAt(1)."woeid"
         ///Get trends by woeid (set 3 param equal to hashtags will remove all hashtags from the trends list.)
-        do ##class(TWReader.Requests.APIMethodsCaller).GetTrendsByPlace(.response,woeid,"")
+        do ##class(TWReader.Requests.Api).GetTrendsByPlace(.response,woeid,"")
         set trends = ##class(%ArrayOfObjects).%New()
         set trends = response.GetAt(1)."trends"
         set dt = $zdt($h, 3)

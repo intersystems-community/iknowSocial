@@ -172,14 +172,15 @@
     #dim d as %String = $piece(twitterTime, " ", 3)
     #dim yyyy as %String = $piece(twitterTime, " ", 6)
     #dim t as %String = $piece(twitterTime, " ", 4)
-    #dim tz as %String = $piece(twitterTime, " ", 5)#else
-
+    #dim tz as %String = $piece(twitterTime, " ", 5)
+#else
     #dim mmm as %String
     #dim d as %String
     #dim yyyy as %String
     #dim t as %String
     #dim tz as %String
-    set $lb(,mmm,d,t,tz,yyyy) = $listfromstring(twitterTime," ")#endif
+    set $lb(,mmm,d,t,tz,yyyy) = $listfromstring(twitterTime," ")
+#endif
 
     #dim dformat as %Integer = 6
     #dim tformat as %Integer = 5

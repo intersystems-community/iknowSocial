@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="TWReader.Requests.APIMethodsCaller">
+<Class name="TWReader.Requests.Api">
 <Super>%RegisteredObject</Super>
 <TimeCreated>63619,75001.090612</TimeCreated>
 
@@ -36,6 +36,7 @@
         set responseData = "[" _ responseData _ "]"
     }
     quit ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+
 ]]></Implementation>
 </Method>
 
@@ -50,6 +51,7 @@
         set server = http _ "://" _ $piece(httpRest, "/", 1)
         set path   = "/" _ $piece(httpRest, "/", 2, *)
     }
+
 ]]></Implementation>
 </Method>
 
@@ -81,6 +83,7 @@ Call Twitter API given <var>api</var> urls and arguments. Return JSON data into 
     #dim authHeader as %String = ##class(Util.Requests.Authorizer).%New().GetAuthHeader("get", url, arrayArgs)
     set responseText = ""
     quit ##class(Util.Requests.RequestSender).SendHttpRequest(apiServer, api, arrayArgs, .responseText, , authHeader)
+
 ]]></Implementation>
 </Method>
 
@@ -93,6 +96,7 @@ Call Twitter API given <var>api</var> urls and arguments. Return JSON data into 
     
     #dim status as %Status = ..CallApiArgs(..#ApiServer, "1.1/application/rate_limit_status.json", a, .responseData)
     quit ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+
 ]]></Implementation>
 </Method>
 
@@ -108,6 +112,7 @@ Call Twitter API given <var>api</var> urls and arguments. Return JSON data into 
     
     #dim status as %Status = ..CallApiArgs(..#ApiServer, "1.1/geo/reverse_geocode.json", a, .responseData)
     quit ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+
 ]]></Implementation>
 </Method>
 
@@ -122,6 +127,7 @@ Call Twitter API given <var>api</var> urls and arguments. Return JSON data into 
     
     #dim status as %Status = ..CallApiArgs(..#ApiServer, "1.1/trends/closest.json", a, .responseData)
     quit ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+
 ]]></Implementation>
 </Method>
 
@@ -137,6 +143,7 @@ Call Twitter API given <var>api</var> urls and arguments. Return JSON data into 
 
     #dim status as %Status = ..CallApiArgs(..#ApiServer, "1.1/trends/place.json", a, .responseData)
     quit ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
+
 ]]></Implementation>
 </Method>
 
@@ -150,6 +157,7 @@ Call Twitter API given <var>api</var> urls and arguments. Return JSON data into 
     do:(exclude'="") a.SetAt(exclude, "exclude")
 
     quit ..CallApiArgs(..#ApiServer, "1.1/trends/place.json", a, .responseData)
+
 ]]></Implementation>
 </Method>
 
@@ -190,6 +198,7 @@ for more details about application signature)]]></Description>
     
     // write indented (in a readable form) to the screen
     quit ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(proxyObject)
+
 ]]></Implementation>
 </Method>
 </Class>
