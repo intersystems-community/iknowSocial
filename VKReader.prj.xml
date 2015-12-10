@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2015-12-09 13:36:29.231354" Target="##class(TWReader.UIBroker).DebugPersistentPosts(&quot;Путин&quot;)" TargetType="0">
+<Project name="VKReader" LastModified="2015-12-11 02:10:31.104156" Target="##class(TWReader.Requests.APIMethodsCaller).DebugApiCall(&quot;https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=twitterapi&amp;count=2&quot;)" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
@@ -32,8 +32,8 @@
   </Items>
   <BreakPoints>
     <BreakPoint Routine="TWReader.UIBroker.CLS" Offset="DebugPersistentPosts+1"></BreakPoint>
-    <BreakPoint Routine="TWReader.Requests.APIMethodsCaller.CLS" Offset="DebugApiCall+5"></BreakPoint>
     <BreakPoint Routine="TWReader.Data.Context.CLS" Offset="AddMorePersistentPosts+7"></BreakPoint>
+    <BreakPoint Routine="TWReader.Requests.APIMethodsCaller.CLS" Offset="DebugApiCall+5"></BreakPoint>
   </BreakPoints>
 </Project>
 </Export>
