@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2015-12-11 18:35:09.450954" Target="##class(TWReader.UIBroker).Debug()" TargetType="0">
+<Project name="VKReader" LastModified="2015-12-12 00:09:45.429935" Target="##class(TWReader.UIBroker).Debug()" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
