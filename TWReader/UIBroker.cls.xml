@@ -192,7 +192,7 @@ simplified trends panel - list instead of table</Description>
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float,persistent:%Boolean=0</FormalSpec>
 <Implementation><![CDATA[
     do ..SaveMorePostsByCoords(shouldClearDomain, numberOfSources, lat, long, persistent)
-    do ..RedrawTable()
+    do ..UpdateTableCount()
     &js<
         $("#add-tweets-by-trends-modal").modal('hide');
         $("#add-tweets-by-trends-modal .progress").css("display", "none");

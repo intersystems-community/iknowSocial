@@ -70,13 +70,14 @@
         $('#page-selection').bootpag({
             total: (totalCount - (totalCount % (pageSize))) / (pageSize)+1,
             page: 1,
-            maxVisible: 10,
+            maxVisible: 10
             }).on('page', function(event, num) {
                 console.log(totalCount - (totalCount % (pageSize)) / (pageSize));
                 redrawTableByPage(num);
             });
         redrawTableByPage(1);
     }
+
     function redrawTableByPage(pageNum, customPageSize) {
         if (customPageSize === undefined) {
             customPageSize = pageSize;
@@ -168,7 +169,7 @@
         </div>
         <div class="col-md-9 col-md-offset-2" id="page-selection"></div>
             <script language="JavaScript">
-                #call(TWReader.UIBroker.RedrawTable())#
+                #call(TWReader.UIBroker.UpdateTableCount())#
             </script>         
           
       </div>

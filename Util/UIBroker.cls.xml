@@ -102,7 +102,7 @@ fields must be appropriate js-array</Description>
     } else {
         &js<console.log("Incorrect value for number of posts.")>
     }
-    do ..RedrawTable()
+    do ..UpdateTableCount(context)
     &js<
         $("#add-sources-modal").modal('hide');
         $("#add-sources-modal .progress").css("display", "none");
@@ -116,7 +116,7 @@ fields must be appropriate js-array</Description>
 <Implementation><![CDATA[
     #dim context As Util.Data.Context = ..InstantiateContext()
     do context.CalculateEmotionalColoring()
-    do ..RedrawTable()
+    do ..UpdateTableCount(context)
     &js<
         $(".ec-link").slideUp(400, function() {
             $(this).html('<span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Calculate EC').fadeIn(400);
@@ -204,28 +204,17 @@ fields must be appropriate js-array</Description>
 ]]></Implementation>
 </Method>
 
-<Method name="RedrawTable">
+<Method name="UpdateTableCount">
 <ClassMethod>1</ClassMethod>
+<FormalSpec>context:Util.Data.Context=0</FormalSpec>
 <Implementation><![CDATA[
-    #dim context As Util.Data.Context = ..InstantiateContext()
+    if '$isobject(context) {
+        set context = ..InstantiateContext()
+    }
     set totalCount = ##class(%iKnow.Queries.SourceAPI).GetCountByDomain(context.DomainID)
-#if 0
-    &js<
-        $('#page-selection').bootpag({
-            total: ((#(totalCount)#) - (#(totalCount)#) % (pageSize)) / (pageSize)+1,
-            page: 1,
-            maxVisible: 10,
-            }).on('page', function(event, num){
-                console.log(((#(totalCount)#) - (#(totalCount)#) % (pageSize)) / (pageSize));
-                redrawTableByPage(num);
-            });
-        redrawTableByPage(1);
-    >
-#else
     &js<
         updatePager(#(totalCount)#);
     >
-#endif
 ]]></Implementation>
 </Method>
 </Class>
