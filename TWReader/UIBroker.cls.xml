@@ -136,23 +136,27 @@ simplified trends panel - list instead of table</Description>
 
 <Method name="SaveMorePostsByCoords">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float,persistent:%Boolean=0</FormalSpec>
 <Implementation><![CDATA[
     if (##class(Util.Misc).IsInteger(numberOfSources)) {
         #dim maxCount As %Integer = ##class(TWReader.Requests.Api).%GetParameter("MaxEntityQueryCount")
         if (numberOfSources > maxCount) {
             set numberOfSources = maxCount
         }
-        set context = ##class(TWReader.Data.Context).%New(shouldClearDomain)
-        ///Get Place object by coordinates
-        do ##class(TWReader.Requests.Api).GetPlaceByCoords(.place,lat,long)
-        ///A WOEID is a Yahoo! Where On Earth ID.
-        set woeid = place.GetAt(1)."woeid"
-        ///Get trends by woeid (set 3 param equal to hashtags will remove all hashtags from the trends list.)
-        do ##class(TWReader.Requests.Api).GetTrendsByPlace(.response,woeid,"")
-        set trends = ##class(%ArrayOfObjects).%New()
-        set trends = response.GetAt(1)."trends"
+
+        #dim context As TWReader.Data.Context = ##class(TWReader.Data.Context).%New(shouldClearDomain)
+
+        
+        do ##class(TWReader.Requests.Api).GetPlaceByCoords(.place, lat, long)   // Get Place object by coordinates
+        #dim woeid As %String = place.GetAt(1).woeid                            // A WOEID is a Yahoo! Where On Earth ID.
+        // Get trends by woeid (set 3 param equal to hashtags will 
+        // remove all hashtags from the trends list.)
+        do ##class(TWReader.Requests.Api).GetTrendsByPlace(.response, woeid, "")
+
+        #dim trends As %ArrayOfObjects = ##class(%ArrayOfObjects).%New()
+        set trends = response.GetAt(1).trends
         set dt = $zdt($h, 3)
+
         for i = 1:1:trends.Count() {
             set trend = ##class(TWReader.Data.Trend).%New()
             set trend.name = trends.GetAt(i)."name"
@@ -160,7 +164,11 @@ simplified trends panel - list instead of table</Description>
             set trend.rank = i
             d trend.%Save()
             
-            do context.AddMorePosts(trend.name, numberOfSources)
+            if persistent {
+                do context.AddMorePersistentPosts(trend.name, numberOfSources)
+            } else {
+                do context.AddMorePosts(trend.name, numberOfSources)
+            }
         }
         do context.CalculateEmotionalColoring()
     } else {
@@ -169,11 +177,21 @@ simplified trends panel - list instead of table</Description>
 ]]></Implementation>
 </Method>
 
+<Method name="Debug">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+    do ##class(TWReader.Data.User).%DeleteExtent()
+    do ##class(TWReader.Data.Tweet).%DeleteExtent()
+    do ##class(TWReader.Data.Trend).%DeleteExtent()
+    do ##class(TWReader.UIBroker).SaveMorePostsByCoords("0", "100", "46.4846", "30.7326", 1)
+]]></Implementation>
+</Method>
+
 <Method name="AddMorePostsByCoords">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float,persistent:%Boolean=0</FormalSpec>
 <Implementation><![CDATA[
-    do ..SaveMorePostsByCoords(shouldClearDomain, numberOfSources, lat, long)
+    do ..SaveMorePostsByCoords(shouldClearDomain, numberOfSources, lat, long, persistent)
     do ..RedrawTable()
     &js<
         $("#add-tweets-by-trends-modal").modal('hide');

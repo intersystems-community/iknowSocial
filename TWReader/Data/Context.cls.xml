@@ -38,8 +38,11 @@
     set tweets = response.GetAt(1)."statuses"
     
     for i = 1:1:tweets.Count() {
-        #dim tweet As TWReader.Data.Tweet = ##class(TWReader.Data.Tweet).%New(tweets.GetAt(i))
-        #dim user As TWReader.Data.User   = ##class(TWReader.Data.User).%New(tweet.User)
+        #dim o = tweets.GetAt(i)
+        #dim idName As %String = o."id_str"
+        #dim tweet As TWReader.Data.Tweet = ##class(TWReader.Data.Tweet).CreateOrOpenId(idName, o)
+        set idName = tweet.User.id
+        #dim user As TWReader.Data.User   = ##class(TWReader.Data.User).CreateOrOpenId(idName, tweet.User)
 
         set status = tweet.%Save() quit:$$$ISERR(status)
         set status = user.%Save() quit:$$$ISERR(status)

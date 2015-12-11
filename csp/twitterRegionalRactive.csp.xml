@@ -239,6 +239,9 @@
         var clearIknowDomain = false;
         var maximumNumberOfTweets = 100;
         
+        function fetchTrends() {
+            #call(TWReader.UIBroker.AddMorePostsByCoords(clearIknowDomain, maximumNumberOfTweets, lastPosition.lat, lastPosition.lng, true))# 
+        }
         function fetchSources(query) {
             #call(TWReader.UIBroker.AddMorePostsWithinContext(clearIknowDomain, maximumNumberOfTweets, query))# 
         }
