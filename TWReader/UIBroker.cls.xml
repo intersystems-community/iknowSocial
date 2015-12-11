@@ -139,8 +139,9 @@ simplified trends panel - list instead of table</Description>
 <FormalSpec>shouldClearDomain:%String,numberOfSources:%String,lat:%Float,long:%Float</FormalSpec>
 <Implementation><![CDATA[
     if (##class(Util.Misc).IsInteger(numberOfSources)) {
-        if (numberOfSources > ##class(TWReader.Requests.Api).%GetParameter("MaxEntityQueryCount")) {
-            set numberOfSources = ##class(TWReader.Requests.Api).%GetParameter("MaxEntityQueryCount")
+        #dim maxCount As %Integer = ##class(TWReader.Requests.Api).%GetParameter("MaxEntityQueryCount")
+        if (numberOfSources > maxCount) {
+            set numberOfSources = maxCount
         }
         set context = ##class(TWReader.Data.Context).%New(shouldClearDomain)
         ///Get Place object by coordinates
