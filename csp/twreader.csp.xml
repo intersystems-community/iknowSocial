@@ -168,10 +168,9 @@
           </div>
         </div>
         <div class="col-md-9 col-md-offset-2" id="page-selection"></div>
-            <script language="JavaScript">
-                #call(TWReader.UIBroker.UpdateTableCount())#
-            </script>         
-          
+        <script language="JavaScript">
+            #call(TWReader.UIBroker.UpdateTableCount())#
+       </script>
       </div>
     </div>
   </div>

@@ -61,6 +61,11 @@
 <Properties>IdStr</Properties>
 </Index>
 
+<Index name="ScreenIndex">
+<Properties>ScreenName</Properties>
+<Unique>1</Unique>
+</Index>
+
 <Method name="%OnNew">
 <FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
 <ReturnType>%Status</ReturnType>

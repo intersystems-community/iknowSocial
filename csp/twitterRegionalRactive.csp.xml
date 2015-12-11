@@ -92,48 +92,48 @@
      data-dt-long="%{day} %{month} %{year}" data-scribe="page:tweet" id="twitter-widget-0" lang="en" data-twitter-event-id="0" -->
 <div class="EmbeddedTweet js-clickToOpenTarget" id="twitter-widget-0" >
     {{#collection }}
-        <blockquote class="Tweet" cite="https://twitter.com/{{name}}/status/{{id}}" data-tweet-id="{{id}}" 
+        <blockquote class="Tweet" cite="https://twitter.com/{{ScreenName}}/status/{{ID}}" data-tweet-id="{{ID}}" 
                     data-scribe="section:subject">
             <div class="Tweet-header u-cf">
                 <div class="Tweet-author u-textTruncate" data-scribe="component:author">
-                    <a class="Tweet-authorLink Identity u-linkBlend" data-scribe="element:user_link" href="https://twitter.com/{{name}}" 
-                       aria-label="{{fullName}} (screen name: {{name}})">
+                    <a class="Tweet-authorLink Identity u-linkBlend" data-scribe="element:user_link" href="https://twitter.com/{{ScreenName}}" 
+                       aria-label="{{FullName}} (screen name: {{ScreenName}})">
                         <span class="Tweet-authorAvatar Identity-avatar">
                         <img class="Avatar u-photo" data-scribe="element:avatar" alt="" 
-                             data-src-1x="{{imgsrc1x}}" data-src-2x="{{imgsrc2x}}" 
-                             src="{{imgsrc2x ? imgsrc2x : imgsrc1x}}">
+                             data-src-2x="{{ProfileImageUrl}}" 
+                             src="{{ProfileImageUrl}}">
                         </span>
-                        <span class="Tweet-authorName Identity-name p-name customisable-highlight" data-scribe="element:name">{{fullName}}</span>
-                        <span class="Tweet-authorScreenName Identity-screenName p-nickname" data-scribe="element:screen_name">@{{name}}</span>
+                        <span class="Tweet-authorName Identity-name p-name customisable-highlight" data-scribe="element:name">{{FullName}}</span>
+                        <span class="Tweet-authorScreenName Identity-screenName p-nickname" data-scribe="element:screen_name">@{{ScreenName}}</span>
                     </a>
                 </div>
             </div>
             <div class="Tweet-body e-entry-content" data-scribe="component:tweet">
-                <p class="Tweet-text e-entry-title" dir="ltr">{{content}}</p>
+                <p class="Tweet-text e-entry-title" dir="ltr">{{Text}}</p>
                 <span class="Tweet-metadata dateline">
-                    <a class="u-linkBlend u-url customisable-highlight long-permalink" data-datetime="{{dateTime}}" 
-                       data-scribe="element:full_timestamp" href="https://twitter.com/{{name}}/status/{{id}}">
-                    <time class="dt-updated" datetime="{{ dateTime }}" pubdate="" title="{{ timePosted(dateTime) }}">{{ humanTime(dateTime)}}</time></a>
+                    <a class="u-linkBlend u-url customisable-highlight long-permalink" data-datetime="{{CreatedAt}}" 
+                       data-scribe="element:full_timestamp" href="https://twitter.com/{{ScreenName}}/status/{{ID}}">
+                    <time class="dt-updated" datetime="{{ CreatedAt }}" pubdate="" title="{{ timePosted(CreatedAt) }}">{{ humanTime(CreatedAt)}}</time></a>
                 </span>
                 <ul class="Tweet-actions" data-scribe="component:actions" role="menu" aria-label="Tweet actions">
                     <li class="Tweet-action">
-                        <a class="TweetAction TweetAction--reply web-intent" href="https://twitter.com/intent/tweet?in_reply_to={{id}}" 
+                        <a class="TweetAction TweetAction--reply web-intent" href="https://twitter.com/intent/tweet?in_reply_to={{ID}}" 
                            data-scribe="element:reply">
                             <div class="Icon Icon--reply TweetAction-icon" aria-label="Reply" title="Reply" role="img"></div>
                         </a>
                     </li>
                     <li class="Tweet-action">
-                        <a class="TweetAction TweetAction--retweet web-intent" href="https://twitter.com/intent/retweet?tweet_id={{id}}" 
+                        <a class="TweetAction TweetAction--retweet web-intent" href="https://twitter.com/intent/retweet?tweet_id={{ID}}" 
                            data-scribe="element:retweet">
                             <div class="Icon Icon--retweet TweetAction-icon" aria-label="Retweet" title="Retweet" role="img"></div>
-                            <span class="TweetAction-stat" data-scribe="element:retweet_count" aria-hidden="true">{{retweets}}</span>
+                            <span class="TweetAction-stat" data-scribe="element:retweet_count" aria-hidden="true">{{RetweetCount}}</span>
                         </a>
                     </li>
                     <li class="Tweet-action">
-                        <a class="TweetAction TweetAction--heart web-intent" href="https://twitter.com/intent/like?tweet_id={{id}}" 
+                        <a class="TweetAction TweetAction--heart web-intent" href="https://twitter.com/intent/like?tweet_id={{ID}}" 
                            data-scribe="element:heart">
                             <div class="Icon Icon--heart TweetAction-icon" aria-label="Like" title="Like" role="img"></div>
-                            <span class="TweetAction-stat" data-scribe="element:heart_count" aria-hidden="true">{{favorits}}</span>
+                            <span class="TweetAction-stat" data-scribe="element:heart_count" aria-hidden="true">{{FavoriteCount}}</span>
                         </a>
                     </li>
                 </ul>
@@ -196,31 +196,31 @@
             }
         });
 
-        var collection  = [
-            {
-            name: 'aavst',
-            fullName: 'Alexey Venediktov',
-            id: '672427856786563073',
-            imgsrc1x: 'https://pbs.twimg.com/profile_images/656383287418601472/fz7K4rmo_normal.jpg',
-            imgsrc2x: 'https://pbs.twimg.com/profile_images/656383287418601472/fz7K4rmo_bigger.jpg',
-            content: 'Предположу, что уход Зыгаря "по собственному желанию" связан с недовольством АП и БД книгой Михаила. Собственно, даже и не предположу',
-            dateTime: '2015-12-03T14:51:08+0000',
-            //retweets: 47,
-            //favorits: 12,
-            },
-            {
-            name: 'tsafin',
-            fullName: 'Timur Safin (40+)',
-            id: '673646600330153984',
-            imgsrc1x: 'https://pbs.twimg.com/profile_images/660577657583755264/6povP9Nv_normal.jpg',
-            //imgsrc2x: 'https://pbs.twimg.com/profile_images/660577657583755264/6povP9Nv_normal.jpg',
-            content: 'RT @AdamRackis: React Under the Hood is off to a great start. Exactly what I\'ve been looking for. @frangel85  @Swizec https://t.co/0xF9I1gq…',
-            dateTime: '2015-12-03T14:51:08+0000',
-            //retweets: 47,
-            //favorits: 12,
-            }
-        ];
-    
+        var collection = [];
+        /* collection = [
+                {
+                name: 'aavst',
+                fullName: 'Alexey Venediktov',
+                id: '672427856786563073',
+                imgsrc1x: 'https://pbs.twimg.com/profile_images/656383287418601472/fz7K4rmo_normal.jpg',
+                imgsrc2x: 'https://pbs.twimg.com/profile_images/656383287418601472/fz7K4rmo_bigger.jpg',
+                content: 'Предположу, что уход Зыгаря "по собственному желанию" связан с недовольством АП и БД книгой Михаила. Собственно, даже и не предположу',
+                dateTime: '2015-12-03T14:51:08+0000',
+                //retweets: 47,
+                //favorits: 12,
+                },
+                {
+                name: 'tsafin',
+                fullName: 'Timur Safin (40+)',
+                id: '673646600330153984',
+                imgsrc1x: 'https://pbs.twimg.com/profile_images/660577657583755264/6povP9Nv_normal.jpg',
+                //imgsrc2x: 'https://pbs.twimg.com/profile_images/660577657583755264/6povP9Nv_normal.jpg',
+                content: 'RT @AdamRackis: React Under the Hood is off to a great start. Exactly what I\'ve been looking for. @frangel85  @Swizec https://t.co/0xF9I1gq…',
+                dateTime: '2015-12-03T14:51:08+0000',
+                //retweets: 47,
+                //favorits: 12,
+                }
+*/
         var ractive = new Ractive({
             el: '#tweets-container',
             template: '#tweet-template',
@@ -242,8 +242,17 @@
         function fetchAllTrendsData() {
             #call(TWReader.UIBroker.AddMorePostsByCoords(clearIknowDomain, maximumNumberOfTweets, lastPosition.lat, lastPosition.lng, true))# 
         }
+        // used in return value by TWReader.UIBroker.AddMorePostsWithinContext
+        function updatePager(maxCount) {
+            console.log(maxCount);
+        }
+
         function fetchTrendSources(query) {
-            #call(TWReader.UIBroker.AddMorePostsWithinContext(clearIknowDomain, maximumNumberOfTweets, query, true))# 
+            #call(TWReader.UIBroker.FetchMorePosts(clearIknowDomain, maximumNumberOfTweets, query))# 
+        }
+        
+        function updateCollection(collection) {
+            ractive.set('collection', collection);
         }
 
         function showSourcesQuery(query) {
@@ -258,9 +267,9 @@
            fetchTrendSources($(this).text())
         });
 
-        $(document).on("click", ".trend-name", function () {
+        /* $(document).on("click", ".trend-name", function () {
             showSourcesQuery($(this).text())
-        });
+        }); */
 
   </script>
 </body>

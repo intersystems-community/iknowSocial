@@ -60,7 +60,7 @@
 </Property>
 
 <Property name="Text">
-<Type>%GlobalCharacterStream</Type>
+<Type>Util.UnlimitedString</Type>
 </Property>
 
 <Property name="Truncated">
@@ -80,6 +80,10 @@
 <Type>%Boolean</Type>
 <Calculated>1</Calculated>
 <ReadOnly>1</ReadOnly>
+</Property>
+
+<Property name="Trend">
+<Type>TWReader.Data.Trend</Type>
 </Property>
 
 <Index name="UniqueId">
@@ -118,9 +122,9 @@
             set ..Retweeted = ##class(Util.Misc).ConvertToBool($get(properties("retweeted")))
             set ..RetweetCount= $get(properties("retweet_count"))
             set ..Source = $get(properties("source"))
-            do ..Text.Write(properties("text"))
+            set ..Text = $get(properties("text"))
             set ..Truncated = ##class(Util.Misc).ConvertToBool($get(properties("truncated")))
-            set ..User = $get(properties("user"))           
+            set ..User = oProxy.user."screen_name"
         }
     }
     quit $$$OK
@@ -221,46 +225,43 @@
 <Value>FavoriteCount</Value>
 </Value>
 <Value name="5">
-<Value>Ids</Value>
-</Value>
-<Value name="6">
-<Value>IdStr</Value>
-</Value>
-<Value name="7">
 <Value>InReplyToStatusId</Value>
 </Value>
-<Value name="8">
+<Value name="6">
 <Value>InReplyToUserId</Value>
 </Value>
-<Value name="9">
+<Value name="7">
 <Value>InReplyToScreenName</Value>
 </Value>
-<Value name="10">
+<Value name="8">
 <Value>Lang</Value>
 </Value>
-<Value name="11">
+<Value name="9">
 <Value>Place</Value>
 </Value>
-<Value name="12">
+<Value name="10">
 <Value>Retweeted</Value>
 </Value>
-<Value name="13">
+<Value name="11">
 <Value>RetweetCount</Value>
 </Value>
-<Value name="14">
+<Value name="12">
 <Value>Source</Value>
 </Value>
-<Value name="15">
+<Value name="13">
 <Value>Text</Value>
 </Value>
-<Value name="16">
+<Value name="14">
 <Value>Truncated</Value>
 </Value>
-<Value name="17">
+<Value name="15">
 <Value>User</Value>
 </Value>
-<Value name="18">
+<Value name="16">
 <Value>CreatedAtDateTime</Value>
+</Value>
+<Value name="17">
+<Value>Trend</Value>
 </Value>
 </Data>
 </Storage>

@@ -128,8 +128,44 @@ simplified trends panel - list instead of table</Description>
         place  = '#(place)#';
         //console.log(place);
         $("#select-geo-location").text(place);
-        console.log(trends);
+        //console.log(trends);
         drawList('#(tableName)#', trends, '#');
+    >
+]]></Implementation>
+</Method>
+
+<Method name="DrawJsonCollection">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>query:%String,maxCount:%Integer=100</FormalSpec>
+<Implementation><![CDATA[
+    set sql = "SELECT top "_ maxCount _ " T.ID, T.Coordinates, T.CreatedAt, T.FavoriteCount, T.Lang, T.Place, " _
+              "T.Retweeted, T.RetweetCount, T.Source, T.Text, " _
+              "U.ScreenName, U.Name As FullName, U.Location, U.ProfileImageUrl " _
+              "FROM TWReader_Data.Tweet T, TWReader_Data.""User"" U " _
+              "WHERE T.""User"" = U.screenname and trend ='" _ query _"'"
+    do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
+]]></Implementation>
+</Method>
+
+<Method name="FetchMorePosts">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String,shouldCountEC:%String=""</FormalSpec>
+<Implementation><![CDATA[
+    if (+numberOfSources > 0) {
+        #dim maxCount As %Integer = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
+        if (numberOfSources > maxCount) {
+            set numberOfSources = maxCount
+        }
+        #dim context As Util.Data.Context = ..InstantiateContext(shouldClearDomain)
+        do context.AddMorePersistentPosts(query, numberOfSources)
+    }
+
+    &js<var arrayObject = >
+        do ..DrawJsonCollection(query, numberOfSources)
+    &js<
+        console.log(arrayObject);
+        updateCollection(arrayObject.children);
     >
 ]]></Implementation>
 </Method>
@@ -146,28 +182,24 @@ simplified trends panel - list instead of table</Description>
 
         #dim context As TWReader.Data.Context = ##class(TWReader.Data.Context).%New(shouldClearDomain)
 
-        
         do ##class(TWReader.Requests.Api).GetPlaceByCoords(.place, lat, long)   // Get Place object by coordinates
         #dim woeid As %String = place.GetAt(1).woeid                            // A WOEID is a Yahoo! Where On Earth ID.
         // Get trends by woeid (set 3 param equal to hashtags will 
         // remove all hashtags from the trends list.)
         do ##class(TWReader.Requests.Api).GetTrendsByPlace(.response, woeid, "")
 
-        #dim trends As %ArrayOfObjects = ##class(%ArrayOfObjects).%New()
+        #dim trends As %ArrayOfObjects //= ##class(%ArrayOfObjects).%New()
         set trends = response.GetAt(1).trends
-        set dt = $zdt($h, 3)
+        #dim dt As %TimeStamp = $zdt($h, 3)
 
         for i = 1:1:trends.Count() {
-            set trend = ##class(TWReader.Data.Trend).%New()
-            set trend.name = trends.GetAt(i)."name"
-            set trend.date = dt
-            set trend.rank = i
-            d trend.%Save()
+            #dim trend As TWReader.Data.Trend = ##class(TWReader.Data.Trend).CreateOrOpenId(trends.GetAt(i).name, dt, i)
+            do:$isobject(trend) trend.%Save()
             
             if persistent {
-                do context.AddMorePersistentPosts(trend.name, numberOfSources)
+                do context.AddMorePersistentPosts(trend.Name, numberOfSources)
             } else {
-                do context.AddMorePosts(trend.name, numberOfSources)
+                do context.AddMorePosts(trend.Name, numberOfSources)
             }
         }
         do context.CalculateEmotionalColoring()
@@ -183,7 +215,8 @@ simplified trends panel - list instead of table</Description>
     do ##class(TWReader.Data.User).%DeleteExtent()
     do ##class(TWReader.Data.Tweet).%DeleteExtent()
     do ##class(TWReader.Data.Trend).%DeleteExtent()
-    do ##class(TWReader.UIBroker).SaveMorePostsByCoords("0", "100", "46.4846", "30.7326", 1)
+    //do ##class(TWReader.UIBroker).SaveMorePostsByCoords("0", "100", "46.4846", "30.7326", 1)
+    do ##class(TWReader.UIBroker).FetchMorePosts(0,100,"Харькова")
 ]]></Implementation>
 </Method>
 
