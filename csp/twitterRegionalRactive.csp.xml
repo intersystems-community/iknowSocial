@@ -239,11 +239,11 @@
         var clearIknowDomain = false;
         var maximumNumberOfTweets = 100;
         
-        function fetchTrends() {
+        function fetchAllTrendsData() {
             #call(TWReader.UIBroker.AddMorePostsByCoords(clearIknowDomain, maximumNumberOfTweets, lastPosition.lat, lastPosition.lng, true))# 
         }
-        function fetchSources(query) {
-            #call(TWReader.UIBroker.AddMorePostsWithinContext(clearIknowDomain, maximumNumberOfTweets, query))# 
+        function fetchTrendSources(query) {
+            #call(TWReader.UIBroker.AddMorePostsWithinContext(clearIknowDomain, maximumNumberOfTweets, query, true))# 
         }
 
         function showSourcesQuery(query) {
@@ -254,11 +254,11 @@
             #call(TWReader.UIBroker.ShowEC())#
         }
 
-        $(document).on("click", "#trends-table .link-to-full-source", function () {
-           fetchSources($(this).text())
+        $(document).on("click", "#trends-table .trend-name", function () {
+           fetchTrendSources($(this).text())
         });
 
-        $(document).on("click", ".link-to-full-source", function () {
+        $(document).on("click", ".trend-name", function () {
             showSourcesQuery($(this).text())
         });
 

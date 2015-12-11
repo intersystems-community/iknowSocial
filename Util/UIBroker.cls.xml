@@ -209,6 +209,7 @@ fields must be appropriate js-array</Description>
 <Implementation><![CDATA[
     #dim context As Util.Data.Context = ..InstantiateContext()
     set totalCount = ##class(%iKnow.Queries.SourceAPI).GetCountByDomain(context.DomainID)
+#if 0
     &js<
         $('#page-selection').bootpag({
             total: ((#(totalCount)#) - (#(totalCount)#) % (pageSize)) / (pageSize)+1,
@@ -220,6 +221,11 @@ fields must be appropriate js-array</Description>
             });
         redrawTableByPage(1);
     >
+#else
+    &js<
+        updatePager(#(totalCount)#);
+    >
+#endif
 ]]></Implementation>
 </Method>
 </Class>
