@@ -183,6 +183,17 @@ Checks whereas passed combination of 'date' and 'time' can actually represent so
 ]]></Implementation>
 </Method>
 
+<Method name="RegexpReplace">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>text:%String,matchRE:%String,replaceRE:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    #dim re As %Regex.Matcher = ##class(%Regex.Matcher).%New(matchRE)
+    set re.Text = text
+    quit re.ReplaceAll(replaceRE)
+]]></Implementation>
+</Method>
+
 <Method name="RunAllTests">
 <Description>
 Runs all tests across the project.</Description>
