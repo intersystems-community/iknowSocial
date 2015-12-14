@@ -7,12 +7,12 @@
 
 <Parameter name="ConfigurationName">
 <Type>%String</Type>
-<Default>TWAPIConfiguration</Default>
+<Default>TWReaderRus</Default>
 </Parameter>
 
 <Parameter name="DomainName">
 <Type>%String</Type>
-<Default>TWAPIDomain</Default>
+<Default>TWReaderRus</Default>
 </Parameter>
 
 <Method name="AddMorePosts">

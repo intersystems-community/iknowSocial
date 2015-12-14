@@ -150,7 +150,7 @@ simplified trends panel - list instead of table</Description>
 
 <Method name="FetchMorePosts">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>shouldClearDomain:%String,numberOfSources:%String,query:%String,shouldCountEC:%String=""</FormalSpec>
+<FormalSpec>shouldClearDomain:%Boolean=0,numberOfSources:%String,query:%String,shouldCountEC:%String=""</FormalSpec>
 <Implementation><![CDATA[
     if (+numberOfSources > 0) {
         #dim maxCount As %Integer = ##class(VKReader.Requests.APIPublicMethodsCaller).%GetParameter("MaxEntityQueryCount")
@@ -159,6 +159,8 @@ simplified trends panel - list instead of table</Description>
         }
         #dim context As Util.Data.Context = ..InstantiateContext(shouldClearDomain)
         do context.AddMorePersistentPosts(query, numberOfSources)
+        do context.Rebuild(shouldClearDomain)
+        do:shouldCountEC context.CalculateEmotionalColoring()
     }
 
     &js<var arrayObject = >
@@ -216,7 +218,7 @@ simplified trends panel - list instead of table</Description>
     do ##class(TWReader.Data.Tweet).%DeleteExtent()
     do ##class(TWReader.Data.Trend).%DeleteExtent()
     //do ##class(TWReader.UIBroker).SaveMorePostsByCoords("0", "100", "46.4846", "30.7326", 1)
-    do ##class(TWReader.UIBroker).FetchMorePosts(0,100,"Харькова")
+    do ##class(TWReader.UIBroker).FetchMorePosts(0, 100, "Харькова", 1)
 ]]></Implementation>
 </Method>
 

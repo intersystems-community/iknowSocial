@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2015-12-12 00:09:45.429935" Target="##class(TWReader.UIBroker).Debug()" TargetType="0">
+<Project name="VKReader" LastModified="2015-12-14 19:01:41.964174" Target="##class(TWReader.UIBroker).Debug()" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
@@ -31,9 +31,11 @@
     <ProjectItem name="csp/vkfb/twitterRegionalRactive.CSP" type="CSP"></ProjectItem>
   </Items>
   <BreakPoints>
-    <BreakPoint Routine="TWReader.Data.User.CLS" Offset="Assign+1"></BreakPoint>
     <BreakPoint Routine="TWReader.UIBroker.CLS" Offset="FetchMorePosts+6"></BreakPoint>
     <BreakPoint Routine="TWReader.UIBroker.CLS" Offset="SaveMorePostsByCoords+7"></BreakPoint>
+    <BreakPoint Routine="TWReader.UIBroker.CLS" Offset="Debug+5"></BreakPoint>
+    <BreakPoint Routine="Util.Data.Context.CLS" Offset="Rebuild+11"></BreakPoint>
+    <BreakPoint Routine="Util.Data.Context.CLS" Offset="%OnNew+1"></BreakPoint>
   </BreakPoints>
 </Project>
 </Export>

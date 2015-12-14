@@ -40,6 +40,41 @@
 ]]></Implementation>
 </Method>
 
+<Method name="DomainName2DomainDef">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domainName:%String</FormalSpec>
+<PublicList>domainName,definitionClass</PublicList>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    new definitionClass
+    &sql( select DefinitionClass into :definitionClass FROM %iKnow. "Domain" WHERE Name = :domainName )
+    quit definitionClass
+]]></Implementation>
+</Method>
+
+<Method name="Rebuild">
+<FormalSpec>clearDomain:%Boolean=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set ..DomainID = ##class(%iKnow.Domain).GetOrCreateId(..#DomainName)
+    set ..Domain = ##class(%iKnow.Domain).OpenId(..DomainID)
+    
+    #dim status As %Status = $$$OK
+    if clearDomain {
+        set status = ..ClearDomain()
+        quit:$$$ISERR(status) status
+    }
+#if 1
+    // FIXME - find a way to calculate original iknow domain definition class to call its %Build
+    #dim domainDefClass As %String = ..DomainName2DomainDef(..#DomainName)
+    set status = $classmethod(domainDefClass, "%Build", 0)
+#else
+    set status = ##class(TWReader.IKnowDomain).%Build(0) // FIXME - shame on me
+#endif
+    quit status
+]]></Implementation>
+</Method>
+
 <Method name="Set">
 <FormalSpec>clearDomain:%Boolean=0</FormalSpec>
 <Private>1</Private>
@@ -48,12 +83,13 @@
     set ..DomainID = ##class(%iKnow.Domain).GetOrCreateId(..#DomainName)
     set ..Domain = ##class(%iKnow.Domain).OpenId(..DomainID)
     
-    set status = $$$OK
+    #dim status As %Status = $$$OK
     if (clearDomain = 1) {
         set status = ..ClearDomain()
         quit:$$$ISERR(status) status
     }
-    
+#if 0
+    // FIXME - this is managed by external iKnow definition, not manually
     do ..AddMetadataFieldIfNotExists("PostCity")
     do ..AddMetadataFieldIfNotExists("PostAdress")
     do ..AddMetadataFieldIfNotExists("PostRating", $$$MDDTNUMBER)
@@ -86,6 +122,7 @@
     set cfg.StemmingConfig = "DEFAULT"
     #endif
     set status =$$$ADDSC(status, cfg.%Save())
+#endif
     quit status
 ]]></Implementation>
 </Method>
