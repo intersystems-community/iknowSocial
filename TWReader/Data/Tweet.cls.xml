@@ -91,6 +91,20 @@
 <Properties>IdStr</Properties>
 </Index>
 
+<Property name="PostedDate">
+<Type>%Date</Type>
+<SqlComputeCode> Set {*} = ##class(TWReader.Data.Tweet).GetDate({CreatedAt}) </SqlComputeCode>
+<SqlComputed>1</SqlComputed>
+<Transient>1</Transient>
+</Property>
+
+<Property name="PostedTime">
+<Type>%Time</Type>
+<SqlComputeCode> Set {*} = ##class(TWReader.Data.Tweet).GetTime({CreatedAt}) </SqlComputeCode>
+<SqlComputed>1</SqlComputed>
+<Transient>1</Transient>
+</Property>
+
 <Method name="%OnNew">
 <FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -167,24 +181,18 @@
 </Method>
 
 <Method name="GetFromTwitterTime">
+<Description><![CDATA[
+<var>twitterTime<var> will be in this format "Wed Aug 27 13:08:45 +0000 2008"]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>twitterTime:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-#if 0
-    #dim mmm as %String = $piece(twitterTime, " ", 2)
-    #dim d as %String = $piece(twitterTime, " ", 3)
-    #dim yyyy as %String = $piece(twitterTime, " ", 6)
-    #dim t as %String = $piece(twitterTime, " ", 4)
-    #dim tz as %String = $piece(twitterTime, " ", 5)
-#else
     #dim mmm as %String
     #dim d as %String
     #dim yyyy as %String
     #dim t as %String
     #dim tz as %String
     set $lb(,mmm,d,t,tz,yyyy) = $listfromstring(twitterTime," ")
-#endif
 
     #dim dformat as %Integer = 6
     #dim tformat as %Integer = 5
@@ -192,6 +200,22 @@
     #dim localeopt as %Boolean = 1
     #dim h as %String = $zdatetimeh(datetime,dformat,tformat,,,,,,,,localeopt)
     quit h
+]]></Implementation>
+</Method>
+
+<Method name="GetDate">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>twitterTime:%String</FormalSpec>
+<ReturnType>%Date</ReturnType>
+<Implementation><![CDATA[    quit +..GetFromTwitterTime(twitterTime)
+]]></Implementation>
+</Method>
+
+<Method name="GetTime">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>twitterTime:%String</FormalSpec>
+<ReturnType>%Date</ReturnType>
+<Implementation><![CDATA[    quit $piece(..GetFromTwitterTime(twitterTime),",",2)
 ]]></Implementation>
 </Method>
 
