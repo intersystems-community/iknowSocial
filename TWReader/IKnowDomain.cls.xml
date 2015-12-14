@@ -12,7 +12,7 @@
 <parameter name="$$$IKPSTEMMING" value="1" />
 
 <metadata>
-<field name="PostDate" dataType="STRING"/>
+<field name="PostDate" dataType="DATE"/>
 <field name="PostTime" dataType="STRING"/>
 <field name="AuthorID" dataType="STRING"/>
 <field name="AuthorCity" dataType="STRING"/>
@@ -22,7 +22,7 @@
 </metadata>
 
 <data dropBeforeBuild="true">
-<list listerClass="TWReader.Lister" configuration="TWReaderRus" batchMode="true" >
+<list disabled="true" listerClass="TWReader.Lister" configuration="TWReaderRus" batchMode="true" >
 <parameter name="query" value="pizza" />
 <parameter name="count" value="30" />
 <parameter name="checkExists" value="1" />
@@ -30,7 +30,13 @@
 <parameter name="startTime" value="" />
 <parameter name="endDate" value="" />
 <parameter name="endTime" value="" />
+<converter converterClass="%iKnow.Source.Converter.Html" />
 </list>
+
+<table batchMode="true" configuration="TWReaderRus"
+      tableName="TWReader_Data.Tweet" idField="IdStr" groupField="IdStr" dataFields="Text"
+      metadataColumns="PostedDate AS PostDate, PostedTime AS PostTime, User AS AuthorID, Place AS AuthorCity" >
+</table>
 </data>
 
 </domain>
