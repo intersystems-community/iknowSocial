@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.Data.Media">
+<Super>%Persistent</Super>
+<TimeCreated>63894,49681.345472</TimeCreated>
+
+<Property name="IdStr">
+<Type>%String</Type>
+</Property>
+
+<Property name="MediaUrl">
+<Type>Util.UnlimitedString</Type>
+</Property>
+
+<Property name="Url">
+<Type>Util.UnlimitedString</Type>
+</Property>
+
+<Property name="DisplayUrl">
+<Type>Util.UnlimitedString</Type>
+</Property>
+
+<Property name="ExpandedUrl">
+<Type>Util.UnlimitedString</Type>
+</Property>
+
+<Property name="Type">
+<Type>%String</Type>
+</Property>
+
+<Property name="Sizes">
+<Type>%String</Type>
+<Collection>list</Collection>
+</Property>
+
+<Index name="UniqueId">
+<IdKey>1</IdKey>
+<Properties>IdStr</Properties>
+</Index>
+
+<Method name="%OnNew">
+<FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    quit ..Assign(oProxy)
+]]></Implementation>
+</Method>
+
+<Method name="Assign">
+<Internal>1</Internal>
+<FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    if (oProxy '= "")
+    {
+        #dim properties As %ListOfObjects
+        do oProxy.%CopyToArray(.properties)
+        if ($data(properties) = 10)
+        {
+            set ..IdStr = $get(properties("id"))
+            set ..MediaUrl = $get(properties("media_url"))
+            set ..Url = $get(properties("url"))
+            set ..DisplayUrl = $get(properties("display_url"))
+            set ..ExpandedUrl = $get(properties("expanded_url"))
+            set ..Type = $get(properties("Type"))
+            //set ..Sizes = $get(properties("medium").w)
+        }
+    }
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CreateOrOpenId">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>id:%String,oProxy:%ZEN.proxyObject=""</FormalSpec>
+<ReturnType>TWReader.Data.Media</ReturnType>
+<Implementation><![CDATA[
+    #dim o As TWReader.Data.Media
+    if ..%ExistsId(id) {
+        set o = ..%OpenId(id)
+        do:$isobject(oProxy) o.Assign(oProxy)
+    } else {
+        set o = ..%New(oProxy)
+        set o.IdStr = id
+    }
+    quit o
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^TWReader.Data.MediaD</DataLocation>
+<DefaultData>MediaDefaultData</DefaultData>
+<IdLocation>^TWReader.Data.MediaD</IdLocation>
+<IndexLocation>^TWReader.Data.MediaI</IndexLocation>
+<StreamLocation>^TWReader.Data.MediaS</StreamLocation>
+<Data name="MediaDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>MediaUrl</Value>
+</Value>
+<Value name="3">
+<Value>Url</Value>
+</Value>
+<Value name="4">
+<Value>DisplayUrl</Value>
+</Value>
+<Value name="5">
+<Value>ExpandedUrl</Value>
+</Value>
+<Value name="6">
+<Value>Type</Value>
+</Value>
+<Value name="7">
+<Value>Sizes</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

@@ -3,7 +3,7 @@
 <Class name="Util.Requests.RequestSender">
 <Description>
 This class provides ability to send https-requests and process their responses conveniently.</Description>
-<Super>%RegisteredObject</Super>
+<Super>%RegisteredObject,Util.AuditHelper</Super>
 <TimeCreated>63524,64364.95359</TimeCreated>
 
 <Parameter name="SSLConfigurationName">
@@ -44,7 +44,12 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
     #dim v as %String = ""
     
     #dim status as %Status = $$$OK
-    set status = req.Get(##class(Util.Requests.RequestMaker).RequestArrayToQueryString(location, parameters), requestType # 3)
+    #dim queryParams As %String = ##class(Util.Requests.RequestMaker).RequestArrayToQueryString(location, parameters)
+    
+    do ..AuditNetworkRequest(1, server, queryParams)
+    do ..AuditLog("AuthorizationData", $get(authorization))
+    
+    set status = req.Get(queryParams, requestType # 3)
     
     if ($$$ISOK(status)) {
         #dim response as %String = ""

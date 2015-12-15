@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="twitterApiStatus.CSP" application="/csp/vkfb/" default="1"><![CDATA[
+<html>
+<head>
+  <title>Twitter API monitoring </title>
+  <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" -->
+  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <!-- link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/css/bootstrap-modal.min.css" -->
+  <link rel="stylesheet" href="lib/bootstrap-modal.min.css">
+  <!-- link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" -->
+  <link rel="stylesheet" href="lib/jquery-ui.css">
+
+  <!-- script src="https://code.jquery.com/jquery-1.11.2.min.js"></script -->
+  <script src="lib/jquery-1.11.2.min.js"></script>
+  <!-- script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script -->
+  <script src="lib/jquery-ui.min.js"></script>
+  <!-- script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script -->
+  <script src="lib/bootstrap.min.js"></script>
+
+  <script src="custom.js"></script>
+  
+  
+
+</head>
+<body>
+
+    <div class="container">
+
+    <table class="table table-striped" id="api-status"> 
+    <thead>
+        <tr><th>Trend</th></tr>
+    </thead>
+    <tbody>
+    </tbody>
+    </table>
+    </div>
+    
+    <!-- script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script -->
+    <script src="//cdn.jsdelivr.net/leaflet.esri/1.0.0/esri-leaflet.js"></script>
+    <script src="//cdn.jsdelivr.net/leaflet.esri.geocoder/1.0.2/esri-leaflet-geocoder.js"></script>
+    <script language="JavaScript">
+
+        $(document).ready(function() {
+            #call(TWReader.UIBroker.DrawTwitterApiStatus("#api-status"))#
+        });
+
+  </script>
+</body>
+</html>
+]]></CSP>
+</Export>

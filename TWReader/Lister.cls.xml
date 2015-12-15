@@ -6,33 +6,33 @@
 through a API request and store the set of items retrieved as separate Sources.</p>
 
 <p><b>Lister Parameters</b> to be supplied to <method>AddListToBatch</method> and
-	<method>ProcessList</method> calls:</p>
+    <method>ProcessList</method> calls:</p>
 <ol>
     <li><b>query</b> As <class>%String</class> - The query to search through vk newsfeed. fe: "pizza"</li>
-	<li><b>count</b> As <class>%Integer</class> - The positive integer number of posts (from 1 to 100) to add.</li>
-	<li><b>checkExists</b> As <class>%Boolean</class> - Whether or not to check whether a post item already exists before attempting to store it (skipping if it exists),  default 1</li>
-	<li><b>startDate</b> As <class>%Date</class> - The starting date value to search posts from.</li>
-	<li><b>startTime</b> As <class>%Time</class> - The starting time value to search posts from.</li>
-	<li><b>endDate</b> As <class>%Date</class> - The ending date value to search posts to.</li>
-	<li><b>endTime</b> As <class>%Time</class> - The ending time value to search posts to.</li>
+    <li><b>count</b> As <class>%Integer</class> - The positive integer number of posts (from 1 to 100) to add.</li>
+    <li><b>checkExists</b> As <class>%Boolean</class> - Whether or not to check whether a post item already exists before attempting to store it (skipping if it exists),  default 1</li>
+    <li><b>startDate</b> As <class>%Date</class> - The starting date value to search posts from.</li>
+    <li><b>startTime</b> As <class>%Time</class> - The starting time value to search posts from.</li>
+    <li><b>endDate</b> As <class>%Date</class> - The ending date value to search posts to.</li>
+    <li><b>endTime</b> As <class>%Time</class> - The ending time value to search posts to.</li>
 </ol>
 
 <p><b>External ID structure:</b> [GroupName]:::[LocalRef]</p>
 <ul>
-	<li>GroupName = query</li>
-	<li>LocalRef = OwnerID#FromID#PostID</li>
+    <li>GroupName = query</li>
+    <li>LocalRef = OwnerID#FromID#PostID</li>
 </ul>
 
 <p><b>Extracted metadata:</b> these metadata fields will be populated with corresponding
 values for each post item, where present.</p>
 <ul>
-	<li>PostDate</li>
-	<li>PostTime</li>
-	<li>AuthorID</li>
-	<li>AuthorCity</li>
-	<li>AuthorCountry</li>
-	<li>AuthorDOB</li>
-	<li>AuthorSex</li>
+    <li>PostDate</li>
+    <li>PostTime</li>
+    <li>AuthorID</li>
+    <li>AuthorCity</li>
+    <li>AuthorCountry</li>
+    <li>AuthorDOB</li>
+    <li>AuthorSex</li>
 </ul>
 
 <p><b>Lister alias:</b> "TwitterAPI"</p>
@@ -49,64 +49,64 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
 <FormalSpec>listparams:%List</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	
-	set query = $li(listparams, 1)
-	set count = $li(listparams, 2)
-	set checkExists = +$lg(listparams, 3, 1)
-	set startDate = $lg(listparams, 4)
-	set startTime = $lg(listparams, 5)
-	set endDate = $lg(listparams, 6)
-	set endTime = $lg(listparams, 7)
-	//set requestType = "popular" 
-	
-	set status = ##class(TWReader.Requests.APIMethodsCaller).TweetsSearch(.response, listparams)
-	quit:$$$ISERR(status) status
-	
-	do ..RegisterMetadataKeys($lb("Query", "PostDate", "PostTime", "AuthorID", "AuthorCity", "AuthorCountry", "PostLatitude", "PostLongitude"))
-	
-	set tweets = ##class(%ArrayOfObjects).%New()
-	set tweets = response.GetAt(1)."statuses"
-	
-	for i = 1:1:tweets.Count() {
-		#dim tweet = ##class(TWReader.Data.Tweet).%New(tweets.GetAt(i))
-		#dim user = ##class(TWReader.Data.User).%New(tweet.User)
-		/*
-		write:(tweet.Coordinates'="") "coords = "_tweet.Coordinates ,!
-		
-		s:(tweet.Coordinates'="") ^Test(i) = $system.OBJ.Dump(tweet.Coordinates)
-		write:(tweet.Coordinates'="") "latitude = "_tweet.Coordinates."coordinates".GetAt(1) ,!
-		write:(tweet.Coordinates'="") "longitude = "_tweet.Coordinates."coordinates".GetAt(2) ,!
-		*/
-		set tPostDate = $piece(tweet.CreatedAtDateTime,",",1)
-		set tPostTime = $piece(tweet.CreatedAtDateTime,",",2)
-		set tOwnerID = user.Id
-		set tID = tweet.Ids
-		#dim tTextStream as %GlobalCharacterStream
-		set tTextStream = tweet.Text
-			
-		set tAuthorCity = user.Location
-		set tAuthorCountry = user.WithheldInCountries
-		set tLatitude = ""
-		set tLongitude = ""
-		set:(tweet.Coordinates'="") tLatitude = tweet.Coordinates."coordinates".GetAt(2)
-		set:(tweet.Coordinates'="") tLongitude = tweet.Coordinates."coordinates".GetAt(1)
-			
-		set tLocalRef = tOwnerID_"#"_tID
-			
-		set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
-		do tTextStream.Rewind()
-		if (tTextStream.Size = 0) {
-			continue
-		}
-		set len = 32000
-		while (len = 32000) {
-			do ..StoreTemp(tRef, tTextStream.Read(.len))
-		}
-			
-		do ..SetMetadataValues(tRef, $lb(query, tPostDate, tPostTime, tID, tAuthorCity, tAuthorCountry, tLatitude, tLongitude))
-	}
-	
-	
+    
+    set query = $li(listparams, 1)
+    set count = $li(listparams, 2)
+    set checkExists = +$lg(listparams, 3, 1)
+    set startDate = $lg(listparams, 4)
+    set startTime = $lg(listparams, 5)
+    set endDate = $lg(listparams, 6)
+    set endTime = $lg(listparams, 7)
+    //set requestType = "popular" 
+    
+    set status = ##class(TWReader.Requests.Api).TweetsSearch(.response, listparams)
+    quit:$$$ISERR(status) status
+    
+    do ..RegisterMetadataKeys($lb("Query", "PostDate", "PostTime", "AuthorID", "AuthorCity", "AuthorCountry", "PostLatitude", "PostLongitude"))
+    
+    set tweets = ##class(%ArrayOfObjects).%New()
+    set tweets = response.GetAt(1)."statuses"
+    
+    for i = 1:1:tweets.Count() {
+        #dim tweet As TWReader.Data.Tweet = ##class(TWReader.Data.Tweet).%New(tweets.GetAt(i))
+        #dim user As TWReader.Data.User   = ##class(TWReader.Data.User).%New(tweet.User)
+        /*
+        write:(tweet.Coordinates'="") "coords = "_tweet.Coordinates ,!
+        
+        s:(tweet.Coordinates'="") ^Test(i) = $system.OBJ.Dump(tweet.Coordinates)
+        write:(tweet.Coordinates'="") "latitude = "_tweet.Coordinates."coordinates".GetAt(1) ,!
+        write:(tweet.Coordinates'="") "longitude = "_tweet.Coordinates."coordinates".GetAt(2) ,!
+        */
+        set tPostDate = $piece(tweet.CreatedAtDateTime,",",1)
+        set tPostTime = $piece(tweet.CreatedAtDateTime,",",2)
+        set tOwnerID = user.IdStr
+        set tID = tweet.IdStr
+        #dim tTextStream as %GlobalCharacterStream
+        set tTextStream = tweet.Text
+            
+        set tAuthorCity = user.Location
+        set tAuthorCountry = user.WithheldInCountries
+        set tLatitude = ""
+        set tLongitude = ""
+        set:(tweet.Coordinates'="") tLatitude = tweet.Coordinates."coordinates".GetAt(2)
+        set:(tweet.Coordinates'="") tLongitude = tweet.Coordinates."coordinates".GetAt(1)
+            
+        set tLocalRef = tOwnerID_"#"_tID
+            
+        set tRef = $lb(i%ListerClassId, ..AddGroup(query), tLocalRef)
+        do tTextStream.Rewind()
+        if (tTextStream.Size = 0) {
+            continue
+        }
+        set len = 32000
+        while (len = 32000) {
+            do ..StoreTemp(tRef, tTextStream.Read(.len))
+        }
+            
+        do ..SetMetadataValues(tRef, $lb(query, tPostDate, tPostTime, tID, tAuthorCity, tAuthorCountry, tLatitude, tLongitude))
+    }
+    
+    
     quit $$$OK
 ]]></Implementation>
 </Method>
@@ -130,9 +130,9 @@ the second part as local reference.</p>
 <Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set delim = ":::"
-	set localRef = $piece(fullRef, delim, $l(fullRef, delim))
-	set groupName = $e(fullRef, 1, *-$l(localRef)-$l(delim))
+    set delim = ":::"
+    set localRef = $piece(fullRef, delim, $l(fullRef, delim))
+    set groupName = $e(fullRef, 1, *-$l(localRef)-$l(delim))
     Quit $$$OK
 ]]></Implementation>
 </Method>

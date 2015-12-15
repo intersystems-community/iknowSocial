@@ -4,26 +4,54 @@
 <Super>%Persistent</Super>
 <TimeCreated>62714,57306.19124</TimeCreated>
 
-<Property name="id">
-<Type>%Library.Integer</Type>
-<SqlColumnNumber>2</SqlColumnNumber>
-<Identity>1</Identity>
+<Property name="Name">
+<Type>%String</Type>
 </Property>
 
-<Property name="name">
-<Type>%Library.String</Type>
-<SqlColumnNumber>3</SqlColumnNumber>
+<Property name="Date">
+<Type>%TimeStamp</Type>
 </Property>
 
-<Property name="date">
-<Type>%Library.TimeStamp</Type>
-<SqlColumnNumber>4</SqlColumnNumber>
+<Property name="Rank">
+<Type>%Integer</Type>
 </Property>
 
-<Property name="rank">
-<Type>%Library.Integer</Type>
-<SqlColumnNumber>5</SqlColumnNumber>
-</Property>
+<Index name="UniqueId">
+<IdKey>1</IdKey>
+<Properties>Name</Properties>
+</Index>
+
+<Method name="%OnNew">
+<FormalSpec>name:%String,date:%TimeStamp,rank:%Integer</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set ..Name = name
+    if $data(date) {
+        set ..Date = date
+    } else {
+        set ..Date = $zdt($horolog, 3)
+    }
+    set ..Rank = $get(rank)
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CreateOrOpenId">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>name:%String,date:%TimeStamp,rank:%Integer</FormalSpec>
+<ReturnType>TWReader.Data.Trend</ReturnType>
+<Implementation><![CDATA[
+    #dim o As TWReader.Data.Trend
+    if ..%ExistsId(name) {
+        set o = ..%OpenId(name)
+        set:$data(date) o.Date = date
+        set:$data(rank) o.Rank = rank
+    } else {
+        set o = ..%New(name, .date, .rank)
+   }
+    quit o
+]]></Implementation>
+</Method>
 
 <Storage name="Default">
 <Type>%Library.CacheStorage</Type>
@@ -37,13 +65,10 @@
 <Value>%%CLASSNAME</Value>
 </Value>
 <Value name="2">
-<Value>name</Value>
+<Value>Date</Value>
 </Value>
 <Value name="3">
-<Value>date</Value>
-</Value>
-<Value name="4">
-<Value>rank</Value>
+<Value>Rank</Value>
 </Value>
 </Data>
 </Storage>

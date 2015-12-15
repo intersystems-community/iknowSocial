@@ -19,9 +19,40 @@
 <FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set lister = ##class(TWReader.Lister).%New(..DomainID)
-	set status = lister.ProcessList(query, count, checkExists, startDate, startTime, endDate, endTime)
-	quit status
+    set lister = ##class(TWReader.Lister).%New(..DomainID)
+    set status = lister.ProcessList(query, count, checkExists, startDate, startTime, endDate, endTime)
+    quit status
+]]></Implementation>
+</Method>
+
+<Method name="AddMorePersistentPosts">
+<FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim trend As TWReader.Data.Trend = ##class(TWReader.Data.Trend).CreateOrOpenId(query)
+    set status = trend.%Save() quit:$$$ISERR(status)
+
+    set status = ##class(TWReader.Requests.Api).TweetsSearch(.response, 
+                                                             $lb(query, count, checkExists, 
+                                                                 startDate, startTime, endDate, endTime))
+    quit:$$$ISERR(status) status
+    
+    set tweets = ##class(%ArrayOfObjects).%New()
+    set tweets = response.GetAt(1)."statuses"
+    
+    for i = 1:1:tweets.Count() {
+        #dim o = tweets.GetAt(i)
+        #dim idName As %String = o."id_str"
+        #dim tweet As TWReader.Data.Tweet = ##class(TWReader.Data.Tweet).CreateOrOpenId(idName, o)
+        set tweet.Trend = trend
+        #dim oUser = o.user
+        set idName = oUser."screen_name"
+        #dim user As TWReader.Data.User   = ##class(TWReader.Data.User).CreateOrOpenId(idName, oUser)
+
+        set status = tweet.%Save() quit:$$$ISERR(status)
+        set status = user.%Save() quit:$$$ISERR(status)
+    }
+    quit $$$OK
 ]]></Implementation>
 </Method>
 </Class>

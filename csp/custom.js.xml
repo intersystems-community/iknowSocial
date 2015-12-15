@@ -14,45 +14,82 @@ function trendCallback() {}
 function uniqueTrendCallback() {}
 
 function wrap(contents, tag) {
-	return "<" + tag + ">" + contents + "</" + tag + ">";
+    return "<" + tag + ">" + contents + "</" + tag + ">";
 }
 
 function higlightAndFadeTableRow(rowId) {
 //http://stackoverflow.com/questions/1757988/highlight-then-fade-highlight-for-list-items-dynamically-added-to-a-list
-	var colorStr = '#DDDDFF'; // color of highlight
-	$(rowId).each(function (i, x) {
-    	$(this).css("background-color", colorStr);
-    	setTimeout(function(){
-        	$(x).css("background-color","#ffffff"); // reset background
-        	$(x).effect("highlight", {color: colorStr}, 1000); // animate
-    	}, 500);
-	});
+    var colorStr = '#DDDDFF'; // color of highlight
+    $(rowId).each(function (i, x) {
+        $(this).css("background-color", colorStr);
+        setTimeout(function(){
+            $(x).css("background-color","#ffffff"); // reset background
+            $(x).effect("highlight", {color: colorStr}, 1000); // animate
+        }, 500);
+    });
 }
 
 function drawTableRow(tableId, rowObject, meta, link) {
-	var rowId = tableId.slice(1) + '-row-' + rowObject.sourceId;
-	$('<tr scope="row" ' + 'id="' + rowId + '"></tr>').appendTo(tableId + " tbody");
-	if (meta.indexOf("sourceId") !== -1) {
-		$(wrap(rowObject.sourceId, "a")).addClass("link-to-full-source").attr({
-			"data-toggle": "modal",
-			"data-target": link
-		}).appendTo($(tableId + " tbody tr").last()).wrap("<th></th>");
-	}
-	for (var i = 0; i < meta.length; i++) {
-		if (meta[i] !== "sourceId") {
-			$(tableId + " tbody tr").last().append($("<td class='tableRow"+i+"'><div>" + rowObject[meta[i]] + "</div></td>"));
-		}
-	}
+    var rowId = tableId.slice(1) + '-row-' + rowObject.sourceId;
+    $('<tr scope="row" ' + 'id="' + rowId + '"></tr>').appendTo(tableId + " tbody");
+    if (meta.indexOf("sourceId") !== -1) {
+        $(wrap(rowObject.sourceId, "a")).addClass("link-to-full-source").attr({
+            "data-toggle": "modal",
+            "data-target": link
+        }).appendTo($(tableId + " tbody tr").last()).wrap("<th></th>");
+    }
+    for (var i = 0; i < meta.length; i++) {
+        if (meta[i] !== "sourceId") {
+            $(tableId + " tbody tr").last().append($("<td class='tableRow"+i+"'><div>" + rowObject[meta[i]] + "</div></td>"));
+        }
+    }
 }
 
 function drawTable(tableId, tableObject, meta, link) {
-	$(tableId + " tbody").html("")
-	meta = typeof meta !== 'undefined' ? meta : ["sourceId", "title", "date", "time", "city", "country", "bdate", "sex", "id", "EC"]
-	link = typeof link !== 'undefined' ? link : "#show-source-id-modal"
-	for (var i = 0; i < tableObject.length; i++) {
-		drawTableRow(tableId, tableObject[i], meta, link);
-	}
+    $(tableId + " tbody").html("")
+    meta = typeof meta !== 'undefined' ? meta : ["sourceId", "title", "date", "time", "city", "country", "bdate", "sex", "id", "EC"]
+    link = typeof link !== 'undefined' ? link : "#show-source-id-modal"
+    for (var i = 0; i < tableObject.length; i++) {
+        drawTableRow(tableId, tableObject[i], meta, link);
+    }
 
+}
+
+function drawList(tableId, tableObject, link, max) {
+    $(tableId).html("");
+    if (typeof max === 'undefined') {
+        max = 10;
+    }
+    link = typeof link !== 'undefined' ? link : "#show-source-id-modal"
+    var i = 0;
+    for (i in tableObject) {
+        drawTrendItem(tableId, tableObject[i], link);
+        if (++i > max )
+            return;
+    }
+}
+
+
+function drawTrendItem(listId, object, link) {
+    $(listId).append(
+        $('<li class="trend-item js-trend-item  "><a class="js-nav trend-name" href="' + link + '">'+ 
+            object['sourceId'] + '</a></li>') 
+    );
+}
+
+function drawSimpleRow(tableId, rowObject, meta) {
+    $('<tr scope="row" ></tr>').appendTo(tableId + " tbody");
+    for (var i = 0; i < meta.length; i++) {
+        $(tableId + " tbody tr").last().append($("<td class='tableRow"+i+"'><div>" + rowObject[meta[i]] + "</div></td>"));
+    }
+}
+
+function drawSimpleTable(tableId, tableObject, meta) {
+    $(tableId + " tbody").html("")
+    meta = typeof meta !== 'undefined' ? meta : ["sourceId", "title", "date", "time", "city", "country", "bdate", "sex", "id", "EC"]
+    for (i in tableObject) {
+        drawSimpleRow(tableId, tableObject[i], meta);
+    }
 }
 
 function toggleTableRow(tableId, row) {
@@ -70,14 +107,14 @@ function unhighlightTableRow(tableId, row) {
 function toggleWholeTable(tableId) {
     var tableRows = $(tableId + " tr");
     tableRows.each(function() {
-    	toggleTableRow(tableId, $(this));
+        toggleTableRow(tableId, $(this));
     });
 };
 
 function unhighlightWholeTable(tableId) {
     var tableRows = $(tableId + " tr");
     tableRows.each(function() {
-	    unhighlightTableRow(tableId, $(this));
+        unhighlightTableRow(tableId, $(this));
     });
 }
 
@@ -85,25 +122,25 @@ function setTableToggling(tableId) {
     var tableRows = $(tableId + " tr");
     tableRows.off("click");
     tableRows.click(function() {
-	    toggleTableRow(tableId, $(this));
+        toggleTableRow(tableId, $(this));
     });
 };
 
 function setSearch(tableId) {
     $(tableId + '-search-pane').keyup(function() {
-    	var text = $(this).val();
-      	$(tableId + ' tr td:nth-child(2)').each(function() {
-        	var elem = $(this);
-        	if (elem.text().indexOf(text) > -1) {
-          		elem.parent().css({
-            		"display":"table-row"
-          		});
-        	} else {
-          		elem.parent().css({
-            		"display":"none"
-          		});
-        	}
-      	});
+        var text = $(this).val();
+        $(tableId + ' tr td:nth-child(2)').each(function() {
+            var elem = $(this);
+            if (elem.text().indexOf(text) > -1) {
+                elem.parent().css({
+                    "display":"table-row"
+                });
+            } else {
+                elem.parent().css({
+                    "display":"none"
+                });
+            }
+        });
     });
 }
 
@@ -118,30 +155,30 @@ function rgbToHex(r, g, b) {
 
 //http://stackoverflow.com/questions/4161369/html-color-codes-red-to-yellow-to-green
 function generateGYRGradient() {
-	var result = [];
-	var red = 255; //i.e. FF
-	var green = 0;
-	var stepSize = 5; //how many colors do you want?
-	while(green < 255) {
-    	green += stepSize;
-    	if(green > 255) {
-	    	green = 255;
-		}
-		output(red, green); //assume output is function that takes RGB
-	}
-	while(red > 0) {
-    	red -= stepSize;
-    	if(red < 0) {
-	    	red = 0;
-	    }
-    	output(red, green); //assume output is function that takes RGB
-	}
+    var result = [];
+    var red = 255; //i.e. FF
+    var green = 0;
+    var stepSize = 5; //how many colors do you want?
+    while(green < 255) {
+        green += stepSize;
+        if(green > 255) {
+            green = 255;
+        }
+        output(red, green); //assume output is function that takes RGB
+    }
+    while(red > 0) {
+        red -= stepSize;
+        if(red < 0) {
+            red = 0;
+        }
+        output(red, green); //assume output is function that takes RGB
+    }
 
-	function output(red, green) {
-		result.push(rgbToHex(red, green, 0));
-	}
+    function output(red, green) {
+        result.push(rgbToHex(red, green, 0));
+    }
 
-	return result;
+    return result;
 }
 ]]></CSP>
 </Export>

@@ -20,17 +20,17 @@ Adds array b to array a</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>a:%ArrayOfDataTypes,b:%ArrayOfDataTypes</FormalSpec>
 <Implementation><![CDATA[
-	if (b '= "")
-	{
-		#dim k as %String = ""
-		set k = ""
-		while (1)
-		{
-			#dim v as %String = b.GetNext(.k)
-			quit:k=""
-			do a.SetAt(v, k)
-		}
-	}
+    if (b '= "")
+    {
+        #dim k as %String = ""
+        set k = ""
+        while (1)
+        {
+            #dim v as %String = b.GetNext(.k)
+            quit:k=""
+            do a.SetAt(v, k)
+        }
+    }
 ]]></Implementation>
 </Method>
 
@@ -41,17 +41,17 @@ Converts date in d[d].m[m].yyyy format to horolog.</Description>
 <FormalSpec>VKDate:%String</FormalSpec>
 <ReturnType>%Date</ReturnType>
 <Implementation><![CDATA[
-	#dim date As %Date = ""
-	if ($length(VKDate, ".") = 3) {
-		if ($length($piece(VKDate, ".", 1)) = 1) {
-			set VKDate = "0" _ VKDate
-		}
-		if ($length($piece(VKDate, ".", 2)) = 1) {
-			set VKDate = $piece(VKDate, ".", 1) _ ".0" _ $piece(VKDate, ".", 2, 3)
-		}
-		set date = $zdateh($replace(VKDate, ".", "/"), 4)
-	}
-	quit date
+    #dim date As %Date = ""
+    if ($length(VKDate, ".") = 3) {
+        if ($length($piece(VKDate, ".", 1)) = 1) {
+            set VKDate = "0" _ VKDate
+        }
+        if ($length($piece(VKDate, ".", 2)) = 1) {
+            set VKDate = $piece(VKDate, ".", 1) _ ".0" _ $piece(VKDate, ".", 2, 3)
+        }
+        set date = $zdateh($replace(VKDate, ".", "/"), 4)
+    }
+    quit date
 ]]></Implementation>
 </Method>
 
@@ -60,9 +60,9 @@ Converts date in d[d].m[m].yyyy format to horolog.</Description>
 <FormalSpec>dt:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set tDate = $zdateh($piece(dt, " ", 1), 3)
-	set tTime = $ztimeh($piece(dt, " ", 2)) 
-	quit ##class(Util.Misc).ConvertHorologToUnixTime(tDate, tTime)
+    set tDate = $zdateh($piece(dt, " ", 1), 3)
+    set tTime = $ztimeh($piece(dt, " ", 2)) 
+    quit ##class(Util.Misc).ConvertHorologToUnixTime(tDate, tTime)
 ]]></Implementation>
 </Method>
 
@@ -70,7 +70,7 @@ Converts date in d[d].m[m].yyyy format to horolog.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>text:%String</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[	quit $data(text) && ($zconvert(text, "l") = ..#True)
+<Implementation><![CDATA[    quit $data(text) && ($zconvert(text, "l") = ..#True)
 ]]></Implementation>
 </Method>
 
@@ -80,8 +80,8 @@ Given 'unixTime' in UNIX-time format saves corresponding value in horolog format
 <ClassMethod>1</ClassMethod>
 <FormalSpec>unixTime:%Integer,*date:%Integer,*time:%Numeric</FormalSpec>
 <Implementation><![CDATA[
-	set date = $normalize(unixTime / 86400, -1) + 47117	// get integer days part and adjust to Cache time
-	set time = unixTime - ..ConvertHorologToUnixTime(date, 0)	// get remaining time in day in seconds
+    set date = $normalize(unixTime / 86400, -1) + 47117 // get integer days part and adjust to Cache time
+    set time = unixTime - ..ConvertHorologToUnixTime(date, 0)   // get remaining time in day in seconds
 ]]></Implementation>
 </Method>
 
@@ -91,7 +91,7 @@ Given 'date' and 'time' in horolog format returns corresponding UNIX-time value.
 <ClassMethod>1</ClassMethod>
 <FormalSpec>date:%Integer,time:%Integer</FormalSpec>
 <ReturnType>%Integer</ReturnType>
-<Implementation><![CDATA[	quit (date - 47117) * 86400 + time
+<Implementation><![CDATA[    quit (date - 47117) * 86400 + time
 ]]></Implementation>
 </Method>
 
@@ -101,10 +101,10 @@ Returns time since Unix epoch</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Integer</ReturnType>
 <Implementation><![CDATA[
-	quit:..#TestUnixTime ..#UnixTimeTest
-	#dim h as %String = $ztimestamp	// get UTC time
-	// Use $NORMALIZE to truncate the time to integer seconds:
-	quit ..ConvertHorologToUnixTime(+h, $normalize(+$piece(h, ",", 2), -1))
+    quit:..#TestUnixTime ..#UnixTimeTest
+    #dim h as %String = $ztimestamp // get UTC time
+    // Use $NORMALIZE to truncate the time to integer seconds:
+    quit ..ConvertHorologToUnixTime(+h, $normalize(+$piece(h, ",", 2), -1))
 ]]></Implementation>
 </Method>
 
@@ -115,12 +115,12 @@ Performs url-escaping.</Description>
 <FormalSpec>text:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	// Convert from Unicode to UTF-8 as explicit character sequences:
-	set text = $zconvert(text, "O", "UTF8")
-	// Encode using URL encoding:
-	set text = $zconvert(text, "O", "URL")
-	set text = $replace(text, "/", "%2F")
-	quit text
+    // Convert from Unicode to UTF-8 as explicit character sequences:
+    set text = $zconvert(text, "O", "UTF8")
+    // Encode using URL encoding:
+    set text = $zconvert(text, "O", "URL")
+    set text = $replace(text, "/", "%2F")
+    quit text
 ]]></Implementation>
 </Method>
 
@@ -130,7 +130,7 @@ Checks whereas passed string represents an integer.</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>str:%String</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[	quit ($isvalidnum(str) && (str # 1 = 0))
+<Implementation><![CDATA[    quit ($isvalidnum(str) && (str # 1 = 0))
 ]]></Implementation>
 </Method>
 
@@ -140,7 +140,7 @@ Checks whereas passed combination of 'date' and 'time' can actually represent so
 <ClassMethod>1</ClassMethod>
 <FormalSpec>date:%Date,time:%Time</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[	quit (##class(Util.Misc).IsInteger(date) && (date >= 0) && ##class(VKReader.Utils).IsInteger(time) && (time >= 0) && (time <= 86399))
+<Implementation><![CDATA[    quit (##class(Util.Misc).IsInteger(date) && (date >= 0) && ##class(VKReader.Utils).IsInteger(time) && (time >= 0) && (time <= 86399))
 ]]></Implementation>
 </Method>
 
@@ -149,9 +149,37 @@ Checks whereas passed combination of 'date' and 'time' can actually represent so
 <FormalSpec>d:%Date</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	#dim dateText as %String = ""
-	set:d'="" dateText = $zdate(d, 3)	// date in the format: YYYY-MM-DD
-	quit dateText
+    #dim dateText as %String = ""
+    set:d'="" dateText = $zdate(d, 3)   // date in the format: YYYY-MM-DD
+    quit dateText
+]]></Implementation>
+</Method>
+
+<Method name="FormatStr">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>fmt,args...</FormalSpec>
+<Implementation><![CDATA[
+    #dim return As %String = ""
+
+    #dim found As %Integer = 0
+    #dim start As %Integer = 0
+    #dim end As %Integer = 0
+    #dim val As %String = ""
+    do 
+    {
+        set found = $locate(fmt,"\$\d+",start,end,val)
+        if found {
+            set return = return _ $extract(fmt, start, found - 1)
+            #dim numVal As %Integer = +$extract(val,2,*)
+            set return = return _ $get(args(numVal))
+            set start = end
+        } else {
+            // save trailing tail
+            set return = return _ $extract(fmt, end, *)
+        }
+    } while found>0
+
+    return return
 ]]></Implementation>
 </Method>
 
@@ -161,11 +189,11 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ##class(Util.Requests.Tests.RequestMakerTests).Run()
-	set status = $$$ADDSC(status, ##class(VKReader.Requests.Tests.APIPublicMethodsCallerTests).Run())
-	set status = $$$ADDSC(status, ##class(VKReader.Data.Tests.PostTests).Run())
-	set status = $$$ADDSC(status, ##class(VKReader.Data.Tests.UserTests).Run())
-	quit status
+    set status = ##class(Util.Requests.Tests.RequestMakerTests).Run()
+    set status = $$$ADDSC(status, ##class(VKReader.Requests.Tests.APIPublicMethodsCallerTests).Run())
+    set status = $$$ADDSC(status, ##class(VKReader.Data.Tests.PostTests).Run())
+    set status = $$$ADDSC(status, ##class(VKReader.Data.Tests.UserTests).Run())
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -174,14 +202,14 @@ Runs all tests across the project.</Description>
 <FormalSpec>SSLConfigurationName</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	new $namespace
-	//set SSLConfigurationName = ##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName")
-	set $namespace = "%SYS"
-	set status = $$$OK
-	if (##class(Security.SSLConfigs).Exists(SSLConfigurationName) = 0) {
-		set status = $$$ADDSC(status, ##class(Security.SSLConfigs).Create(SSLConfigurationName))
-	}
-	quit status
+    new $namespace
+    //set SSLConfigurationName = ##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName")
+    set $namespace = "%SYS"
+    set status = $$$OK
+    if (##class(Security.SSLConfigs).Exists(SSLConfigurationName) = 0) {
+        set status = $$$ADDSC(status, ##class(Security.SSLConfigs).Create(SSLConfigurationName))
+    }
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -189,9 +217,9 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
-	set context = ##class(VKReader.Data.Context).%New(1)
-	quit status
+    set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
+    set context = ##class(VKReader.Data.Context).%New(1)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -199,9 +227,9 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
-	set context = ##class(TWReader.Data.Context).%New(1)
-	quit status
+    set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
+    set context = ##class(TWReader.Data.Context).%New(1)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -209,9 +237,9 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
-	set context = ##class(HTMLReader.Data.Context).%New(1)
-	quit status
+    set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
+    set context = ##class(HTMLReader.Data.Context).%New(1)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -219,11 +247,11 @@ Runs all tests across the project.</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
-	set context = ##class(HTMLReader.Data.Context).%New(1)
-	set context = ##class(TWReader.Data.Context).%New(1)
-	set context = ##class(VKReader.Data.Context).%New(1)
-	quit status
+    set status = ..CreateSSLConfiguration(##class(Util.Requests.RequestSender).%GetParameter("SSLConfigurationName"))
+    set context = ##class(HTMLReader.Data.Context).%New(1)
+    set context = ##class(TWReader.Data.Context).%New(1)
+    set context = ##class(VKReader.Data.Context).%New(1)
+    quit status
 ]]></Implementation>
 </Method>
 </Class>

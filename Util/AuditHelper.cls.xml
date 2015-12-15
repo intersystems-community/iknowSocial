@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.AuditHelper">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63879,49452.689451</TimeCreated>
+
+<Parameter name="AuditEventSource">
+<Type>%String</Type>
+<Default>iKnowSocial</Default>
+</Parameter>
+
+<Parameter name="AuditEventType">
+<Type>%String</Type>
+<Default>Network</Default>
+</Parameter>
+
+<Parameter name="AuditEventNameAccess">
+<Type>%String</Type>
+<Default>TwitterAccess</Default>
+</Parameter>
+
+<Method name="AuditLog">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>eventName:%String,eventData:%String,eventDescription:%String=""</FormalSpec>
+<Implementation><![CDATA[    do $system.Security.Audit(..#AuditEventSource, ..#AuditEventType, eventName, eventData, eventDescription)
+]]></Implementation>
+</Method>
+
+<Method name="AuditNetworkRequest">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>https:%Boolean=0,serverName:%String,queryString:%String,description:%String=""</FormalSpec>
+<Implementation><![CDATA[
+    #dim uriPrefix As %String = $select(https:"https",1:"http")
+    #dim url As %String = ##class(Util.Misc).FormatStr("$1://$2/$3", uriPrefix, serverName, queryString)
+    do ..AuditLog(..#AuditEventNameAccess, url, description)
+]]></Implementation>
+</Method>
+</Class>
+</Export>

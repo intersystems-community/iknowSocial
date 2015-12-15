@@ -33,10 +33,10 @@
 <Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if (##class(%iKnow.Queries.MetadataAPI).GetFieldId(..DomainID, fieldName) = "") {
-		do ##class(%iKnow.Queries.MetadataAPI).AddField(..DomainID, fieldName, $$$MDALLOPERATORS, dataType)
-	}
-	quit $$$OK
+    if (##class(%iKnow.Queries.MetadataAPI).GetFieldId(..DomainID, fieldName) = "") {
+        do ##class(%iKnow.Queries.MetadataAPI).AddField(..DomainID, fieldName, $$$MDALLOPERATORS, dataType)
+    }
+    quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -45,41 +45,41 @@
 <Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set ..DomainID = ##class(%iKnow.Domain).GetOrCreateId(..#DomainName)
-	set ..Domain = ##class(%iKnow.Domain).OpenId(..DomainID)
-	
-	set status = $$$OK
-	if (clearDomain = 1) {
-		set status = ..ClearDomain()
-		quit:$$$ISERR(status) status
-	}
-	
-	do ..AddMetadataFieldIfNotExists("PostCity")
-	do ..AddMetadataFieldIfNotExists("PostAdress")
-	do ..AddMetadataFieldIfNotExists("PostRating", $$$MDDTNUMBER)
-	do ..AddMetadataFieldIfNotExists("PostTitle")
-	do ..AddMetadataFieldIfNotExists("PostLatitude", $$$MDDTNUMBER)
-	do ..AddMetadataFieldIfNotExists("PostLongitude", $$$MDDTNUMBER)
-	do ..AddMetadataFieldIfNotExists("PostDate")
-	do ..AddMetadataFieldIfNotExists("PostTime")
-	do ..AddMetadataFieldIfNotExists("AuthorID")
-	do ..AddMetadataFieldIfNotExists("AuthorCity")
-	do ..AddMetadataFieldIfNotExists("AuthorCountry")
-	do ..AddMetadataFieldIfNotExists("AuthorDOB")
-	do ..AddMetadataFieldIfNotExists("AuthorSex")
-	do ..AddMetadataFieldIfNotExists("Query")
-	do ..AddMetadataFieldIfNotExists(##class(Misc.DomainEmotionalColoringCounter).%GetParameter("EmotionalColoringField"), $$$MDDTNUMBER)
-		
-	#dim cfg as %iKnow.Configuration
-	if ##class(%iKnow.Configuration).Exists(..#ConfigurationName) {
-    	set cfg = ##class(%iKnow.Configuration).Open(..#ConfigurationName) 
+    set ..DomainID = ##class(%iKnow.Domain).GetOrCreateId(..#DomainName)
+    set ..Domain = ##class(%iKnow.Domain).OpenId(..DomainID)
+    
+    set status = $$$OK
+    if (clearDomain = 1) {
+        set status = ..ClearDomain()
+        quit:$$$ISERR(status) status
+    }
+    
+    do ..AddMetadataFieldIfNotExists("PostCity")
+    do ..AddMetadataFieldIfNotExists("PostAdress")
+    do ..AddMetadataFieldIfNotExists("PostRating", $$$MDDTNUMBER)
+    do ..AddMetadataFieldIfNotExists("PostTitle")
+    do ..AddMetadataFieldIfNotExists("PostLatitude", $$$MDDTNUMBER)
+    do ..AddMetadataFieldIfNotExists("PostLongitude", $$$MDDTNUMBER)
+    do ..AddMetadataFieldIfNotExists("PostDate")
+    do ..AddMetadataFieldIfNotExists("PostTime")
+    do ..AddMetadataFieldIfNotExists("AuthorID")
+    do ..AddMetadataFieldIfNotExists("AuthorCity")
+    do ..AddMetadataFieldIfNotExists("AuthorCountry")
+    do ..AddMetadataFieldIfNotExists("AuthorDOB")
+    do ..AddMetadataFieldIfNotExists("AuthorSex")
+    do ..AddMetadataFieldIfNotExists("Query")
+    do ..AddMetadataFieldIfNotExists(##class(Misc.DomainEmotionalColoringCounter).%GetParameter("EmotionalColoringField"), $$$MDDTNUMBER)
+        
+    #dim cfg as %iKnow.Configuration
+    if ##class(%iKnow.Configuration).Exists(..#ConfigurationName) {
+        set cfg = ##class(%iKnow.Configuration).Open(..#ConfigurationName) 
     }else {
-		set cfg = ##class(%iKnow.Configuration).%New(..#ConfigurationName, 1, $LB("ru"))
+        set cfg = ##class(%iKnow.Configuration).%New(..#ConfigurationName, 1, $LB("ru"))
         do cfg.%Save() 
     }
     set status = $$$ADDSC(status, ..Domain.SetParameter($$$IKPDEFAULTCONFIG, ..#ConfigurationName))
     if (clearDomain = 1) {
-    	set status = $$$ADDSC(status, ..Domain.SetParameter($$$IKPSTEMMING, 1))
+        set status = $$$ADDSC(status, ..Domain.SetParameter($$$IKPSTEMMING, 1))
     }
     set status = $$$ADDSC(status, ..Domain.%Save())
     #if 0
@@ -93,13 +93,23 @@
 <Method name="ClearDomain">
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ..Domain.DropData()
-	quit status
+    set status = ..Domain.DropData()
+    quit status
 ]]></Implementation>
 </Method>
 
 <Method name="AddMorePosts">
+<Description>
+Load more posts into iknow domain</Description>
 <Abstract>1</Abstract>
+<ReturnType>%Status</ReturnType>
+</Method>
+
+<Method name="AddMorePersistentPosts">
+<Description>
+load more posts into their respective persistent tables (tweets, users, media, locations, etc.)</Description>
+<Abstract>1</Abstract>
+<FormalSpec>query:%String,count:%Integer=10,checkExists:%Boolean=1,startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 </Method>
 
@@ -107,8 +117,8 @@
 <FormalSpec>filter:%iKnow.Filters.Filter=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ##class(Misc.DomainEmotionalColoringCounter).CalcSourcesEmotionalColoring(..#DomainName, filter)
-	quit status
+    set status = ##class(Misc.DomainEmotionalColoringCounter).CalcSourcesEmotionalColoring(..#DomainName, filter)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -116,8 +126,8 @@
 <FormalSpec>clearDomain:%Boolean=0</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set status = ..Set(clearDomain)
-	quit status
+    set status = ..Set(clearDomain)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -126,12 +136,12 @@
 <Private>1</Private>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, ..DomainID, sourceId, 1, 1)
-	set tTitle = $lg($g(tSentences(1)), 2)
-	if ($length(tTitle) > ..#TitleMaxLength) {
-		set tTitle = $extract(tTitle, 1, ..#TitleMaxLength) _ "..."
-	}
-	quit tTitle
+    do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.tSentences, ..DomainID, sourceId, 1, 1)
+    set tTitle = $lg($g(tSentences(1)), 2)
+    if ($length(tTitle) > ..#TitleMaxLength) {
+        set tTitle = $extract(tTitle, 1, ..#TitleMaxLength) _ "..."
+    }
+    quit tTitle
 ]]></Implementation>
 </Method>
 
@@ -140,11 +150,11 @@
 <Private>1</Private>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set tDate = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, seed, externalId)
-	if ($length(tDate) > 0) {
-		quit $zdate(tDate, 1)
-	}
-	quit ""
+    set tDate = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, seed, externalId)
+    if ($length(tDate) > 0) {
+        quit $zdate(tDate, 1)
+    }
+    quit ""
 ]]></Implementation>
 </Method>
 
@@ -153,11 +163,11 @@
 <Private>1</Private>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set tTime = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, seed, externalId)
-	if ($length(tTime) > 0) {
-		quit $ztime(tTime, 1)
-	}
-	quit ""
+    set tTime = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, seed, externalId)
+    if ($length(tTime) > 0) {
+        quit $ztime(tTime, 1)
+    }
+    quit ""
 ]]></Implementation>
 </Method>
 
@@ -166,13 +176,13 @@
 <Private>1</Private>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set tDate = ..GetDate(externalId, seedDate)
-	set tTime = ..GetTime(externalId, seedTime)
-	if (($length(tDate) > 0) && ($length(tTime) > 0)) {
-		set tUnixtime = ##class(Util.Misc).ConvertHorologToUnixTime($zdateh(tDate, 1), $ztimeh(tTime, 1))
-		quit tUnixtime
-	}
-	quit ""
+    set tDate = ..GetDate(externalId, seedDate)
+    set tTime = ..GetTime(externalId, seedTime)
+    if (($length(tDate) > 0) && ($length(tTime) > 0)) {
+        set tUnixtime = ##class(Util.Misc).ConvertHorologToUnixTime($zdateh(tDate, 1), $ztimeh(tTime, 1))
+        quit tUnixtime
+    }
+    quit ""
 ]]></Implementation>
 </Method>
 
@@ -181,13 +191,13 @@
 <Private>1</Private>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set tSex = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, seed, externalId)
-	if (tSex = "1") {
-		quit "F"
-	} elseif (tSex = "2") {
-		quit "M"
-	}
-	quit ""
+    set tSex = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, seed, externalId)
+    if (tSex = "1") {
+        quit "F"
+    } elseif (tSex = "2") {
+        quit "M"
+    }
+    quit ""
 ]]></Implementation>
 </Method>
 
@@ -202,20 +212,20 @@
 <FormalSpec>contents:%ArrayOfDataTypes</FormalSpec>
 <Private>1</Private>
 <Implementation><![CDATA[
-	set result = "{"
-	set key = ""
-	for {
-		set key = contents.Next(key)
-		if (key = "") {
-			set result = result _ "}"
-			return result
-		}
-		set value = ##class(%CSP.Page).QuoteJS(contents.GetAt(key))
-		if ($length(result) > 1) {
-			set result = result _ ", " 
-		}
-		set result = result _  "'" _ key _ "' : " _ value 
-	}
+    set result = "{"
+    set key = ""
+    for {
+        set key = contents.Next(key)
+        if (key = "") {
+            set result = result _ "}"
+            return result
+        }
+        set value = ##class(%CSP.Page).QuoteJS(contents.GetAt(key))
+        if ($length(result) > 1) {
+            set result = result _ ", " 
+        }
+        set result = result _  "'" _ key _ "' : " _ value 
+    }
 ]]></Implementation>
 </Method>
 
@@ -224,7 +234,7 @@
 <FormalSpec>lat</FormalSpec>
 <Private>1</Private>
 <ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[	quit (($length(lat) > 0) && (lat >= -90) && (lat <= 90))
+<Implementation><![CDATA[    quit (($length(lat) > 0) && (lat >= -90) && (lat <= 90))
 ]]></Implementation>
 </Method>
 
@@ -233,7 +243,7 @@
 <FormalSpec>long</FormalSpec>
 <Private>1</Private>
 <ReturnType>%Boolean</ReturnType>
-<Implementation><![CDATA[	quit (($length(long) > 0) && (long >= -180) && (long <= 180))
+<Implementation><![CDATA[    quit (($length(long) > 0) && (long >= -180) && (long <= 180))
 ]]></Implementation>
 </Method>
 
@@ -249,25 +259,25 @@
 <Private>1</Private>
 <ReturnType>%iKnow.Filters.Filter</ReturnType>
 <Implementation><![CDATA[
-	if (..IsValidLatitude(latTL) && ..IsValidLatitude(latBR) && ..IsValidLongitude(longTL) && ..IsValidLongitude(longBR)){
-		set longFilter = ""
-		if (longTL < longBR) {
-			set longFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLongitude", "BETWEEN", longTL _ ";" _ longBR)
-		} else {
-			set belowFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLongitude", "BETWEEN", longTL _ ";" _ "180")
-			set aboveFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLongitude", "BETWEEN", "-180" _ ";" _ longBR)
-			set longFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "OR", 0)
-			do longFilter.AddSubFilter(belowFilter)
-			do longFilter.AddSubFilter(aboveFilter)
-		}
-		set latFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLatitude", "BETWEEN", latBR _ ";" _ latTL)
-		set coordFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "AND", 0)
-		do coordFilter.AddSubFilter(longFilter)
-		do coordFilter.AddSubFilter(latFilter)
-		quit coordFilter
-	} else {
-		quit ""
-	}
+    if (..IsValidLatitude(latTL) && ..IsValidLatitude(latBR) && ..IsValidLongitude(longTL) && ..IsValidLongitude(longBR)){
+        set longFilter = ""
+        if (longTL < longBR) {
+            set longFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLongitude", "BETWEEN", longTL _ ";" _ longBR)
+        } else {
+            set belowFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLongitude", "BETWEEN", longTL _ ";" _ "180")
+            set aboveFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLongitude", "BETWEEN", "-180" _ ";" _ longBR)
+            set longFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "OR", 0)
+            do longFilter.AddSubFilter(belowFilter)
+            do longFilter.AddSubFilter(aboveFilter)
+        }
+        set latFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "PostLatitude", "BETWEEN", latBR _ ";" _ latTL)
+        set coordFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "AND", 0)
+        do coordFilter.AddSubFilter(longFilter)
+        do coordFilter.AddSubFilter(latFilter)
+        quit coordFilter
+    } else {
+        quit ""
+    }
 ]]></Implementation>
 </Method>
 
@@ -275,83 +285,83 @@
 <FormalSpec>shouldCountEC:%String="",pageNum:%Integer=0,pageSize:%Integer=100,latTL="",longTL="",latBR="",longBR="",trend="",timeFrom="",timeTo=""</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	set totalResult = ""
-	
-	if ($length(shouldCountEC) > 0) {
-		do ..CalculateEmotionalColoring()
-	}
-	set i = pageNum
+    set totalResult = ""
+    
+    if ($length(shouldCountEC) > 0) {
+        do ..CalculateEmotionalColoring()
+    }
+    set i = pageNum
     set:(pageNum = 0) i = 1
-	
-	set coordFilter = ..CoordinateBoxFilter(latTL, longTL, latBR, longBR)
-	set trendFilter = ""
-	if ($length(trend) > 0) {
-		set trendFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "Query", "=", trend)
-	}
-	set totalFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "AND", 0)
-	if (coordFilter '= "") {
-		do totalFilter.AddSubFilter(coordFilter)
-	}
-	if (trendFilter '= "") {
-		do totalFilter.AddSubFilter(trendFilter)
-	}
-	if ((coordFilter = "") && (trendFilter = "")) {
-		set totalFilter = ""
-	}
-	for {
-		kill result		
-		do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize, totalFilter)
-		if ($data(result) = 0) {
-			set totalResult = "{ 'posts' : [ " _ totalResult _ " ]}"
-			return totalResult
-		}
-		set p = ""
-		for {
-			set p = $order(result(p))	
-			if (p '= "") {
-				set tExternalId = $list(result(p), 2)
-				set tLatitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLatitude", tExternalId)
-				set tLongitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLongitude", tExternalId)
-				set tSourceId = ##class(%iKnow.Queries.SourceAPI).GetSourceId(..DomainID, tExternalId)
-				set tTitle = ..GetTitle(tSourceId)
-				set tDate = ..GetDate(tExternalId, "PostDate")
-				set tTime = ..GetTime(tExternalId, "PostTime")
-				set tUnixtime = ..GetUnixtime(tExternalId, "PostDate", "PostTime")
-				set tCity = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorCity", tExternalId)
-				set tCountry = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorCountry", tExternalId)
-				set tDOB = ..GetDate(tExternalId, "AuthorDOB")
-				set tSex = ..GetSex(tExternalId, "AuthorSex")
-				set tId = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorID", tExternalId)
-				set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainEmotionalColoringCounter).#EmotionalColoringField, tExternalId)
-				set tRow = ##class(%ArrayOfDataTypes).%New()
-				set tQuery = $piece($piece(tExternalId,":::",1),":",3)
-				do tRow.SetAt(tSourceId ,"sourceId")
-				do tRow.SetAt(tTitle ,"title")
-				do tRow.SetAt(tLatitude ,"latitude")
-				do tRow.SetAt(tLongitude ,"longitude")
-				do tRow.SetAt(tDate ,"date")
-				do tRow.SetAt(tTime ,"time")
-				do tRow.SetAt(tUnixtime, "unixtime")
-				do tRow.SetAt(tCity, "city")
-				do tRow.SetAt(tCountry ,"country")
-				do tRow.SetAt(tDOB ,"bdate")
-				do tRow.SetAt(tSex ,"sex")
-				do tRow.SetAt(tId, "id")
-				do tRow.SetAt(tEC, "EC")
-				do tRow.SetAt(tQuery, "query")
-				
-				set postJSON = ..GetJSONFromArray(tRow)
-				if ($length(totalResult) > 0) {
-					set totalResult = totalResult _ ", "
-				}
-				set totalResult = totalResult _ postJSON
-			} else {
-				quit
-			}
-		}
-		return:(pageNum '= 0) "{ 'posts' : [ " _ totalResult _ " ]}"
-		set i = i + 1
-	}
+    
+    set coordFilter = ..CoordinateBoxFilter(latTL, longTL, latBR, longBR)
+    set trendFilter = ""
+    if ($length(trend) > 0) {
+        set trendFilter = ##class(%iKnow.Filters.SimpleMetadataFilter).%New(..DomainID, "Query", "=", trend)
+    }
+    set totalFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "AND", 0)
+    if (coordFilter '= "") {
+        do totalFilter.AddSubFilter(coordFilter)
+    }
+    if (trendFilter '= "") {
+        do totalFilter.AddSubFilter(trendFilter)
+    }
+    if ((coordFilter = "") && (trendFilter = "")) {
+        set totalFilter = ""
+    }
+    for {
+        kill result     
+        do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize, totalFilter)
+        if ($data(result) = 0) {
+            set totalResult = "{ 'posts' : [ " _ totalResult _ " ]}"
+            return totalResult
+        }
+        set p = ""
+        for {
+            set p = $order(result(p))   
+            if (p '= "") {
+                set tExternalId = $list(result(p), 2)
+                set tLatitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLatitude", tExternalId)
+                set tLongitude = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostLongitude", tExternalId)
+                set tSourceId = ##class(%iKnow.Queries.SourceAPI).GetSourceId(..DomainID, tExternalId)
+                set tTitle = ..GetTitle(tSourceId)
+                set tDate = ..GetDate(tExternalId, "PostDate")
+                set tTime = ..GetTime(tExternalId, "PostTime")
+                set tUnixtime = ..GetUnixtime(tExternalId, "PostDate", "PostTime")
+                set tCity = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorCity", tExternalId)
+                set tCountry = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorCountry", tExternalId)
+                set tDOB = ..GetDate(tExternalId, "AuthorDOB")
+                set tSex = ..GetSex(tExternalId, "AuthorSex")
+                set tId = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorID", tExternalId)
+                set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainEmotionalColoringCounter).#EmotionalColoringField, tExternalId)
+                set tRow = ##class(%ArrayOfDataTypes).%New()
+                set tQuery = $piece($piece(tExternalId,":::",1),":",3)
+                do tRow.SetAt(tSourceId ,"sourceId")
+                do tRow.SetAt(tTitle ,"title")
+                do tRow.SetAt(tLatitude ,"latitude")
+                do tRow.SetAt(tLongitude ,"longitude")
+                do tRow.SetAt(tDate ,"date")
+                do tRow.SetAt(tTime ,"time")
+                do tRow.SetAt(tUnixtime, "unixtime")
+                do tRow.SetAt(tCity, "city")
+                do tRow.SetAt(tCountry ,"country")
+                do tRow.SetAt(tDOB ,"bdate")
+                do tRow.SetAt(tSex ,"sex")
+                do tRow.SetAt(tId, "id")
+                do tRow.SetAt(tEC, "EC")
+                do tRow.SetAt(tQuery, "query")
+                
+                set postJSON = ..GetJSONFromArray(tRow)
+                if ($length(totalResult) > 0) {
+                    set totalResult = totalResult _ ", "
+                }
+                set totalResult = totalResult _ postJSON
+            } else {
+                quit
+            }
+        }
+        return:(pageNum '= 0) "{ 'posts' : [ " _ totalResult _ " ]}"
+        set i = i + 1
+    }
 ]]></Implementation>
 </Method>
 </Class>
