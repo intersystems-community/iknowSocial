@@ -8,7 +8,7 @@
 <XMLNamespace>http://www.intersystems.com/iknow</XMLNamespace>
 <Data><![CDATA[
 <domain name="TWReaderRus">
-<configuration name="TWReaderRus" languages="ru"/>
+<configuration name="TWReaderRus" detectLanguage="true" languages="ru,uk,en"/>
 <parameter name="$$$IKPSTEMMING" value="1" />
 
 <metadata>
@@ -34,7 +34,7 @@
 </list>
 
 <table batchMode="true" configuration="TWReaderRus"
-      tableName="TWReader_Data.Tweet" idField="IdStr" groupField="IdStr" dataFields="Text"
+      tableName="TWReader_Data.Tweet" idField="IdStr" groupField="IdStr" dataFields="CleanText"
       metadataColumns="PostedDate AS PostDate, PostedTime AS PostTime, User AS AuthorID, Place AS AuthorCity" >
 </table>
 </data>

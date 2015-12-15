@@ -63,6 +63,13 @@
 <Type>Util.UnlimitedString</Type>
 </Property>
 
+<Property name="CleanText">
+<Type>Util.UnlimitedString</Type>
+<SqlComputeCode> Set {*} = ##class(TWReader.Data.Tweet).CleanValue({Text}) </SqlComputeCode>
+<SqlComputed>1</SqlComputed>
+<Transient>1</Transient>
+</Property>
+
 <Property name="Truncated">
 <Type>%Boolean</Type>
 </Property>
@@ -166,6 +173,20 @@
 <Implementation><![CDATA[
     quit (..InReplyToStatusId '= "") || (..InReplyToUserId '= "") || (..InReplyToScreenName '= "") ||
          (($length(..Text) > 0) && ($extract(..Text, 1) = "@"))
+]]></Implementation>
+</Method>
+
+<Method name="CleanValue">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>value:Util.UnlimitedString</FormalSpec>
+<ReturnType>Util.UnlimitedString</ReturnType>
+<Implementation><![CDATA[
+    #dim text As Util.UnlimitedString = value
+    set text = ##class(Util.Misc).RegexpReplace(text, "^RT @\w+:? ?", "")
+    set text = ##class(Util.Misc).RegexpReplace(text, "\bRT @\w+:? ?", "\n")
+    set text = ##class(Util.Misc).RegexpReplace(text, "\bhttps?:\S+", "")
+    set text = ##class(Util.Misc).RegexpReplace(text, "(\S)([\.,;?!:])(\S)", "$1$2 $3")
+    quit text
 ]]></Implementation>
 </Method>
 
