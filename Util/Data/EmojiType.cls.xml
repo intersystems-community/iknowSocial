@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.Data.EmojiType">
+<Description>
+Scientific sentiment score rank for unicode symbols
+http://kt.ijs.si/data/Emoji_sentiment_ranking/</Description>
+<Super>%Persistent</Super>
+<TimeCreated>63902,41419.166577</TimeCreated>
+
+<Property name="CodePoint">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="UnicodeChar">
+<Type>%String</Type>
+<Calculated>1</Calculated>
+<SqlComputeCode> set {*} = $wchar({CodePoint})</SqlComputeCode>
+<SqlComputed>1</SqlComputed>
+<Transient>1</Transient>
+<ReadOnly>1</ReadOnly>
+</Property>
+
+<Property name="SentimentScore">
+<Type>%Numeric</Type>
+<Parameter name="MAXVAL" value="1"/>
+<Parameter name="MINVAL" value="-1"/>
+</Property>
+
+<Property name="UnicodeName">
+<Type>%String</Type>
+<Parameter name="MAXLEN"/>
+</Property>
+
+<Property name="UnicodeBlock">
+<Type>%String</Type>
+</Property>
+
+<Method name="UnicodeCharGet">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[    quit $wchar(..CodePoint)
+]]></Implementation>
+</Method>
+
+<Method name="LoadCSV">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>fileName:%String,resetTable:%Boolean=1</FormalSpec>
+<Implementation><![CDATA[
+    if resetTable {
+        do ..%DeleteExtent()
+    }
+    #dim file As %Stream.FileCharacter = ##class(%Stream.FileCharacter).%New()
+    set file.Filename = fileName
+    while 'file.AtEnd {
+        set line = file.ReadLine(,.status)
+        quit:$$$ISERR(status)
+        set $lb(,,codePoint,,,,,,sentimentScore,unicodeName,unicodeBlock) = $lfs(line, ";")
+        if codePoint="" || (unicodeName="") || (unicodeBlock="") { 
+            continue
+        }
+        #dim o As Util.Data.EmojiType = ##class(Util.Data.EmojiType).%New()
+        set o.CodePoint      = $zhex($extract(codePoint,3,*))
+        set o.SentimentScore = sentimentScore
+        set o.UnicodeName    = unicodeName
+        set o.UnicodeBlock   = unicodeBlock
+        set status = o.%Save()
+        quit:$$$ISERR(status)
+        write o.CodePoint, "  ", o.UnicodeChar, "  ", o.UnicodeName, "  ", o.UnicodeBlock,!
+    }
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^Util.Data.EmojiTypeD</DataLocation>
+<DefaultData>EmojiTypeDefaultData</DefaultData>
+<IdLocation>^Util.Data.EmojiTypeD</IdLocation>
+<IndexLocation>^Util.Data.EmojiTypeI</IndexLocation>
+<StreamLocation>^Util.Data.EmojiTypeS</StreamLocation>
+<Data name="EmojiTypeDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>CodePoint</Value>
+</Value>
+<Value name="3">
+<Value>SentimentScore</Value>
+</Value>
+<Value name="4">
+<Value>UnicodeName</Value>
+</Value>
+<Value name="5">
+<Value>UnicodeBlock</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
