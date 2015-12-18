@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.Data.EmojiDispatcher">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63904,52547.705394</TimeCreated>
+
+<Property name="EmojiScore">
+<Type>%Numeric</Type>
+<MultiDimensional>1</MultiDimensional>
+</Property>
+
+<Method name="CreateScoresDispatcher">
+<ClassMethod>1</ClassMethod>
+<ReturnType>Util.Data.EmojiDispatcher</ReturnType>
+<Implementation><![CDATA[
+    #dim this As Util.Data.EmojiDispatcher = ..%New()
+    #dim status As %Status = $$$OK
+    #dim sql As %String = "select UnicodeChar, SentimentScore from Util_Data.EmojiType"
+    #dim stmt As %SQL.Statement = ##class(%SQL.Statement).%New()
+    set status = stmt.%Prepare(sql)
+    quit:$$$ISERR(status) status
+    #dim rset As %SQL.StatementResult = stmt.%Execute()
+
+    while rset.%Next(.status) {
+        set this.EmojiScore(rset.UnicodeChar) = rset.SentimentScore
+    }
+    quit this
+]]></Implementation>
+</Method>
+</Class>
+</Export>
