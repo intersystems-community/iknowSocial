@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2015-12-18 15:03:59.204323" Target="##class(Util.Data.EmojiType).LoadCSV(&quot;C:\Users\Timur\Documents\Intersystems\unicode-emoticons-sentiment-score.csv&quot;)" TargetType="0">
+<Project name="VKReader" LastModified="2015-12-18 15:57:22.054713" Target="##class(Util.Data.EmojiType).LoadCSV(&quot;C:\Users\Timur\Documents\Intersystems\unicode-emoticons-sentiment-score.csv&quot;)" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>

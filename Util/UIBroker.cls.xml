@@ -129,7 +129,7 @@ fields must be appropriate js-array</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>stringifiedList,domainId</FormalSpec>
 <Implementation><![CDATA[
-    set JSONClosure = ##class(Misc.EmotionalMarker).ProposeStringifiedJSONClosureForCSVOfMarkerIds(stringifiedList, domainId)
+    set JSONClosure = ##class(Misc.SentimentMarker).ProposeStringifiedJSONClosureForCSVOfMarkerIds(stringifiedList, domainId)
     set JSONClosure = ##class(%CSP.Page).QuoteJS(JSONClosure)
     &js<
         var stringifiedResponse = #(JSONClosure)#;
@@ -147,7 +147,7 @@ fields must be appropriate js-array</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>stringifiedDict</FormalSpec>
 <Implementation><![CDATA[
-    set stringifiedJSON = ##class(Misc.EmotionalMarker).ApproveMarkersFromJSONAndReturnJSONWithIds(stringifiedDict)
+    set stringifiedJSON = ##class(Misc.SentimentMarker).ApproveMarkersFromJSONAndReturnJSONWithIds(stringifiedDict)
     set stringifiedJSON = ##class(%CSP.Page).QuoteJS(stringifiedJSON)
     &js<
         dict = JSON.parse(#(stringifiedJSON)#);
@@ -190,7 +190,7 @@ fields must be appropriate js-array</Description>
 <Method name="PrintEmotionalsMarkers">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-    set query = "select distinct * from Misc.EmotionalMarker"
+    set query = "select distinct * from Misc.SentimentMarker"
     set statement = ##class(%SQL.Statement).%New()
     set status = statement.%Prepare(query)
     set result = statement.%Execute()

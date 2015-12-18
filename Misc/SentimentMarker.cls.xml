@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="Misc.EmotionalMarker">
+<Class name="Misc.SentimentMarker">
 <IncludeCode>%IKPublic</IncludeCode>
+<StorageStrategy/>
 <Super>%Persistent</Super>
 <TimeCreated>63579,66295.439709</TimeCreated>
 
@@ -25,10 +26,10 @@
 
 <Method name="DirectlyApproveMarker">
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[entity:%String,weigth:%String,&approved:Misc.EmotionalMarker]]></FormalSpec>
+<FormalSpec><![CDATA[entity:%String,weigth:%String,&approved:Misc.SentimentMarker]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    set approved = ##class(Misc.EmotionalMarker).%New(entity, weigth)
+    set approved = ##class(Misc.SentimentMarker).%New(entity, weigth)
     set status = approved.%Save()
     quit status
 ]]></Implementation>
@@ -64,7 +65,7 @@
         while ($listdata(words, j) '= 0) {
             
             set entity = $list(words, j)
-            set localStatus = ##class(Misc.EmotionalMarker).DirectlyApproveMarker(entity, weight)
+            set localStatus = ##class(Misc.SentimentMarker).DirectlyApproveMarker(entity, weight)
             if ($$$ISOK(localStatus)) {
                 w "Added ",entity, !
             }
@@ -81,7 +82,7 @@
 <ClassMethod>1</ClassMethod>
 <FormalSpec>FileName:%String</FormalSpec>
 <Implementation><![CDATA[
-    #dim query As %String = "select * from Misc.EmotionalMarker group by %exact(entity)"
+    #dim query As %String = "select * from Misc.SentimentMarker group by %exact(entity)"
     #dim statement As %SQL.Statement = ##class(%SQL.Statement).%New()
     #dim status As %Status = statement.%Prepare(query)
     #dim result As %SQL.StatementResult = statement.%Execute()
@@ -105,7 +106,7 @@
         if (current = "") {
             return status
         }
-        set status = $$$ADDSC(status, ##class(Misc.EmotionalMarker).DirectlyApproveMarker(current, dictionary.GetAt(current)))
+        set status = $$$ADDSC(status, ##class(Misc.SentimentMarker).DirectlyApproveMarker(current, dictionary.GetAt(current)))
     }
     quit status
 ]]></Implementation>
@@ -126,7 +127,7 @@
             quit
         }
         kill marker
-        set status = ##class(Misc.EmotionalMarker).DirectlyApproveMarker(current, dict.%data(current), .marker)
+        set status = ##class(Misc.SentimentMarker).DirectlyApproveMarker(current, dict.%data(current), .marker)
         if ($$$ISERR(status)) {
             continue
         }
@@ -181,7 +182,7 @@
     set len = $length(stringifiedList, ",")
     for i = 0: 1: len {
         kill arr
-        set marker = ##class(Misc.EmotionalMarker).%OpenId($piece(stringifiedList, ",", i + 1))
+        set marker = ##class(Misc.SentimentMarker).%OpenId($piece(stringifiedList, ",", i + 1))
         if (marker = "") {
             continue
         }
@@ -202,12 +203,14 @@
 
 <Storage name="Default">
 <Type>%Library.CacheStorage</Type>
-<DataLocation>^Misc.EmotionalMarkerD</DataLocation>
-<DefaultData>EmotionalMarkerDefaultData</DefaultData>
-<IdLocation>^Misc.EmotionalMarkerD</IdLocation>
-<IndexLocation>^Misc.EmotionalMarkerI</IndexLocation>
-<StreamLocation>^Misc.EmotionalMarkerS</StreamLocation>
-<Data name="EmotionalMarkerDefaultData">
+<DataLocation>^Misc.SentimentMarkerD</DataLocation>
+<DefaultData>SentimentMarkerDefaultData</DefaultData>
+<IdLocation>^Misc.SentimentMarkerD</IdLocation>
+<IndexLocation>^Misc.SentimentMarkerI</IndexLocation>
+<StreamLocation>^Misc.SentimentMarkerS</StreamLocation>
+<Data name="SentimentMarkerDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
 <Value name="1">
 <Value>%%CLASSNAME</Value>
 </Value>

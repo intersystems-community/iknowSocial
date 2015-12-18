@@ -144,7 +144,7 @@
         quit status
     }   
     
-    set query = "select distinct * from Misc.EmotionalMarker"
+    set query = "select distinct * from Misc.SentimentMarker"
     set statement = ##class(%SQL.Statement).%New()
     set status = statement.%Prepare(query)
     quit:$$$ISERR(status) status
