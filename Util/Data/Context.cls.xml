@@ -65,12 +65,14 @@
         quit:$$$ISERR(status) status
     }
 #if 1
+
     // FIXME - find a way to calculate original iknow domain definition class to call its %Build
     #dim domainDefClass As %String = ..DomainName2DomainDef(..#DomainName)
     set status = $classmethod(domainDefClass, "%Build", 0)
 #else
     set status = ##class(TWReader.IKnowDomain).%Build(0) // FIXME - shame on me
 #endif
+
     quit status
 ]]></Implementation>
 </Method>
@@ -89,6 +91,7 @@
         quit:$$$ISERR(status) status
     }
 #if 0
+
     // FIXME - this is managed by external iKnow definition, not manually
     do ..AddMetadataFieldIfNotExists("PostCity")
     do ..AddMetadataFieldIfNotExists("PostAdress")
@@ -104,7 +107,7 @@
     do ..AddMetadataFieldIfNotExists("AuthorDOB")
     do ..AddMetadataFieldIfNotExists("AuthorSex")
     do ..AddMetadataFieldIfNotExists("Query")
-    do ..AddMetadataFieldIfNotExists(##class(Misc.DomainEmotionalColoringCounter).%GetParameter("EmotionalColoringField"), $$$MDDTNUMBER)
+    do ..AddMetadataFieldIfNotExists(##class(Misc.DomainSentimentScore).%GetParameter("EmotionalColoringField"), $$$MDDTNUMBER)
         
     #dim cfg as %iKnow.Configuration
     if ##class(%iKnow.Configuration).Exists(..#ConfigurationName) {
@@ -123,6 +126,7 @@
     #endif
     set status =$$$ADDSC(status, cfg.%Save())
 #endif
+
     quit status
 ]]></Implementation>
 </Method>
@@ -154,7 +158,7 @@ load more posts into their respective persistent tables (tweets, users, media, l
 <FormalSpec>filter:%iKnow.Filters.Filter=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    set status = ##class(Misc.DomainEmotionalColoringCounter).CalcSourcesEmotionalColoring(..#DomainName, filter)
+    set status = ##class(Misc.DomainSentimentScore).CalcSourcesEmotionalColoring(..#DomainName, filter)
     quit status
 ]]></Implementation>
 </Method>
@@ -369,7 +373,7 @@ load more posts into their respective persistent tables (tweets, users, media, l
                 set tDOB = ..GetDate(tExternalId, "AuthorDOB")
                 set tSex = ..GetSex(tExternalId, "AuthorSex")
                 set tId = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorID", tExternalId)
-                set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainEmotionalColoringCounter).#EmotionalColoringField, tExternalId)
+                set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainSentimentScore).#EmotionalColoringField, tExternalId)
                 set tRow = ##class(%ArrayOfDataTypes).%New()
                 set tQuery = $piece($piece(tExternalId,":::",1),":",3)
                 do tRow.SetAt(tSourceId ,"sourceId")

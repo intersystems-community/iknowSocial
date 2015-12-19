@@ -49,6 +49,7 @@
     }
     set totalFilter = ##class(%iKnow.Filters.GroupFilter).%New(..DomainID, "AND", 0)
 #if 0
+
     if (coordFilter '= "") {
         do totalFilter.AddSubFilter(coordFilter)
     }
@@ -61,6 +62,7 @@
 #else
     set totalFilter = ""
 #endif
+
     for {
         kill result     
         do ##class(%iKnow.Queries.SourceAPI).GetByDomain(.result, ..DomainID, i, pageSize, totalFilter)
@@ -90,7 +92,7 @@
                 set tAdress = ..GetSex(tExternalId, "PostAdress")
                 set tId = $piece($piece(tExternalId,":::",2),"#",2)
                 set tAuthor = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "AuthorID", tExternalId)
-                set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainEmotionalColoringCounter).#EmotionalColoringField, tExternalId)
+                set tEC = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, ##class(Misc.DomainSentimentScore).#EmotionalColoringField, tExternalId)
                 set tQuery = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "Query", tExternalId)
                 set tRating = ##class(%iKnow.Queries.MetadataAPI).GetValue(..DomainID, "PostRating", tExternalId)
                 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="Misc.DomainEmotionalColoringCounter">
+<Class name="Misc.DomainSentimentScore">
 <Super>%RegisteredObject</Super>
 <TimeCreated>63524,66706.279868</TimeCreated>
 
@@ -16,6 +16,7 @@
 <Implementation><![CDATA[
     set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+value))
     quit status
+
 ]]></Implementation>
 </Method>
 
@@ -29,6 +30,7 @@
     set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+current) + (+value))
     //do $system.Status.DisplayError(status)
     quit status
+
 ]]></Implementation>
 </Method>
 
@@ -86,6 +88,7 @@
         set k1 = k1 + 1     
     }   // for
     quit $$$OK
+
 ]]></Implementation>
 </Method>
 
@@ -126,6 +129,7 @@
         set i = i + 1
     }
     return $$$OK
+
 ]]></Implementation>
 </Method>
 
@@ -155,6 +159,7 @@
     } 
     
     quit status
+
 ]]></Implementation>
 </Method>
 </Class>
