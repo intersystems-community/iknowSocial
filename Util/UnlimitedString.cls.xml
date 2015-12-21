@@ -5,6 +5,8 @@
 <TimeCreated>63895,1507.968767</TimeCreated>
 
 <Parameter name="MAXLEN">
+<Description>
+Set empty MAXLEN to avoid validity checks upon save</Description>
 <Type>INTEGER</Type>
 </Parameter>
 </Class>
