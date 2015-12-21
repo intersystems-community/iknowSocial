@@ -126,6 +126,13 @@
 <Transient>1</Transient>
 </Property>
 
+<Property name="SentimentScore">
+<Type>%Numeric</Type>
+<SqlComputeCode> set {*} = {EmojiScore} </SqlComputeCode>
+<SqlComputed>1</SqlComputed>
+<Transient>1</Transient>
+</Property>
+
 <Method name="%OnNew">
 <FormalSpec>oProxy:%ZEN.proxyObject=""</FormalSpec>
 <ReturnType>%Status</ReturnType>

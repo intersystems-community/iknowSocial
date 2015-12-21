@@ -105,6 +105,11 @@ function getRandomSentimentStyle() {
     var randomInt = getRandomInt(-5, 5)
     return sentimentStyles[randomInt];
 }
+function getSentimentStyle(score) {
+    score = Math.round(score);
+    score = score > 5 ? 5 : (score < -5 ? -5 : score);
+    return sentimentStyles[score];
+}
 </script>
 
 <script id='tweet-template' type='text/ractive'>
@@ -116,7 +121,7 @@ function getRandomSentimentStyle() {
      data-dt-long="%{day} %{month} %{year}" data-scribe="page:tweet" id="twitter-widget-0" lang="en" data-twitter-event-id="0" -->
 <div class="EmbeddedTweet js-clickToOpenTarget" id="twitter-widget-0" >
     {{#collection }}
-        <blockquote class="Tweet" class='{{ getRandomSentimentStyle() }}' cite="https://twitter.com/{{ScreenName}}/status/{{ID}}" 
+        <blockquote class="Tweet" class='{{ getSentimentStyle(SentimentScore) }}' cite="https://twitter.com/{{ScreenName}}/status/{{ID}}" 
                     data-tweet-id="{{ID}}" data-scribe="section:subject">
             <div class="Tweet-header u-cf">
                 <div class="Tweet-author u-textTruncate" data-scribe="component:author">
@@ -257,8 +262,8 @@ function getRandomSentimentStyle() {
                 timePosted: function(dateTime) {
                     return ('Time posted: ' + dateTime);
                 },
-                getRandomSentimentStyle: function() {
-                    return getRandomSentimentStyle();
+                getSentimentStyle: function(score) {
+                    return getSentimentStyle(score);
                 }
             },
         });

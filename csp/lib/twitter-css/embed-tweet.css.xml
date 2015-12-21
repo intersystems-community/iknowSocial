@@ -1032,7 +1032,8 @@ ol, ul {
     border-left: 4px solid #FDD17F !important;
 }
 .sentiment-neutral {
-    border-left: 4px solid #FFEB84 !important;
+    /* border-left: 4px solid #FFEB84 !important; */
+    border-left: 4px solid #e1e8ed !important;
 }
 .sentiment-pos1 {
     border-left: 4px solid #E0E383 !important;
