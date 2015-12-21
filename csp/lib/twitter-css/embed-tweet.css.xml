@@ -1012,5 +1012,51 @@ ol, ul {
     margin: 0;
     list-style: none;
     padding: 0;
+}
+
+
+/* sentiment visualization */
+.sentiment-neg5 {
+    border-left: 4px solid #F8696B !important;
+}
+.sentiment-neg4 {
+    border-left: 4px solid #F9826F !important;
+}
+.sentiment-neg3 {
+    border-left: 4px solid #FA9D75 !important;
+}
+.sentiment-neg2 {
+    border-left: 4px solid #FCB77A !important;
+}
+.sentiment-neg1 {
+    border-left: 4px solid #FDD17F !important;
+}
+.sentiment-neutral {
+    border-left: 4px solid #FFEB84 !important;
+}
+.sentiment-pos1 {
+    border-left: 4px solid #E0E383 !important;
+}
+.sentiment-pos2 {
+    border-left: 4px solid #C1DA81 !important;
+}
+.sentiment-pos3 {
+    border-left: 4px solid #A2D07F !important;
+}
+.sentiment-pos4 {
+    border-left: 4px solid #83C77D !important;
+}
+.sentiment-pos5 {
+    border-left: 4px solid #63BE7B !important;
+}
+
+.sentiment-neg5, .sentiment-neg4, .sentiment-neg3, .sentiment-neg2, .sentiment-neg1,
+  .sentiment-pos5, .sentiment-pos4, .sentiment-pos3, .sentiment-pos2, .sentiment-pos1,
+  .sentiment-neutral 
+{
+    margin-bottom: 0;
+    /* border-right: 1px solid #e1e8ed  !important; */
+    /* border-top: 1px solid #e1e8ed !important; */
+    border-bottom: 1px solid #e1e8ed !important;
 }]]></CSP>
 </Export>

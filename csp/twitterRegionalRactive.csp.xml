@@ -83,6 +83,30 @@
 
 <div id="tweets-container" class="col-md-9"></div>
 
+<script language="JavaScript">
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+var sentimentStyles = {
+        "-5": "sentiment-neg5",
+        "-4": "sentiment-neg4",
+        "-3": "sentiment-neg3",
+        "-2": "sentiment-neg2",
+        "-1": "sentiment-neg1",
+        "0": "sentiment-neutral",
+        "1": "sentiment-pos1",
+        "2": "sentiment-pos2",
+        "3": "sentiment-pos3",
+        "4": "sentiment-pos4",
+        "5": "sentiment-pos5"
+    };
+function getRandomSentimentStyle() {
+    var randomInt = getRandomInt(-5, 5)
+    return sentimentStyles[randomInt];
+}
+</script>
+
 <script id='tweet-template' type='text/ractive'>
 <!-- div class="EmbeddedTweet js-clickToOpenTarget"
      data-dt-full="%{hours12}:%{minutes} %{amPm} - %{day} %{month} %{year}" 
@@ -92,8 +116,8 @@
      data-dt-long="%{day} %{month} %{year}" data-scribe="page:tweet" id="twitter-widget-0" lang="en" data-twitter-event-id="0" -->
 <div class="EmbeddedTweet js-clickToOpenTarget" id="twitter-widget-0" >
     {{#collection }}
-        <blockquote class="Tweet" cite="https://twitter.com/{{ScreenName}}/status/{{ID}}" data-tweet-id="{{ID}}" 
-                    data-scribe="section:subject">
+        <blockquote class="Tweet" class='{{ getRandomSentimentStyle() }}' cite="https://twitter.com/{{ScreenName}}/status/{{ID}}" 
+                    data-tweet-id="{{ID}}" data-scribe="section:subject">
             <div class="Tweet-header u-cf">
                 <div class="Tweet-author u-textTruncate" data-scribe="component:author">
                     <a class="Tweet-authorLink Identity u-linkBlend" data-scribe="element:user_link" href="https://twitter.com/{{ScreenName}}" 
@@ -232,6 +256,9 @@
                 },
                 timePosted: function(dateTime) {
                     return ('Time posted: ' + dateTime);
+                },
+                getRandomSentimentStyle: function() {
+                    return getRandomSentimentStyle();
                 }
             },
         });
