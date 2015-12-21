@@ -47,6 +47,13 @@
 <Type>%String</Type>
 </Property>
 
+<Property name="CalculatedPlace">
+<Type>%String</Type>
+<SqlComputeCode> set {*} = ##class(TWReader.Data.Tweet).CalculatePlace({ID}) </SqlComputeCode>
+<SqlComputed>1</SqlComputed>
+<Transient>1</Transient>
+</Property>
+
 <Property name="Retweeted">
 <Type>%Boolean</Type>
 </Property>
@@ -205,6 +212,26 @@
     set i%CreatedAt = createdAt
     set i%CreatedAtDateTime = ..GetFromTwitterTime(createdAt)
     quit status
+]]></Implementation>
+</Method>
+
+<Method name="CalculatePlace">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>ID:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    #dim tweet As TWReader.Data.Tweet = ..%OpenId(ID)
+    #dim place As %String 
+    if $isobject(tweet) {
+        set place = tweet.Place
+        if place="" {
+            #dim user As TWReader.Data.User = ##class(TWReader.Data.User).%OpenId(tweet.User)
+            set place = user.Location
+        }
+        quit place
+    } else {
+        quit ""
+    }
 ]]></Implementation>
 </Method>
 
