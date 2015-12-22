@@ -47,7 +47,7 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
     #dim queryParams As %String = ##class(Util.Requests.RequestMaker).RequestArrayToQueryString(location, parameters)
     
     do ..AuditNetworkRequest(1, server, queryParams)
-    do ..AuditLog("AuthorizationData", $get(authorization))
+    //do ..AuditLog("AuthorizationData", $get(authorization))
     
     set status = req.Get(queryParams, requestType # 3)
     
@@ -69,6 +69,7 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
             }
         }
         set responseText = response
+        do ..AuditLog("TwitterResponse", $get(responseText))
     } else {
         set responseText = ""
     }

@@ -14,9 +14,19 @@
 <Default>Network</Default>
 </Parameter>
 
+<Parameter name="AuditEventNameAuthorization">
+<Type>%String</Type>
+<Default>AuthorizationData</Default>
+</Parameter>
+
 <Parameter name="AuditEventNameAccess">
 <Type>%String</Type>
 <Default>TwitterAccess</Default>
+</Parameter>
+
+<Parameter name="AuditEventNameResponse">
+<Type>%String</Type>
+<Default>TwitterResponse</Default>
 </Parameter>
 
 <Method name="AuditLog">

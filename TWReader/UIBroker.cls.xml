@@ -124,7 +124,8 @@ simplified trends panel - list instead of table</Description>
 #endif
     
     &js<
-        trends = (#(response)#).trends;
+        trends = hardcodedTrends.length ? hardcodedTrends : [];
+        trends = trends.concat((#(response)#).trends);
         place  = '#(place)#';
         //console.log(place);
         $("#select-geo-location").text(place);

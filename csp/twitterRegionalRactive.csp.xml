@@ -85,6 +85,8 @@
 
 <script language="JavaScript">
 
+var hardcodedTrends = [{sourceId: 'egovkz'}, {sourceId: 'ЦОН'}, {sourceId: 'OpenData'}];
+
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
