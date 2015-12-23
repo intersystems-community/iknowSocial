@@ -587,6 +587,18 @@ a:active {
     white-space: pre;
     content: "\A\200e"
 }
+.Tweet-tweetLocation {
+    font-size: .875rem
+}
+
+.Tweet-tweetLocation:before {
+    white-space: pre;
+    content: "\A\200e("
+}
+.Tweet-tweetLocation:after {
+    white-space: pre;
+    content: ")"
+}
 .Tweet-authorVerifiedBadge {
     position: absolute;
     top: 0

@@ -63,7 +63,7 @@
                     <h3 id="myModalLabel">Select Geo Location For Trends</h3>
                 </div>
                 <div class="modal-body">
-                    <p><div id="map" style="height:280px"></div></p>
+                    <p><div id="map" style="height:60vh"></div></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" data-dismiss="modal" class="btn">Cancel</button>
@@ -85,7 +85,7 @@
 
 <script language="JavaScript">
 
-var hardcodedTrends = [{sourceId: 'egovkz'}, {sourceId: 'ЦОН'}, {sourceId: 'OpenData'}];
+var hardcodedTrends = ['egovkz', 'ЦОН', 'OpenData'].map(function (s) { return { sourceId: s, fixed: true}; });
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
@@ -136,6 +136,7 @@ function getSentimentStyle(score) {
                         </span>
                         <span class="Tweet-authorName Identity-name p-name customisable-highlight" data-scribe="element:name">{{FullName}}</span>
                         <span class="Tweet-authorScreenName Identity-screenName p-nickname" data-scribe="element:screen_name">@{{ScreenName}}</span>
+                        <span class="Tweet-tweetLocation">{{Location}}</span>
                     </a>
                 </div>
             </div>
@@ -182,17 +183,24 @@ function getSentimentStyle(score) {
     <script src="//cdn.jsdelivr.net/leaflet.esri.geocoder/1.0.2/esri-leaflet-geocoder.js"></script>
     <script language="JavaScript">
 
-        var map = L.map('map').setView([49, 32], 5);
-        L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        var map = L.map('map'); 
+        map.setView([49, 32], 6);
+        // NB! use http://leaflet-extras.github.io/leaflet-providers/preview/ for tile provider demo
+        //L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', { // BUGBUG - has no Astana
+        //L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
+            maxZoom: 18,
+            zoom: 6,
             attribution: false,
             detectRetina: true
         }).addTo(map);
+        //map.locate({setView: true, maxZoom: 16});
 
         var searchControl = L.esri.Geocoding.Controls.geosearch().addTo(map);
 
         var results = L.layerGroup().addTo(map);
 
-        searchControl.on('results', function(data){
+        searchControl.on('results', function(data) {
             results.clearLayers();
             for (var i = data.results.length - 1; i >= 0; i--) {
                 results.addLayer(L.marker(data.results[i].latlng));
@@ -201,7 +209,6 @@ function getSentimentStyle(score) {
   
         var marker;
         var lastPosition;
-        var geocodeService = L.esri.Geocoding.Services.geocoding();
 
         map.on('click', function(e) {
             if( !marker ) {
@@ -228,30 +235,6 @@ function getSentimentStyle(score) {
         });
 
         var collection = [];
-        /* collection = [
-                {
-                name: 'aavst',
-                fullName: 'Alexey Venediktov',
-                id: '672427856786563073',
-                imgsrc1x: 'https://pbs.twimg.com/profile_images/656383287418601472/fz7K4rmo_normal.jpg',
-                imgsrc2x: 'https://pbs.twimg.com/profile_images/656383287418601472/fz7K4rmo_bigger.jpg',
-                content: 'Предположу, что уход Зыгаря "по собственному желанию" связан с недовольством АП и БД книгой Михаила. Собственно, даже и не предположу',
-                dateTime: '2015-12-03T14:51:08+0000',
-                //retweets: 47,
-                //favorits: 12,
-                },
-                {
-                name: 'tsafin',
-                fullName: 'Timur Safin (40+)',
-                id: '673646600330153984',
-                imgsrc1x: 'https://pbs.twimg.com/profile_images/660577657583755264/6povP9Nv_normal.jpg',
-                //imgsrc2x: 'https://pbs.twimg.com/profile_images/660577657583755264/6povP9Nv_normal.jpg',
-                content: 'RT @AdamRackis: React Under the Hood is off to a great start. Exactly what I\'ve been looking for. @frangel85  @Swizec https://t.co/0xF9I1gq…',
-                dateTime: '2015-12-03T14:51:08+0000',
-                //retweets: 47,
-                //favorits: 12,
-                }
-*/
         var ractive = new Ractive({
             el: '#tweets-container',
             template: '#tweet-template',

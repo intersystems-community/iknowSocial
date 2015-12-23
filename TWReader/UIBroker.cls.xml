@@ -142,7 +142,7 @@ simplified trends panel - list instead of table</Description>
 <Implementation><![CDATA[
     set sql = "SELECT top "_ maxCount _ " T.ID, T.Coordinates, T.CreatedAt, T.FavoriteCount, T.Lang, T.Place, " _
               "T.Retweeted, T.RetweetCount, T.Source, T.Text, " _
-              "U.ScreenName, U.Name As FullName, U.Location, U.ProfileImageUrl, T.SentimentScore " _
+              "U.ScreenName, U.Name As FullName, T.CalculatedPlace As Location, U.ProfileImageUrl, T.SentimentScore " _
               "FROM TWReader_Data.Tweet T, TWReader_Data.""User"" U " _
               "WHERE T.""User"" = U.screenname and trend ='" _ query _"'"
     do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
