@@ -52,9 +52,35 @@
 <div class="container">
 
     <div id="left-pane" class="col-md-3">
-        <button role="button" class="btn btn-primary" type="button" id="select-geo" data-toggle="modal">
+        <!-- button role="button" class="btn btn-primary" type="button" id="select-geo" data-toggle="modal">
             Select Geo location<span id="select-geo-location" class="badge">...</span>
-        </button>
+        </button -->
+        <div class="btn-group">
+            <button type="button" class="btn btn-default btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Geo location<span id="select-geo-location" class="badge">...</span>
+            </button>
+            <ul class="dropdown-menu">
+                <!-- See woeid explorer @ http://isithackday.com/geoplanet-explorer/index.php -->
+                <li><a href="#" data-woeid="2122265">Moscow</a></li>
+                <li><a href="#" data-woeid="2123260">Saint-Petersburg</a></li>
+                <li><a href="#" data-woeid="2121267">Kazan</a></li>
+                <li><a href="#" data-woeid="2124298">Volgograd</a></li>
+                <li><a href="#" data-woeid="2124288">Vladivostock</a></li>
+                <li class="active"><a href="#" data-woeid="23424936">Whole Russia</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" data-woeid="924938">Kyiv</a></li>
+                <li><a href="#" data-woeid="922137">Kharkiv</a></li>
+                <li><a href="#" data-woeid="929398">Odesa</a></li>
+                <li class="active"><a href="#" data-woeid="23424976">Whole Ukraine</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" data-woeid="2264962">Astana</a></li>
+                <li><a href="#" data-woeid="2255777">Almaty</a></li>
+                <li><a href="#" data-woeid="2261214">Qaraghandy</a></li>
+                <li class="active"><a href="#" data-woeid="23424871">Whole Kazakhstan</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" id="select-geo">Select map location<span id="select-geo-location" class="badge">...</span></a></li>
+            </ul>
+        </div>
              
         <div id="myModal" class="modal fade highlight" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-content">
