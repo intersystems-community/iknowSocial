@@ -142,12 +142,6 @@ function getSentimentStyle(score) {
 </script>
 
 <script id='tweet-template' type='text/ractive'>
-<!-- div class="EmbeddedTweet js-clickToOpenTarget"
-     data-dt-full="%{hours12}:%{minutes} %{amPm} - %{day} %{month} %{year}" 
-     data-dt-months="Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec" data-dt-am="AM" data-dt-pm="PM" data-dt-now="now" 
-     data-dt-s="s" data-dt-m="m" data-dt-h="h" data-dt-second="second" data-dt-seconds="seconds" data-dt-minute="minute" 
-     data-dt-minutes="minutes" data-dt-hour="hour" data-dt-hours="hours" data-dt-abbr="%{number}%{symbol}" data-dt-short="%{day} %{month}" 
-     data-dt-long="%{day} %{month} %{year}" data-scribe="page:tweet" id="twitter-widget-0" lang="en" data-twitter-event-id="0" -->
 <div class="EmbeddedTweet js-clickToOpenTarget" id="twitter-widget-0" >
     {{#collection }}
         <blockquote class="Tweet" class='{{ getSentimentStyle(SentimentScore) }}' cite="https://twitter.com/{{ScreenName}}/status/{{ID}}" 
@@ -200,7 +194,6 @@ function getSentimentStyle(score) {
         </blockquote>
         {{/collection}}
 </div>
-
 </script>
   
 </div> <!-- contaiiner -->
