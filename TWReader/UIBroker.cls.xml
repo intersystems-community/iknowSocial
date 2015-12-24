@@ -101,37 +101,6 @@ simplified trends panel - list instead of table</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>fields:%String="",tableName:%String="#trends-table",lat:%String,long:%String</FormalSpec>
 <Implementation><![CDATA[
-#if 0
-    s response=""
-    do ##class(TWReader.Requests.Api).GetPlaceByCoords(.place, lat, long)
-    #dim localtionObject As %ZEN.proxyObject = place.GetAt(1)
-    set woeid = localtionObject.woeid
-    set city = localtionObject.name
-    set country = localtionObject.country
-    do ##class(TWReader.Requests.Api).GetTrendsByPlaceJSON(.response, woeid)
-    
-#if 0
-    do ##class(TWReader.Requests.Api).GetReverseGeocodeCity(.responseObject, lat, long)
-#endif
-    
-    set response = $replace(response,"[{","{",1,1)
-    set response = $replace(response,"}]}]","}]}")
-    set response = $replace(response,"name","sourceId")
-#if 0
-    set place    = responseObject.result.places.GetAt(1)."full_name"
-    // FIXME - there are no cities for Ukraine if we use reversegeocode in twitter
-#else
-    set place = city _","_country
-#endif
-    
-    &js<
-        trends = hardcodedTrends.length ? hardcodedTrends : [];
-        trends = trends.concat((#(response)#).trends);
-        updatePlace('#(place)#');
-        //console.log(trends);
-        drawList('#(tableName)#', trends, '#');
-    >
-#else
     s response=""
     do ##class(TWReader.Requests.Api).GetPlaceByCoords(.place, lat, long)
     #dim localtionObject As %ZEN.proxyObject = place.GetAt(1)
@@ -140,7 +109,6 @@ simplified trends panel - list instead of table</Description>
     set country = localtionObject.country
     do ##class(TWReader.Requests.Api).GetTrendsByPlaceJSON(.response, woeid)
     do ..FetchTrendsCollection(tableName, woeid, city, country)
-#endif
 ]]></Implementation>
 </Method>
 
@@ -148,19 +116,18 @@ simplified trends panel - list instead of table</Description>
 <Description>
 internal entry for fetching trends collectiotable</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>tableName:%String="#trends-table",placeWoeid:%String,city:%String,country:%String</FormalSpec>
+<FormalSpec>tableName:%String="#trends-table",placeWoeid:%String,city:%String,country:%String=""</FormalSpec>
 <Implementation><![CDATA[
     do ##class(TWReader.Requests.Api).GetTrendsByPlaceJSON(.response, placeWoeid)
 
     set response = $replace(response,"[{","{",1,1)
     set response = $replace(response,"}]}]","}]}")
     set response = $replace(response,"name","sourceId")
-    set place = city _","_country
     
     &js<
         trends = hardcodedTrends.length ? hardcodedTrends : [];
         trends = trends.concat((#(response)#).trends);
-        updatePlace('#(place)#');
+        updatePlace('#(city)#','#(country)#');
         drawList('#(tableName)#', trends, '#');
     >
 ]]></Implementation>

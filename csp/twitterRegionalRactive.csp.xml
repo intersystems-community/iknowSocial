@@ -61,21 +61,21 @@
             </button>
             <ul class="dropdown-menu">
                 <!-- See woeid explorer @ http://isithackday.com/geoplanet-explorer/index.php -->
-                <li><a href="#" data-woeid="2122265">Moscow</a></li>
-                <li><a href="#" data-woeid="2123260">Saint-Petersburg</a></li>
-                <li><a href="#" data-woeid="2121267">Kazan</a></li>
-                <!-- li><a href="#" data-woeid="2124298">Volgograd</a></li>
-                <li><a href="#" data-woeid="2124288">Vladivostock</a></li -->
+                <li><a href="#" data-woeid="2122265" data-country="Russia" >Moscow</a></li>
+                <li><a href="#" data-woeid="2123260" data-country="Russia" >Saint-Petersburg</a></li>
+                <li><a href="#" data-woeid="2121267" data-country="Russia" >Kazan</a></li>
+                <!-- li><a href="#" data-woeid="2124298" data-country="Russia" >Volgograd</a></li>
+                <li><a href="#" data-woeid="2124288" data-country="Russia" >Vladivostock</a></li -->
                 <li class="active"><a href="#" data-woeid="23424936">Whole Russia</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="#" data-woeid="924938">Kyiv</a></li>
-                <li><a href="#" data-woeid="922137">Kharkiv</a></li>
-                <li><a href="#" data-woeid="929398">Odesa</a></li>
+                <li><a href="#" data-woeid="924938" data-country="Ukraine" >Kyiv</a></li>
+                <li><a href="#" data-woeid="922137" data-country="Ukraine" >Kharkiv</a></li>
+                <li><a href="#" data-woeid="929398" data-country="Ukraine" >Odesa</a></li>
                 <li class="active"><a href="#" data-woeid="23424976">Whole Ukraine</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="#" data-woeid="2264962">Astana</a></li>
-                <li><a href="#" data-woeid="2255777">Almaty</a></li>
-                <!-- li><a href="#" data-woeid="2261214">Qaraghandy</a></li -->
+                <li><a href="#" data-woeid="2264962" data-country="Kazakhstan" >Astana</a></li>
+                <li><a href="#" data-woeid="2255777" data-country="Kazakhstan" >Almaty</a></li>
+                <!-- li><a href="#" data-woeid="2261214" data-country="Kazakhstan" >Qaraghandy</a></li -->
                 <li class="active"><a href="#" data-woeid="23424871">Whole Kazakhstan</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#" id="select-geo">Select map location<span id="select-geo-location" class="badge">...</span></a></li>
@@ -247,10 +247,10 @@ function getSentimentStyle(score) {
         $('#select-menu ul li a').on('click', function() {
             var woeid = $(this).attr('data-woeid');
             var place = $(this).text();
-            console.log(place + ' = ' + woeid);
+            var country = $(this).attr('data-country');
+            console.log(place + ',' + country + ' = ' + woeid);
             if (woeid) {
-                updatePlace(place);
-                /// TODO - render trends by woeid
+                #call(TWReader.UIBroker.FetchTrendsCollection("#trends-table", woeid, place, country))#
             }
         });
         $('#select-geo').on('click', function() {
@@ -316,7 +316,10 @@ function getSentimentStyle(score) {
             #call(TWReader.UIBroker.ShowEC())#
         }
 
-        function updatePlace(place) {
+        function updatePlace(place, country) {
+            if (typeof(country) !== 'undefined' && country !== 'undefined' && country.length > 0) { // FIXME - 
+                place = place + ',' + country
+            }
             $("#select-geo-location").text(place);
         }
 
