@@ -55,7 +55,7 @@
         <!-- button role="button" class="btn btn-primary" type="button" id="select-geo" data-toggle="modal">
             Select Geo location<span id="select-geo-location" class="badge">...</span>
         </button -->
-        <div class="btn-group">
+        <div class="btn-group" id="select-menu">
             <button type="button" class="btn btn-default btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Select Geo location<span id="select-geo-location" class="badge">...</span>
             </button>
@@ -64,8 +64,8 @@
                 <li><a href="#" data-woeid="2122265">Moscow</a></li>
                 <li><a href="#" data-woeid="2123260">Saint-Petersburg</a></li>
                 <li><a href="#" data-woeid="2121267">Kazan</a></li>
-                <li><a href="#" data-woeid="2124298">Volgograd</a></li>
-                <li><a href="#" data-woeid="2124288">Vladivostock</a></li>
+                <!-- li><a href="#" data-woeid="2124298">Volgograd</a></li>
+                <li><a href="#" data-woeid="2124288">Vladivostock</a></li -->
                 <li class="active"><a href="#" data-woeid="23424936">Whole Russia</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#" data-woeid="924938">Kyiv</a></li>
@@ -75,7 +75,7 @@
                 <li role="separator" class="divider"></li>
                 <li><a href="#" data-woeid="2264962">Astana</a></li>
                 <li><a href="#" data-woeid="2255777">Almaty</a></li>
-                <li><a href="#" data-woeid="2261214">Qaraghandy</a></li>
+                <!-- li><a href="#" data-woeid="2261214">Qaraghandy</a></li -->
                 <li class="active"><a href="#" data-woeid="23424871">Whole Kazakhstan</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#" id="select-geo">Select map location<span id="select-geo-location" class="badge">...</span></a></li>
@@ -138,6 +138,7 @@ function getSentimentStyle(score) {
     score = score > 5 ? 5 : (score < -5 ? -5 : score);
     return sentimentStyles[score];
 }
+
 </script>
 
 <script id='tweet-template' type='text/ractive'>
@@ -243,6 +244,15 @@ function getSentimentStyle(score) {
             lastPosition = e.latlng;
             console.log(lastPosition)
         });
+        $('#select-menu ul li a').on('click', function() {
+            var woeid = $(this).attr('data-woeid');
+            var place = $(this).text();
+            console.log(place + ' = ' + woeid);
+            if (woeid) {
+                updatePlace(place);
+                /// TODO - render trends by woeid
+            }
+        });
         $('#select-geo').on('click', function() {
             $('#myModal').modal('toggle');
         });
@@ -304,6 +314,10 @@ function getSentimentStyle(score) {
 
         function showSentimentCounters() {
             #call(TWReader.UIBroker.ShowEC())#
+        }
+
+        function updatePlace(place) {
+            $("#select-geo-location").text(place);
         }
 
         $(document).on("click", "#trends-table .trend-name", function () {
