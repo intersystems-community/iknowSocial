@@ -128,7 +128,8 @@ internal entry for fetching trends collectiotable</Description>
         trends = hardcodedTrends.length ? hardcodedTrends : [];
         trends = trends.concat((#(response)#).trends);
         updatePlace('#(city)#','#(country)#');
-        drawList('#(tableName)#', trends, '#');
+        //drawList('#(tableName)#', trends, '#');
+        updateTrends(trends);
     >
 ]]></Implementation>
 </Method>

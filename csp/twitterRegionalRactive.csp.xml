@@ -98,16 +98,18 @@
             </div>
         </div> 
 
-        <div class="Trends module trends">
+        <!-- div class="Trends module trends">
             <div class="trends-inner flex-module trends-container">
                 <div class="flex-module-inner" >
                     <ul class="trend-items js-trends"  id="trends-table"></ul>
                 </div>
             </div>
-        </div>
+        </div -->
+        
+        <div id="trends-container"></div>
     </div>
 
-<div id="tweets-container" class="col-md-9"></div>
+    <div id="tweets-container" class="col-md-9"></div>
 
 <script language="JavaScript">
 
@@ -141,6 +143,19 @@ function getSentimentStyle(score) {
 
 </script>
 
+<script id='trends-template' type='text/ractive'>
+<div class="Trends module trends">
+    <div class="trends-inner flex-module trends-container">
+        <div class="flex-module-inner">
+            <ul class="trend-items js-trends" id="trends-table">
+            {{#trendsCollection }}
+                <li class="trend-item js-trend-item  "><a class="js-nav trend-name" href="#" data-fixed="{{fixed}}">{{sourceId}}</a></li>
+            {{/trendsCollection}}
+            </ul>
+        </div>
+    </div>
+</div>
+</script>
 <script id='tweet-template' type='text/ractive'>
 <div class="EmbeddedTweet js-clickToOpenTarget" id="twitter-widget-0" >
     {{#collection }}
@@ -264,7 +279,8 @@ function getSentimentStyle(score) {
         });
 
         var collection = [];
-        var ractive = new Ractive({
+        var trendsCollection = [];
+        var ractiveTweets = new Ractive({
             el: '#tweets-container',
             template: '#tweet-template',
             data: {
@@ -279,6 +295,14 @@ function getSentimentStyle(score) {
                 getSentimentStyle: function(score) {
                     return getSentimentStyle(score);
                 }
+            },
+        });
+
+        var ractiveTrends = new Ractive({
+            el: '#trends-container',
+            template: '#trends-template',
+            data: {
+                trendsCollection: trendsCollection,
             },
         });
         
@@ -298,7 +322,11 @@ function getSentimentStyle(score) {
         }
         
         function updateCollection(collection) {
-            ractive.set('collection', collection);
+            ractiveTweets.set('collection', collection);
+        }
+        
+        function updateTrends(trends) {
+            ractiveTrends.set('trendsCollection', trends);
         }
 
         function showSourcesQuery(query) {
