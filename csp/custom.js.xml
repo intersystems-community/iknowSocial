@@ -55,28 +55,6 @@ function drawTable(tableId, tableObject, meta, link) {
 
 }
 
-function drawList(tableId, tableObject, link, max) {
-    $(tableId).html("");
-    if (typeof max === 'undefined') {
-        max = 10;
-    }
-    link = typeof link !== 'undefined' ? link : "#show-source-id-modal"
-    var i = 0;
-    for (i in tableObject) {
-        drawTrendItem(tableId, tableObject[i], link);
-        if (++i > max )
-            return;
-    }
-}
-
-
-function drawTrendItem(listId, object, link) {
-    $(listId).append(
-        $('<li class="trend-item js-trend-item  "><a class="js-nav trend-name" href="' + link + '">'+ 
-            object['sourceId'] + '</a></li>') 
-    );
-}
-
 function drawSimpleRow(tableId, rowObject, meta) {
     $('<tr scope="row" ></tr>').appendTo(tableId + " tbody");
     for (var i = 0; i < meta.length; i++) {

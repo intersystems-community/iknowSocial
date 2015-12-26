@@ -98,14 +98,6 @@
             </div>
         </div> 
 
-        <!-- div class="Trends module trends">
-            <div class="trends-inner flex-module trends-container">
-                <div class="flex-module-inner" >
-                    <ul class="trend-items js-trends"  id="trends-table"></ul>
-                </div>
-            </div>
-        </div -->
-        
         <div id="trends-container"></div>
     </div>
 
