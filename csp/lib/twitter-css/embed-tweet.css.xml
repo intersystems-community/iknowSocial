@@ -1019,6 +1019,9 @@ ul.Tweet-actions {
     line-height: inherit;
     padding: 15px;
 }
+a.trend-name[data-fixed=true] {
+    color: #a94442;
+}
 
 ol, ul {
     margin: 0;
@@ -1071,5 +1074,6 @@ ol, ul {
     /* border-right: 1px solid #e1e8ed  !important; */
     /* border-top: 1px solid #e1e8ed !important; */
     border-bottom: 1px solid #e1e8ed !important;
-}]]></CSP>
+}
+]]></CSP>
 </Export>

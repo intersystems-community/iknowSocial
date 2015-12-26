@@ -141,7 +141,11 @@ function getSentimentStyle(score) {
         <div class="flex-module-inner">
             <ul class="trend-items js-trends" id="trends-table">
             {{#trendsCollection }}
-                <li class="trend-item js-trend-item  "><a class="js-nav trend-name" href="#" data-fixed="{{fixed}}">{{sourceId}}</a></li>
+                <li class="trend-item js-trend-item  ">
+                <a class="js-nav trend-name" href="#" data-fixed="{{fixed}}">{{sourceId}}
+                <span class="{{ fixed ? 'glyphicon glyphicon-asterisk' : ''}}" aria-hidden="true"></span>
+                </a>
+                </li>
             {{/trendsCollection}}
             </ul>
         </div>

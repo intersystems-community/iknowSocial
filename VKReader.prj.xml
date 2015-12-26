@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2015-12-23 00:24:07.846604" Target="##class(Util.Data.EmojiType).LoadCSV(&quot;C:\Users\Timur\Documents\Intersystems\unicode-emoticons-sentiment-score.csv&quot;)" TargetType="0">
+<Project name="VKReader" LastModified="2015-12-26 03:47:10.815114" Target="##class(TWReader.UIBroker).FetchTrendsCollection(,2122265,&quot;Moscow&quot;,&quot;Russia&quot;)" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
@@ -30,13 +30,5 @@
     <ProjectItem name="csp/vkfb/twitterRegional.CSP" type="CSP"></ProjectItem>
     <ProjectItem name="csp/vkfb/twitterRegionalRactive.CSP" type="CSP"></ProjectItem>
   </Items>
-  <BreakPoints>
-    <BreakPoint Routine="TWReader.UIBroker.CLS" Offset="Debug+5"></BreakPoint>
-    <BreakPoint Routine="TWReader.UIBroker.CLS" Offset="FetchMorePosts+6"></BreakPoint>
-    <BreakPoint Routine="TWReader.UIBroker.CLS" Offset="SaveMorePostsByCoords+7"></BreakPoint>
-    <BreakPoint Routine="Util.Data.Context.CLS" Offset="%OnNew+1"></BreakPoint>
-    <BreakPoint Routine="Util.Data.Context.CLS" Offset="Rebuild+11"></BreakPoint>
-    <BreakPoint Routine="Util.Data.EmojiType.CLS" Offset="LoadCSV+2"></BreakPoint>
-  </BreakPoints>
 </Project>
 </Export>
