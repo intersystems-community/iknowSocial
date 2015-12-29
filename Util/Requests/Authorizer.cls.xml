@@ -8,22 +8,22 @@ This is read-only Twitter application - it can not POST, only GET</Description>
 
 <Parameter name="ConsumerKey">
 <Type>%String</Type>
-<Default>8bgOxI4bW8DbgU3wEM3081MZ7</Default>
+<Default>RcC65GyigLPx27HKmTUkTx8BZ</Default>
 </Parameter>
 
 <Parameter name="ConsumerSecret">
 <Type>%String</Type>
-<Default>eQQRbMm6B26cfWDBVfHQYN6P1VDfzBBr1QNlFhIcmVl0Rhth2Y</Default>
+<Default>WcxZAqCVtIc65amsi806gavyJnHYlUuzujT65rh2NvrumKFrQM</Default>
 </Parameter>
 
 <Parameter name="AccessToken">
 <Type>%String</Type>
-<Default>347842808-IWq1pklWuC271Vwy7j049tE6FbScrRYv76zDRQMI</Default>
+<Default>244577254-6ObYaMbrpwcUxd1EQi7wFt0r3qClyYLtOEW14YFA</Default>
 </Parameter>
 
 <Parameter name="AccessTokenSecret">
 <Type>%String</Type>
-<Default>U9sitaj34McyYog6Jfp7VOyC8wcOAfzN8AAcbwVkIHCEf</Default>
+<Default>FvHybQAkF7pWGUUVZBm3iyB1MCrOEUBCvM7vmP1Lf63rH</Default>
 </Parameter>
 
 <Parameter name="RandomStringSize">

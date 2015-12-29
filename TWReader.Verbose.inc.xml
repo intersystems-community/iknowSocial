@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Routine name="TWReader.Verbose" type="INC"><![CDATA[
+#; 3 - verbose headers only
+#; 2 - verbose output to devices
+#; 1 - no actual connect - test mode
+#; 0 - no log (default mode)
+#define HTTPLOGLEVEL 2
+]]></Routine>
+</Export>

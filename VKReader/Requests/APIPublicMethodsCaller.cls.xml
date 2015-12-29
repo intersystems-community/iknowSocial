@@ -24,12 +24,12 @@ This class is actually API wrapper (with some properties disabled) for VK API.</
 <Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	do parameters.SetAt(..#APIVersion, "v")
-	set status = ##class(Util.Requests.RequestSender).SendHttpRequest(,"method/" _ method, parameters, .responseData)
-	quit:$$$ISERR(status) status
-	
-	set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, , .response)
-	quit status
+    do parameters.SetAt(..#APIVersion, "v")
+    set status = ##class(Util.Requests.RequestSender).SendHttpRequest(,"method/" _ method, parameters, .responseData)
+    quit:$$$ISERR(status) status
+    
+    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(responseData, /*$$$HTTPLOGLEVEL*/, .response)
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -39,13 +39,13 @@ This class is actually API wrapper (with some properties disabled) for VK API.</
 <Private>1</Private>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if (object.error '= "") {
-		set errorMessage = object.error."error_msg"
-		set errorCode = object.error."error_code"
-		set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
-		quit status
-	}
-	quit $$$OK
+    if (object.error '= "") {
+        set errorMessage = object.error."error_msg"
+        set errorCode = object.error."error_code"
+        set status = $system.Status.Error(5001, "VK API error: "_errorCode_" "_errorMessage)
+        quit status
+    }
+    quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -62,37 +62,37 @@ For more information see: <a href="http://vk.com/dev/users.get">users.get<a>]]><
 <FormalSpec>*response:%ArrayOfObjects,userIds:%String,fields:%String="",nameCase:%String=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if ($length(userIds) < 1)  || ($length(userIds, ",") > 200) {
-		set status = $system.Status.Error(5001, "Number of user_ids must be positive integer not exceeding 200.")
-		quit status
-	}
-	set parameters = ##class(%ArrayOfDataTypes).%New()
-	do parameters.SetAt(userIds, "user_ids")
-	if (fields '= "") {
-		do parameters.SetAt(fields, "fields")
-	}
-	if (nameCase '= "") {
-		do parameters.SetAt(nameCase, "name_case")
-	}
-	
-	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "users.get", parameters)
-	quit:$$$ISERR(status) status
-	
-	set status = ..CheckAPIError(responseObject)
-	quit:$$$ISERR(status) status
-	
-	set responseObject = responseObject.response
-	set response = ##class(%ArrayOfObjects).%New()
-	for i = 1:1:responseObject.Count() {
-		set userZenProxy = responseObject.GetAt(i)
-		set user = ##class(VKReader.Data.User).%New(userZenProxy)
-		set localStatus = response.SetAt(user, user.ID)
-		set status = $$$ADDSC(status, localStatus)
-	}
-	if ($$$ISERR(status)) {
-		set response = ""
-	}
-	quit status
+    if ($length(userIds) < 1)  || ($length(userIds, ",") > 200) {
+        set status = $system.Status.Error(5001, "Number of user_ids must be positive integer not exceeding 200.")
+        quit status
+    }
+    set parameters = ##class(%ArrayOfDataTypes).%New()
+    do parameters.SetAt(userIds, "user_ids")
+    if (fields '= "") {
+        do parameters.SetAt(fields, "fields")
+    }
+    if (nameCase '= "") {
+        do parameters.SetAt(nameCase, "name_case")
+    }
+    
+    set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "users.get", parameters)
+    quit:$$$ISERR(status) status
+    
+    set status = ..CheckAPIError(responseObject)
+    quit:$$$ISERR(status) status
+    
+    set responseObject = responseObject.response
+    set response = ##class(%ArrayOfObjects).%New()
+    for i = 1:1:responseObject.Count() {
+        set userZenProxy = responseObject.GetAt(i)
+        set user = ##class(VKReader.Data.User).%New(userZenProxy)
+        set localStatus = response.SetAt(user, user.ID)
+        set status = $$$ADDSC(status, localStatus)
+    }
+    if ($$$ISERR(status)) {
+        set response = ""
+    }
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -107,30 +107,30 @@ For more information see: <a href="http://vk.com/dev/database.getCitiesById">dat
 <FormalSpec>*response:%ArrayOfDataTypes,cityIds:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if (($length(cityIds) < 1) || ($length(cityIds, ",") > 1000)) {
-		set status = $system.Status.Error(83, "Number of city_ids must be positive integer not exceeding 1000.")
-		quit status
-	}
-	set parameters = ##class(%ArrayOfDataTypes).%New()
-	do parameters.SetAt(cityIds, "city_ids")
-	
-	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "database.getCitiesById", parameters)
-	quit:$$$ISERR(status) status
-	
-	set status = ..CheckAPIError(responseObject)
-	quit:$$$ISERR(status) status
-	
-	set responseObject = responseObject.response
-	set response = ##class(%ArrayOfDataTypes).%New()
-	for i = 1:1:responseObject.Count() {
-		set city = responseObject.GetAt(i)
-		set localStatus = response.SetAt(city.title, city.id)
-		set status = $$$ADDSC(status, localStatus)
-	}
-	if ($$$ISERR(status)) {
-		set response = ""
-	}
-	quit status
+    if (($length(cityIds) < 1) || ($length(cityIds, ",") > 1000)) {
+        set status = $system.Status.Error(83, "Number of city_ids must be positive integer not exceeding 1000.")
+        quit status
+    }
+    set parameters = ##class(%ArrayOfDataTypes).%New()
+    do parameters.SetAt(cityIds, "city_ids")
+    
+    set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "database.getCitiesById", parameters)
+    quit:$$$ISERR(status) status
+    
+    set status = ..CheckAPIError(responseObject)
+    quit:$$$ISERR(status) status
+    
+    set responseObject = responseObject.response
+    set response = ##class(%ArrayOfDataTypes).%New()
+    for i = 1:1:responseObject.Count() {
+        set city = responseObject.GetAt(i)
+        set localStatus = response.SetAt(city.title, city.id)
+        set status = $$$ADDSC(status, localStatus)
+    }
+    if ($$$ISERR(status)) {
+        set response = ""
+    }
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -142,19 +142,19 @@ For more information see: <a href="http://vk.com/dev/utils.resolveScreenName">ut
 <FormalSpec>*type:%String,*objectId:%String,screenName:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set parameters = ##class(%ArrayOfDataTypes).%New()
-	do parameters.SetAt(screenName, "screen_name")
-	
-	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "utils.resolveScreenName", parameters)
-	quit:$$$ISERR(status) status
-	
-	set status = ..CheckAPIError(responseObject)
-	quit:$$$ISERR(status) status
-	
-	set responseObject = responseObject.response
-	set type = responseObject.type
-	set objectId = responseObject."object_id"
-	quit status
+    set parameters = ##class(%ArrayOfDataTypes).%New()
+    do parameters.SetAt(screenName, "screen_name")
+    
+    set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "utils.resolveScreenName", parameters)
+    quit:$$$ISERR(status) status
+    
+    set status = ..CheckAPIError(responseObject)
+    quit:$$$ISERR(status) status
+    
+    set responseObject = responseObject.response
+    set type = responseObject.type
+    set objectId = responseObject."object_id"
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -173,60 +173,60 @@ For more information see: <a href="http://vk.com/dev/wall.get">wall.get</a>]]></
 <FormalSpec>*response:%ListOfObjects,ownerId:%String="",domain:%String="",offset:%String=0,filter:%String="",count:%Integer=1</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if (($length(domain) > 0) && ($length(ownerId) > 0)) {
-		set status = $system.Status.Error(5001, "'ownerId' and 'domain' can not be specified simultaneously.")
-		quit status
-	}
-	if ((ownerId = "") && (domain = "")) {
-		set status = $system.Status.Error(5001, "At least one of 'onwerId' and 'domain' arguments must be specified")
-		quit status
-	}
-	if (($length(filter) > 0) && (filter '= "all") && (filter '= "others") && (filter '= "owner") && (filter '= "postponed") && (filter '= "suggests")) {
-		set status = $system.Status.Error(5001, "Invalid value passed as filter.")
-		quit status
-	}
-	set parameters = ##class(%ArrayOfDataTypes).%New()
-	if (ownerId '= "") {
-		set status = ##class(Util.Misc).IsInteger(ownerId)
-		if ($$$ISERR(status)) {
-			set status = $system.Status.Error(5001, "'ownerId' has non-integer value.")
-			quit status
-		}
-		do parameters.SetAt(ownerId, "owner_id")
-	} else {
-		do parameters.SetAt(domain, "domain")
-	} 
-	if (offset '= 0) {
-		do parameters.SetAt(offset, "offset")
-	}
-	if ($length(filter) > 0) {
-		do parameters.SetAt(filter, "filter")
-	}
-	if (##class(Util.Misc).IsInteger(count) && (count > 0)) {
-		do parameters.SetAt(count, "count")
-	} else {
-		set status = $system.Status.Error(5001, "'count' value must be positive integer")
-		quit status
-	}
-	
-	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "wall.get", parameters)
-	quit:$$$ISERR(status) status
-	
-	set status = ..CheckAPIError(responseObject)
-	quit:$$$ISERR(status) status
-	
-	set responseObject = responseObject.response.items
-	set response = ##class(%ListOfObjects).%New()
-	for i = 1:1:responseObject.Count() {
-		set postZenProxy = responseObject.GetAt(i)
-		set post = ##class(VKReader.Data.Post).%New(postZenProxy)
-		set localStatus = response.Insert(post)
-		set status = $$$ADDSC(status, localStatus)
-	}
-	if ($$$ISERR(status)) {
-		set response = ""
-	}
-	quit status
+    if (($length(domain) > 0) && ($length(ownerId) > 0)) {
+        set status = $system.Status.Error(5001, "'ownerId' and 'domain' can not be specified simultaneously.")
+        quit status
+    }
+    if ((ownerId = "") && (domain = "")) {
+        set status = $system.Status.Error(5001, "At least one of 'onwerId' and 'domain' arguments must be specified")
+        quit status
+    }
+    if (($length(filter) > 0) && (filter '= "all") && (filter '= "others") && (filter '= "owner") && (filter '= "postponed") && (filter '= "suggests")) {
+        set status = $system.Status.Error(5001, "Invalid value passed as filter.")
+        quit status
+    }
+    set parameters = ##class(%ArrayOfDataTypes).%New()
+    if (ownerId '= "") {
+        set status = ##class(Util.Misc).IsInteger(ownerId)
+        if ($$$ISERR(status)) {
+            set status = $system.Status.Error(5001, "'ownerId' has non-integer value.")
+            quit status
+        }
+        do parameters.SetAt(ownerId, "owner_id")
+    } else {
+        do parameters.SetAt(domain, "domain")
+    } 
+    if (offset '= 0) {
+        do parameters.SetAt(offset, "offset")
+    }
+    if ($length(filter) > 0) {
+        do parameters.SetAt(filter, "filter")
+    }
+    if (##class(Util.Misc).IsInteger(count) && (count > 0)) {
+        do parameters.SetAt(count, "count")
+    } else {
+        set status = $system.Status.Error(5001, "'count' value must be positive integer")
+        quit status
+    }
+    
+    set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "wall.get", parameters)
+    quit:$$$ISERR(status) status
+    
+    set status = ..CheckAPIError(responseObject)
+    quit:$$$ISERR(status) status
+    
+    set responseObject = responseObject.response.items
+    set response = ##class(%ListOfObjects).%New()
+    for i = 1:1:responseObject.Count() {
+        set postZenProxy = responseObject.GetAt(i)
+        set post = ##class(VKReader.Data.Post).%New(postZenProxy)
+        set localStatus = response.Insert(post)
+        set status = $$$ADDSC(status, localStatus)
+    }
+    if ($$$ISERR(status)) {
+        set response = ""
+    }
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -246,61 +246,61 @@ For more information see: <a href="http://vk.com/dev/wall.search">wall.search</a
 <FormalSpec>*response:%ListOfObjects,query:%String,ownerId:%String="",domain:%String="",offset:%String=0,ownersOnly:%String=0,count:%Integer=1</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if (($length(domain) > 0) && ($length(ownerId) > 0)) {
-		set status = $system.Status.Error(5001, "'ownerId' and 'domain' can not be specified simultaneously.")
-		quit status
-	}
-	if ((ownerId = "") && (domain = "")) {
-		set status = $system.Status.Error(5001, "At least one of 'onwerId' and 'domain' arguments must be specified")
-		quit status
-	}
-	set parameters = ##class(%ArrayOfDataTypes).%New()
-	if (ownerId '= "") {
-		set status = ##class(Util.Misc).IsInteger(ownerId)
-		if ($$$ISERR(status)) {
-			set status = $system.Status.Error(5001, "'ownerId' has non-integer value.")
-			quit status
-		}
-		do parameters.SetAt(ownerId, "owner_id")
-	} else {
-		do parameters.SetAt(domain, "domain")
-	} 
-	if (offset '= 0) {
-		do parameters.SetAt(offset, "offset")
-	}
-	do parameters.SetAt(query, "query")
-	if (ownersOnly '= 0) {
-		if (ownersOnly '= 1) {
-			set status = $system.Status.Error(5001, "ownersOnly must have boolean value.")
-			quit status
-		}
-		do parameters.SetAt(ownersOnly, "owners_only")
-	}
-	if (##class(Util.Misc).IsInteger(count) && (count > 0)) {
-		do parameters.SetAt(count, "count")
-	} else {
-		set status = $system.Status.Error(5001, "'count' value must be positive integer")
-		quit status
-	}
-	
-	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "wall.search", parameters)
-	quit:$$$ISERR(status) status
-	
-	set status = ..CheckAPIError(responseObject)
-	quit:$$$ISERR(status) status
-	
-	set responseObject = responseObject.response.items
-	set response = ##class(%ListOfObjects).%New()
-	for i = 1:1:responseObject.Count() {
-		set postZenProxy = responseObject.GetAt(i)
-		set post = ##class(VKReader.Data.Post).%New(postZenProxy)
-		set localStatus = response.Insert(post)
-		set status = $$$ADDSC(status, localStatus)
-	}
-	if ($$$ISERR(status)) {
-		set response = ""
-	}
-	quit status
+    if (($length(domain) > 0) && ($length(ownerId) > 0)) {
+        set status = $system.Status.Error(5001, "'ownerId' and 'domain' can not be specified simultaneously.")
+        quit status
+    }
+    if ((ownerId = "") && (domain = "")) {
+        set status = $system.Status.Error(5001, "At least one of 'onwerId' and 'domain' arguments must be specified")
+        quit status
+    }
+    set parameters = ##class(%ArrayOfDataTypes).%New()
+    if (ownerId '= "") {
+        set status = ##class(Util.Misc).IsInteger(ownerId)
+        if ($$$ISERR(status)) {
+            set status = $system.Status.Error(5001, "'ownerId' has non-integer value.")
+            quit status
+        }
+        do parameters.SetAt(ownerId, "owner_id")
+    } else {
+        do parameters.SetAt(domain, "domain")
+    } 
+    if (offset '= 0) {
+        do parameters.SetAt(offset, "offset")
+    }
+    do parameters.SetAt(query, "query")
+    if (ownersOnly '= 0) {
+        if (ownersOnly '= 1) {
+            set status = $system.Status.Error(5001, "ownersOnly must have boolean value.")
+            quit status
+        }
+        do parameters.SetAt(ownersOnly, "owners_only")
+    }
+    if (##class(Util.Misc).IsInteger(count) && (count > 0)) {
+        do parameters.SetAt(count, "count")
+    } else {
+        set status = $system.Status.Error(5001, "'count' value must be positive integer")
+        quit status
+    }
+    
+    set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "wall.search", parameters)
+    quit:$$$ISERR(status) status
+    
+    set status = ..CheckAPIError(responseObject)
+    quit:$$$ISERR(status) status
+    
+    set responseObject = responseObject.response.items
+    set response = ##class(%ListOfObjects).%New()
+    for i = 1:1:responseObject.Count() {
+        set postZenProxy = responseObject.GetAt(i)
+        set post = ##class(VKReader.Data.Post).%New(postZenProxy)
+        set localStatus = response.Insert(post)
+        set status = $$$ADDSC(status, localStatus)
+    }
+    if ($$$ISERR(status)) {
+        set response = ""
+    }
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -317,65 +317,65 @@ For more information see: <a href="http://vk.com/dev/newsfeed.search">newsfeed.s
 <ClassMethod>1</ClassMethod>
 <FormalSpec>*response:%ListOfObjects,query:%String,count:%Integer=1,latitude:%Numeric="",longitude:%Numeric="",startDate:%Date="",startTime:%Time="",endDate:%Date="",endTime:%Time=""</FormalSpec>
 <Implementation><![CDATA[
-	set parameters = ##class(%ArrayOfDataTypes).%New()
-	do parameters.SetAt(query, "q")
-	if (##class(Util.Misc).IsInteger(count) && (count > 0)) {
-		do parameters.SetAt(count, "count")
-	} else {
-		set status = $system.Status.Error(5001, "'count' value must be positive integer")
-		quit status
-	}
-	if ($length(latitude) > 0) {
-		if ($isvalidnum(latitude) && (latitude <= 90) && (latitude >= -90)) {
-			do parameters.SetAt(latitude, "latitude")
-		} else {
-			set status = $system.Status.Error(5001, "'latitude' value must be double from [-90; 90] segment.")
-			quit status
-		}
-	}
-	if ($length(longitude) > 0) {
-		if ($isvalidnum(longitude) && (longitude <= 180) && (longitude >= -180)) {
-			do parameters.SetAt(longitude, "longitude")
-		} else {
-			set status = $system.Status.Error(5001, "'longitude' value must be double from [-180; 180] segment.")
-			quit status
-		}
-	}
-	if (($length(startDate) > 0) && ($length(startTime) > 0)) {
-		if (##class(Util.Misc).IsValidDateAndTime(startDate, startTime)) {
-			do parameters.SetAt(##class(Util.Misc).ConvertHorologToUnixTime(startDate, startTime), "start_time")
-		} else {
-			set status = $system.Status.Error(5001, "Incorrect time value passed for <startDate, startTime>.")
-			quit status
-		}
-	}
-	if (($length(endDate) > 0) && ($length(endTime) > 0)) {
-		if (##class(Util.Misc).IsValidDateAndTime(endDate, endTime)) {
-			do parameters.SetAt(##class(Util.Misc).ConvertHorologToUnixTime(endDate, endTime), "end_time")
-		} else {
-			set status = $system.Status.Error(5001, "Incorrect time value passed for <endDate, endTime>.")
-			quit status
-		}
-	}
-	
-	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "newsfeed.search", parameters)
-	quit:$$$ISERR(status) status
-	
-	set status = ..CheckAPIError(responseObject)
-	quit:$$$ISERR(status) status
-	
-	set responseObject = responseObject.response.items
-	set response = ##class(%ListOfObjects).%New()
-	for i = 1:1:responseObject.Count() {
-		set postZenProxy = responseObject.GetAt(i)
-		set post = ##class(VKReader.Data.Post).%New(postZenProxy)
-		set localStatus = response.Insert(post)
-		set status = $$$ADDSC(status, localStatus)
-	}
-	if ($$$ISERR(status)) {
-		set response = ""
-	}
-	quit status
+    set parameters = ##class(%ArrayOfDataTypes).%New()
+    do parameters.SetAt(query, "q")
+    if (##class(Util.Misc).IsInteger(count) && (count > 0)) {
+        do parameters.SetAt(count, "count")
+    } else {
+        set status = $system.Status.Error(5001, "'count' value must be positive integer")
+        quit status
+    }
+    if ($length(latitude) > 0) {
+        if ($isvalidnum(latitude) && (latitude <= 90) && (latitude >= -90)) {
+            do parameters.SetAt(latitude, "latitude")
+        } else {
+            set status = $system.Status.Error(5001, "'latitude' value must be double from [-90; 90] segment.")
+            quit status
+        }
+    }
+    if ($length(longitude) > 0) {
+        if ($isvalidnum(longitude) && (longitude <= 180) && (longitude >= -180)) {
+            do parameters.SetAt(longitude, "longitude")
+        } else {
+            set status = $system.Status.Error(5001, "'longitude' value must be double from [-180; 180] segment.")
+            quit status
+        }
+    }
+    if (($length(startDate) > 0) && ($length(startTime) > 0)) {
+        if (##class(Util.Misc).IsValidDateAndTime(startDate, startTime)) {
+            do parameters.SetAt(##class(Util.Misc).ConvertHorologToUnixTime(startDate, startTime), "start_time")
+        } else {
+            set status = $system.Status.Error(5001, "Incorrect time value passed for <startDate, startTime>.")
+            quit status
+        }
+    }
+    if (($length(endDate) > 0) && ($length(endTime) > 0)) {
+        if (##class(Util.Misc).IsValidDateAndTime(endDate, endTime)) {
+            do parameters.SetAt(##class(Util.Misc).ConvertHorologToUnixTime(endDate, endTime), "end_time")
+        } else {
+            set status = $system.Status.Error(5001, "Incorrect time value passed for <endDate, endTime>.")
+            quit status
+        }
+    }
+    
+    set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "newsfeed.search", parameters)
+    quit:$$$ISERR(status) status
+    
+    set status = ..CheckAPIError(responseObject)
+    quit:$$$ISERR(status) status
+    
+    set responseObject = responseObject.response.items
+    set response = ##class(%ListOfObjects).%New()
+    for i = 1:1:responseObject.Count() {
+        set postZenProxy = responseObject.GetAt(i)
+        set post = ##class(VKReader.Data.Post).%New(postZenProxy)
+        set localStatus = response.Insert(post)
+        set status = $$$ADDSC(status, localStatus)
+    }
+    if ($$$ISERR(status)) {
+        set response = ""
+    }
+    quit status
 ]]></Implementation>
 </Method>
 
@@ -384,34 +384,34 @@ For more information see: <a href="http://vk.com/dev/newsfeed.search">newsfeed.s
 <FormalSpec>*response:%ArrayOfObjects,groupIds:%String,fields:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	if ($length(groupIds) < 1)  || ($length(groupIds, ",") > 200) {
-		set status = $system.Status.Error(5001, "Number of group_ids must be positive integer not exceeding 200.")
-		quit status
-	}
-	set parameters = ##class(%ArrayOfDataTypes).%New()
-	do parameters.SetAt(groupIds, "group_ids")
-	if (fields '= "") {
-		do parameters.SetAt(fields, "fields")
-	}
-	
-	set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "groups.getById", parameters)
-	quit:$$$ISERR(status) status
-	
-	set status = ..CheckAPIError(responseObject)
-	quit:$$$ISERR(status) status
-	
-	set responseObject = responseObject.response
-	set response = ##class(%ArrayOfObjects).%New()
-	for i = 1:1:responseObject.Count() {
-		set groupZenProxy = responseObject.GetAt(i)
-		set group = ##class(VKReader.Data.Group).%New(groupZenProxy)
-		set localStatus = response.SetAt(group, group.ID)
-		set status = $$$ADDSC(status, localStatus)
-	}
-	if ($$$ISERR(status)) {
-		set response = ""
-	}
-	quit status
+    if ($length(groupIds) < 1)  || ($length(groupIds, ",") > 200) {
+        set status = $system.Status.Error(5001, "Number of group_ids must be positive integer not exceeding 200.")
+        quit status
+    }
+    set parameters = ##class(%ArrayOfDataTypes).%New()
+    do parameters.SetAt(groupIds, "group_ids")
+    if (fields '= "") {
+        do parameters.SetAt(fields, "fields")
+    }
+    
+    set status = ..RetrieveProxyObjectFromAPIRequest(.responseObject, "groups.getById", parameters)
+    quit:$$$ISERR(status) status
+    
+    set status = ..CheckAPIError(responseObject)
+    quit:$$$ISERR(status) status
+    
+    set responseObject = responseObject.response
+    set response = ##class(%ArrayOfObjects).%New()
+    for i = 1:1:responseObject.Count() {
+        set groupZenProxy = responseObject.GetAt(i)
+        set group = ##class(VKReader.Data.Group).%New(groupZenProxy)
+        set localStatus = response.SetAt(group, group.ID)
+        set status = $$$ADDSC(status, localStatus)
+    }
+    if ($$$ISERR(status)) {
+        set response = ""
+    }
+    quit status
 ]]></Implementation>
 </Method>
 </Class>

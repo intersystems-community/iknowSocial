@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.Streaming.Api">
+<Super>TWReader.Rest.Api</Super>
+<TimeCreated>63915,60460.976583</TimeCreated>
+
+<Parameter name="ApiServer">
+<Default>stream.twitter.com</Default>
+</Parameter>
+</Class>
+</Export>
