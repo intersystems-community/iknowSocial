@@ -32,7 +32,7 @@
     #dim trend As TWReader.Data.Trend = ##class(TWReader.Data.Trend).CreateOrOpenId(query)
     set status = trend.%Save() quit:$$$ISERR(status)
 
-    set status = ##class(TWReader.Requests.Api).TweetsSearch(.response, 
+    set status = ##class(TWReader.Rest.Api).TweetsSearch(.response, 
                                                              $lb(query, count, checkExists, 
                                                                  startDate, startTime, endDate, endTime))
     quit:$$$ISERR(status) status

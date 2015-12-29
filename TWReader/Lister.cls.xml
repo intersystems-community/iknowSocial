@@ -59,7 +59,7 @@ this Lister will also retrieve and populate mentioned above metadata fields. In 
     set endTime = $lg(listparams, 7)
     //set requestType = "popular" 
     
-    set status = ##class(TWReader.Requests.Api).TweetsSearch(.response, listparams)
+    set status = ##class(TWReader.Rest.Api).TweetsSearch(.response, listparams)
     quit:$$$ISERR(status) status
     
     do ..RegisterMetadataKeys($lb("Query", "PostDate", "PostTime", "AuthorID", "AuthorCity", "AuthorCountry", "PostLatitude", "PostLongitude"))

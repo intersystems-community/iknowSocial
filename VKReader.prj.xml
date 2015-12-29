@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2015-12-26 03:47:10.815114" Target="##class(TWReader.UIBroker).FetchTrendsCollection(,2122265,&quot;Moscow&quot;,&quot;Russia&quot;)" TargetType="0">
+<Project name="VKReader" LastModified="2015-12-29 16:21:10.436587" Target="##class(TWReader.UIBroker).FetchTrendsCollection(,2122265,&quot;Moscow&quot;,&quot;Russia&quot;)" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
