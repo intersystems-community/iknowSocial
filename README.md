@@ -26,6 +26,9 @@ domain with russian iKnow configuration and sets stemming for this domain.
 
 
 ###LoadingTask
-Open Cache' Management Portal->System Operation->Task Manager->Import Tasks.
-Import tasks from a file LoadTweetsTask.xml.
-Open Portal->System Operation->Task Manager->Task Schedule. Task name is "LoadTweets" 
+~~Open Cache' Management Portal->System Operation->Task Manager->Import Tasks.
+Import tasks from a file LoadTweetsTask.xml.~~
+~~Open Portal->System Operation->Task Manager->Task Schedule. Task name is "LoadTweets"~~
+
+There is no LoadTweets task at the moment - background tweets fetch support will be reimplemented as 
+part of upcoming streamin API support.
