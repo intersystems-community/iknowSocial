@@ -71,7 +71,7 @@ This is read-only Twitter application - it can not POST, only GET</Description>
     if ((asciiCode >= $ascii("0")) && (asciiCode <= $ascii("9"))) {
         quit 1
     }
-    if ((asciiCode >= $ascii("A")) && (asciiCode <= $ascii("90"))) {
+    if ((asciiCode >= $ascii("A")) && (asciiCode <= $ascii("Z"))) {
         quit 1
     }
     if ((asciiCode >= $ascii("a")) && (asciiCode <= $ascii("z"))) {
