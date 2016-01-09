@@ -44,7 +44,7 @@ This is read-only Twitter application - it can not POST, only GET</Description>
 
 <Parameter name="HeaderPrefix">
 <Type>%string</Type>
-<Default>Oauth</Default>
+<Default>OAuth</Default>
 </Parameter>
 
 <Property name="Nonce">
@@ -136,15 +136,6 @@ This is read-only Twitter application - it can not POST, only GET</Description>
     do h.SetAt(..#AccessToken,  "oauth_token")
     do h.SetAt(..#OauthVersion, "oauth_version")
     quit h
-]]></Implementation>
-</Method>
-
-<Method name="DumpOauthParameters">
-<Implementation><![CDATA[
-    write "OAuth parameters:",!
-    for param="oauth_consumer_key","oauth_nonce","oauth_signature_method", "oauth_timestamp", "oauth_token", "oauth_version" {
-        write ?4, param, ":", !
-    }
 ]]></Implementation>
 </Method>
 

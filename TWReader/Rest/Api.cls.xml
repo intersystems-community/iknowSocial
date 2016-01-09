@@ -173,12 +173,13 @@ for more details about application signature)]]></Description>
         if $length(apiUrl, "?")>1 {
             set $lb(apiUrl, apiParams) = $lfs(apiUrl, "?")
         }
-    }
-    for i=1:1:$length(apiParams,"&") {
-        set param = $piece(apiParams,"&", i)
-        #dim arg As %String     = $piece(param,"=",1)
-        #dim value As %String   = $piece(param,"=",*)
-        do array.SetAt(value, arg)
+    } else {
+        for i=1:1:$length(apiParams,"&") {
+            set param = $piece(apiParams,"&", i)
+            #dim arg As %String     = $piece(param,"=",1)
+            #dim value As %String   = $piece(param,"=",*)
+            do array.SetAt(value, arg)
+        }
     }
     #dim jsonContent As %String
     #dim status As %Status = ..CallApiArgs(..#ApiServer, apiUrl, array, .jsonContent)
@@ -186,7 +187,7 @@ for more details about application signature)]]></Description>
 
     // ok - now we have json in text, but it won't be readable much
     // let's try to parse it to object and then output in readable form
-        #dim proxyObject As %ZEN.proxyObject
+    #dim proxyObject As %ZEN.proxyObject
     set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(jsonContent, ,.proxyObject)
     quit:$$$ISERR(status) status
     
