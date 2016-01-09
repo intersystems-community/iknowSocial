@@ -18,8 +18,13 @@ Holds name of SSL configuration to use with https-request (set it to the one fro
 1 => request printout, no request. 
 2 => request printout and request made.
 3 => request made, no printout at all.]]></Description>
-<Default>3</Default>
+<Default>2</Default>
 </Parameter>
+
+<Method name="DumpArgs">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Args:%Library.ArrayOfDataTypes</FormalSpec>
+</Method>
 
 <Method name="SendHttpRequest">
 <Description>
@@ -35,8 +40,7 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
     set req.Server = server
     set req.Https = 1
     set req.SSLConfiguration = ..#SSLConfigurationName
-    if (authorization '= "")
-    {
+    if (authorization '= "") {
         set req.Authorization = authorization
     }
     
@@ -45,7 +49,21 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
     
     #dim status as %Status = $$$OK
     #dim queryParams As %String = ##class(Util.Requests.RequestMaker).RequestArrayToQueryString(location, parameters)
-    
+    if (requestType >= 2) {
+        write "server: ", server, !
+        write "ssl configuration: ", ..#SSLConfigurationName, !
+        write "authorization: ", authorization, !
+        write "parameters:",!
+        #dim key as %String = ""
+        while (1) {
+            #dim value as %String = parameters.GetNext(.key)
+            quit:key=""  
+            write ?4, key, " = ", value, !
+        }
+
+        write "query params encoded: ", queryParams, !
+    }
+
     do ..AuditNetworkRequest(1, server, queryParams)
     //do ..AuditLog("AuthorizationData", $get(authorization))
     
