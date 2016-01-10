@@ -18,15 +18,22 @@ Holds name of SSL configuration to use with https-request (set it to the one fro
 1 => request printout, no request. 
 2 => request printout and request made.
 3 => request made, no printout at all.]]></Description>
-<Default>2</Default>
+<Default>0</Default>
 </Parameter>
 
 <Method name="%OnHttpReceive">
 <FormalSpec>Data:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+    #dim status As %Status = $$$OK
     set oldIO = $IO use 0
-    write "[received]:", Data, !
+    #dim proxyObject As %ZEN.proxyObject
+    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(Data, ,.proxyObject)
+    goto:$$$ISERR(status) close
+    
+    // write indented (in a readable form) to the screen
+    do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(proxyObject)
+close
     use oldIO
     return $$$OK
 ]]></Implementation>
