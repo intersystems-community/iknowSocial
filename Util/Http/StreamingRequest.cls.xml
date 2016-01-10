@@ -1080,9 +1080,9 @@ device after the Get. This can be used to check that it will send what you are e
 This calls <METHOD>Reset</METHOD> automatically after reading the response, except
 in <var>test</var>=1 mode or if <var>reset</var>=0.]]></Description>
 <CodeMode>expression</CodeMode>
-<FormalSpec>location:%String="",test:%Integer=0,reset:%Boolean=1</FormalSpec>
+<FormalSpec>location:%String="",test:%Integer=0,reset:%Boolean=1,callback:Util.Http.IChunkCallback=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[..Send("GET",location,test,reset)
+<Implementation><![CDATA[..Send("GET",location,test,reset,callback)
 ]]></Implementation>
 </Method>
 
@@ -1101,9 +1101,9 @@ device after the Post. This can be used to check that it will send what you are 
 This calls <METHOD>Reset</METHOD> automatically after reading the response, except
 in <var>test</var>=1 mode or if <var>reset</var>=0.]]></Description>
 <CodeMode>expression</CodeMode>
-<FormalSpec>location:%String="",test:%Integer=0,reset:%Boolean=1</FormalSpec>
+<FormalSpec>location:%String="",test:%Integer=0,reset:%Boolean=1,callback:Util.Http.IChunkCallback=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[..Send("POST",location,test,reset)
+<Implementation><![CDATA[..Send("POST",location,test,reset,callback)
 ]]></Implementation>
 </Method>
 
@@ -1122,9 +1122,9 @@ device after the Put. This can be used to check that it will send what you are e
 This calls <METHOD>Reset</METHOD> automatically after reading the response, except
 in <var>test</var>=1 mode or if <var>reset</var>=0.]]></Description>
 <CodeMode>expression</CodeMode>
-<FormalSpec>location:%String="",test:%Integer=0,reset:%Boolean=1</FormalSpec>
+<FormalSpec>location:%String="",test:%Integer=0,reset:%Boolean=1,callback:Util.Http.IChunkCallback=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[..Send("PUT",location,test,reset)
+<Implementation><![CDATA[..Send("PUT",location,test,reset,callback)
 ]]></Implementation>
 </Method>
 
@@ -1143,9 +1143,9 @@ device after the Head. This can be used to check that it will send what you are 
 This calls <METHOD>Reset</METHOD> automatically after reading the response, except
 in <var>test</var> mode or if <var>reset</var>=0.]]></Description>
 <CodeMode>expression</CodeMode>
-<FormalSpec>location:%String,test:%Integer=0,reset:%Boolean=1</FormalSpec>
+<FormalSpec>location:%String,test:%Integer=0,reset:%Boolean=1,callback:Util.Http.IChunkCallback=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[..Send("HEAD",location,test,reset)
+<Implementation><![CDATA[..Send("HEAD",location,test,reset,callback)
 ]]></Implementation>
 </Method>
 
@@ -1155,7 +1155,7 @@ Method that actually sends HTTP request to the server.
 This is normally called from <method>Get</method>, <method>Post</method>, <method>Put</method>, <method>Head</method>
 but if you wish to use a different HTTP verb you can call this directly passing the <var>type</var> as the verb
 you require.]]></Description>
-<FormalSpec>type:%String,location:%String,test:%Integer=0,reset:%Boolean=1</FormalSpec>
+<FormalSpec>type:%String,location:%String,test:%Integer=0,reset:%Boolean=1,callback:Util.Http.IChunkCallback=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
    Set i%SSLError="",i%SentChars=0,i%RecChars=0
@@ -1380,7 +1380,7 @@ you require.]]></Description>
     Set ..HttpResponse=##class(%Net.HttpResponse).%New()
     If ..ResponseStream'="" Set ..HttpResponse.Data=..ResponseStream
     
-    Set return=..Read(i%Device,i%Timeout,startTime,type)
+    Set return=..Read(i%Device,i%Timeout,startTime,type,callback)
     Set i%TTLC=$zh-startTime
     Use io
     
@@ -1928,7 +1928,7 @@ array(index)=$LB(name,domain,path,value,expires,secure)]]></Description>
 <Method name="Read">
 <Description>
 Internal method used to read the response from the web server into this object.</Description>
-<FormalSpec>device:%String,timeout:%Integer=10,startTime:%Float,type:%String=""</FormalSpec>
+<FormalSpec>device:%String,timeout:%Integer=10,startTime:%Float,type:%String="",callback:Util.Http.IChunkCallback=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     Set return=$$$OK,zerror=$zerror,httpresponse=..HttpResponse,data=httpresponse.Data,eof=$zutil(68,40) Do $zutil(68,40,0)
@@ -2089,6 +2089,14 @@ Internal method used to read the response from the web server into this object.<
         #; *** Content ***
         If state=3 {
             If query'="" {
+                #;TTS+
+                If $isobject(callback) {
+                    // FIXME: uncompress(gunzip) each received line, not whole stream at the end
+                    // FIXME: have to set AcceptGzip=0 to make it working with Twitter Streaming API
+                    Do callback.%OnHttpReceive(query)
+                }
+                #;TTS-
+
                 If gzip {
                     Use filename
                     If $$$isVMS {

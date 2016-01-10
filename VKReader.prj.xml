@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2016-01-09 03:50:58.414954" Target="##class(TWReader.Streaming.Api).DebugApiCall(&quot;/1.1/statuses/filter.json&quot;,&quot;locations=-74,40,-73,41&quot;)" TargetType="0">
+<Project name="VKReader" LastModified="2016-01-10 03:12:27.263278" Target="##class(TWReader.Rest.Api).DebugApiCall(&quot;/1.1/application/rate_limit_status.json&quot;)" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
@@ -32,8 +32,9 @@
     <ProjectItem name="csp/vkfb/twitterRegionalRactive.CSP" type="CSP"></ProjectItem>
   </Items>
   <BreakPoints>
-    <BreakPoint Routine="TWReader.Rest.Api.CLS" Offset="DebugApiCall+5"></BreakPoint>
-    <BreakPoint Routine="Util.Requests.RequestSender.CLS" Offset="SendHttpRequest+22"></BreakPoint>
+    <BreakPoint Routine="Util.Requests.RequestSender.CLS" Offset="SendHttpRequest+7"></BreakPoint>
+    <BreakPoint Routine="Util.Http.StreamingRequest.CLS" Offset="Read+1"></BreakPoint>
+    <BreakPoint Routine="Util.Http.StreamingRequest.CLS" Offset="Read+177"></BreakPoint>
   </BreakPoints>
 </Project>
 </Export>

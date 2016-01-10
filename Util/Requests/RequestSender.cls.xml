@@ -3,7 +3,7 @@
 <Class name="Util.Requests.RequestSender">
 <Description>
 This class provides ability to send https-requests and process their responses conveniently.</Description>
-<Super>%RegisteredObject,Util.AuditHelper</Super>
+<Super>%RegisteredObject,Util.AuditHelper,Util.Http.IChunkCallback</Super>
 <TimeCreated>63524,64364.95359</TimeCreated>
 
 <Parameter name="SSLConfigurationName">
@@ -21,9 +21,27 @@ Holds name of SSL configuration to use with https-request (set it to the one fro
 <Default>2</Default>
 </Parameter>
 
-<Method name="DumpArgs">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>Args:%Library.ArrayOfDataTypes</FormalSpec>
+<Method name="%OnHttpReceive">
+<FormalSpec>Data:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set oldIO = $IO use 0
+    write "[received]:", Data, !
+    use oldIO
+    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="Write">
+<FormalSpec>data:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+#if 0
+    // FIXE - uncomment when inherit from %Stream.TmpCharacter
+    do ..%OnHttpReceive(data)
+    quit ##super(data)
+#endif
+]]></Implementation>
 </Method>
 
 <Method name="SendHttpRequest">
@@ -36,7 +54,8 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
     if (requestType = "") {
         set requestType = ..#RequestTest
     }
-    #dim req as %Net.HttpRequest = ##class(%Net.HttpRequest).%New()
+    // #dim req as %Net.HttpRequest = ##class(%Net.HttpRequest).%New()
+    #dim req as Util.Http.StreamingRequest = ##class(Util.Http.StreamingRequest).%New()
     set req.Server = server
     set req.Https = 1
     set req.SSLConfiguration = ..#SSLConfigurationName
@@ -67,7 +86,18 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
     do ..AuditNetworkRequest(1, server, queryParams)
     //do ..AuditLog("AuthorizationData", $get(authorization))
     
+    set callback = ..%New()
+#if 0
+    // FIXME - still is being buffered till the end
+    set callback.%Location = $name(^||Util.Requests.Global)
+    set callback.RemoveOnClose = $$$OK
+    set req.ResponseStream = callback
     set status = req.Get(queryParams, requestType # 3)
+#else
+    set req.AcceptGzip = 0 ; BUGBUG: otherwise we have uncompressed data only at the end of http request
+    set status = req.Get(queryParams, requestType # 3,,callback)
+#endif
+   
     
     if ($$$ISOK(status)) {
         #dim response as %String = ""

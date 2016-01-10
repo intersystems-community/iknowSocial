@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.Http.IChunkCallback">
+<Description>
+interface class for streaming API callbacks</Description>
+<Abstract>1</Abstract>
+<TimeCreated>63927,5467.783833</TimeCreated>
+
+<Method name="%OnHttpReceive">
+<FormalSpec>Data:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="%OnHttpClose">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    return $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>
