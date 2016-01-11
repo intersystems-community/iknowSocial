@@ -3,7 +3,8 @@
 <Class name="Util.Requests.RequestSender">
 <Description>
 This class provides ability to send https-requests and process their responses conveniently.</Description>
-<Super>%RegisteredObject,Util.AuditHelper,Util.Http.IChunkCallback</Super>
+<IncludeCode>TWReader.Verbose</IncludeCode>
+<Super>%RegisteredObject,Util.AuditHelper</Super>
 <TimeCreated>63524,64364.95359</TimeCreated>
 
 <Parameter name="SSLConfigurationName">
@@ -14,48 +15,19 @@ Holds name of SSL configuration to use with https-request (set it to the one fro
 
 <Parameter name="RequestTest">
 <Description><![CDATA[
+see %Net.Request.Send for <var>test</var> operating modes
 0 => request made, no request printout.
-1 => request printout, no request. 
-2 => request printout and request made.
-3 => request made, no printout at all.]]></Description>
+1 => no request made 
+2 => request printout and request made
+3 => headers printout and request made]]></Description>
 <Default>0</Default>
 </Parameter>
-
-<Method name="%OnHttpReceive">
-<FormalSpec>Data:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    #dim status As %Status = $$$OK
-    set oldIO = $IO use 0
-    #dim proxyObject As %ZEN.proxyObject
-    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(Data, ,.proxyObject)
-    goto:$$$ISERR(status) close
-    
-    // write indented (in a readable form) to the screen
-    do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(proxyObject)
-close
-    use oldIO
-    return $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="Write">
-<FormalSpec>data:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-#if 0
-    // FIXE - uncomment when inherit from %Stream.TmpCharacter
-    do ..%OnHttpReceive(data)
-    quit ##super(data)
-#endif
-]]></Implementation>
-</Method>
 
 <Method name="SendHttpRequest">
 <Description>
 Sends 'GET https://server/location?parametersString' request. Response is saved into responseText.</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[server:%String="api.vk.com",location:%String,parameters:%ArrayOfDataTypes,&responseText:%String(MAXLEN=1000000),requestType:%Integer="",authorization:%String=""]]></FormalSpec>
+<FormalSpec><![CDATA[server:%String="api.vk.com",location:%String,parameters:%ArrayOfDataTypes,&responseText:%String(MAXLEN=1000000),requestType:%Integer="",authorization:%String="",callback:Util.Http.IChunkCallback=""]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     if (requestType = "") {
@@ -93,17 +65,8 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
     do ..AuditNetworkRequest(1, server, queryParams)
     //do ..AuditLog("AuthorizationData", $get(authorization))
     
-    set callback = ..%New()
-#if 0
-    // FIXME - still is being buffered till the end
-    set callback.%Location = $name(^||Util.Requests.Global)
-    set callback.RemoveOnClose = $$$OK
-    set req.ResponseStream = callback
-    set status = req.Get(queryParams, requestType # 3)
-#else
     set req.AcceptGzip = 0 ; BUGBUG: otherwise we have uncompressed data only at the end of http request
-    set status = req.Get(queryParams, requestType # 3,,callback)
-#endif
+    set status = req.Get(queryParams, requestType # 3,, callback)
    
     
     if ($$$ISOK(status)) {
@@ -111,13 +74,13 @@ Sends 'GET https://server/location?parametersString' request. Response is saved 
         if (requestType '= 1) {
             #dim res as %Net.HttpResponse = req.HttpResponse
             
-            if (($data(res)) &&  (requestType '= 3)) {
+            if (($data(res)) &&  (requestType >= 2)) {
                 write "Response: ", res.StatusCode, ", ", res.StatusLine, ", ", res.ReasonPhrase, !
             }
             if ($$$ISOK(status)) {
                 #dim responseLength as %Integer = 1000000
                 set response = res.Data.Read(.responseLength)
-                if (requestType '= 3) {
+                if (requestType >= 2) {
                     write "Response type: ", $classname(res.Data), !
                     write "Response length: ", $length(response), ", ", responseLength, !
                 }

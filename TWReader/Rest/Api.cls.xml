@@ -57,7 +57,6 @@
 <Method name="CallApiArgs">
 <Description><![CDATA[
 Call Twitter API given <var>api</var> urls and arguments. Return JSON data into <var>responseText</var>]]></Description>
-<Internal>1</Internal>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>apiServer:%String,api:%String,arrayArgs:%ArrayOfDataTypes,*responseText:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>

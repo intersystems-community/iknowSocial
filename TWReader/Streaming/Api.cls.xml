@@ -1,11 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="TWReader.Streaming.Api">
-<Super>TWReader.Rest.Api</Super>
+<Super>TWReader.Rest.Api,Util.Http.IChunkCallback</Super>
 <TimeCreated>63915,60460.976583</TimeCreated>
 
 <Parameter name="ApiServer">
 <Default>stream.twitter.com</Default>
 </Parameter>
+
+<Method name="%OnHttpReceive">
+<FormalSpec>Data:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim status As %Status = $$$OK
+    set oldIO = $IO use 0
+    #dim proxyObject As %ZEN.proxyObject
+    set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(Data, ,.proxyObject)
+    goto:$$$ISERR(status) close
+    try {
+        #dim smallerObject As %ZEN.proxyObject = ##class(%ZEN.proxyObject).%New()
+        set smallerObject.coordinates = proxyObject.coordinates
+        set smallerObject.id = proxyObject.id
+        set smallerObject.lang = proxyObject.lang
+        set smallerObject.place = proxyObject.place
+        set smallerObject.text = proxyObject.text
+        set smallerObject.user = ##class(%ZEN.proxyObject).%New()
+        set smallerObject.user.id = proxyObject.user.id
+        set smallerObject.user.lang = proxyObject.user.lang
+        set smallerObject.user.name = proxyObject.user.name
+        set smallerObject.user.location = proxyObject.user.location
+        set smallerObject.user."time_zone" = proxyObject.user."time_zone"
+        set smallerObject.user."utc_offset" = proxyObject.user."utc_offset"
+        
+        // write indented (in a readable form) to the screen
+        do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(smallerObject)
+    } 
+    catch {
+        do BACK^%ETN
+    }
+close
+    use oldIO
+    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="Write">
+<FormalSpec>data:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+#if 0
+    // FIXE - uncomment when inherit from %Stream.TmpCharacter
+    do ..%OnHttpReceive(data)
+    quit ##super(data)
+#endif
+]]></Implementation>
+</Method>
+
+<Method name="CallApiArgs">
+<Description>
+Almost the same as CallApiArgs from REST API, but providing streaming callbacks</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>apiServer:%String,api:%String,arrayArgs:%ArrayOfDataTypes,*responseText:%String,callback:Util.Http.IChunkCallback=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim url As %String = ""
+    
+    if $match(api,"^https?:.*/.*") { // Full URL given in api will override everything
+        // do ..SplitUrl(api, .url, .api)
+        set url = api
+    } else {
+        if $match(apiServer, "^https?:.*") {
+            set url = apiServer
+        } else {
+            set url = "https://" _ apiServer
+        }
+        if $match(api, "^/.*") {
+            set url = url _ api
+        } else {
+            set url = url _ "/" _ api
+        }
+    }
+    #dim authorizer As Util.Requests.Authorizer = ##class(Util.Requests.Authorizer).%New()
+    #dim authHeader as %String = authorizer.GetAuthHeader("get", url, arrayArgs)
+
+    if '$isobject(callback) {
+        set callback = ..%New()
+    }
+    set responseText = ""
+
+    return ##class(Util.Requests.RequestSender).SendHttpRequest(apiServer, api, arrayArgs, .responseText, $$$HTTPLOGLEVEL, authHeader, callback)
+]]></Implementation>
+</Method>
+
+<Method name="Debug">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Key:%String</FormalSpec>
+<Implementation><![CDATA[
+    #dim lowKey As %String = $zcvt(Key, "l")
+    #dim ukrainanWords As %String = "Ukraine,Украина,ГПУ,АТО"
+    #dim russianWords As %String = "Russia,Россия,Российская+Федерация,ВКС"
+    #dim kazakhWords As %String = "Казахстан,Kazakhstan,egovkz,ЦОН,OpenData"
+    if lowKey = "moscow" {
+        set ne = "56.950164,40.285724" // "55.9576,37.967609"
+        set sw = "54.660273,35.199055" // "55.4907,37.31926"
+        set keys = russianWords_",Москва,Moscow"
+    } elseif lowKey = "st.pete" {
+        set ne = "60.241791,30.75886"
+        set sw = "59.633801,29.424641"
+        set keys = russianWords_",Питер,Санкт-Петербург,С-Петербург,Saint-Peterburgh,Saint-Peterburg,St.Peterburg"
+    } elseif lowKey = "kiev" {
+        set ne = "50.316879,30.355551"
+        set sw = "50.529751,30.581539"
+        set keys = ukrainanWords_",Kiev,Киев"
+    } elseif lowKey = "kharkiv" {
+        set ne = "50.067001,36.430191"
+        set sw = "49.889118,36.066051"
+        set keys = ukrainanWords_",Харьков,Kharkiv"
+    } elseif lowKey = "ukraine" {
+        set ne = "52.375359,40.218079"
+        set sw = "44.390411,22.128811"
+        set keys = ukrainanWords
+    } elseif lowKey = "astana" {
+        set ne = "51.221821,71.497452"
+        set sw = "51.153999,71.378922"
+        set keys = kazakhWords_",Астана,Astana"
+    } elseif lowKey = "kazakhstan" {
+        set ne = "55.431808,87.312737"
+        set sw = "40.566689,46.491859"
+        set keys = kazakhWords
+    }
+    do ..DebugApiCall("/1.1/statuses/filter.json","track="_keys_"&locations="_sw_","_ne)
+]]></Implementation>
+</Method>
 </Class>
 </Export>
