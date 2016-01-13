@@ -21,7 +21,7 @@
 <field name="AuthorSEX" dataType="STRING"/>
 </metadata>
 
-<data dropBeforeBuild="true">
+<data dropBeforeBuild="false">
 <list disabled="true" listerClass="TWReader.Lister" configuration="TWReaderRus" batchMode="true" >
 <parameter name="query" value="pizza" />
 <parameter name="count" value="30" />
@@ -35,12 +35,60 @@
 
 <table batchMode="true" configuration="TWReaderRus"
       tableName="TWReader_Data.Tweet" idField="IdStr" groupField="IdStr" dataFields="CleanText"
+      whereClause="ID &gt; %domain.GetPreviousLastId()"
       metadataColumns="PostedDate AS PostDate, PostedTime AS PostTime, User AS AuthorID, Place AS AuthorCity" >
 </table>
+<query disabled="true" 
+      sql="SELECT PostedDate AS PostDate, PostedTime AS PostTime, User AS AuthorID, Place AS AuthorCity FROM TWReader_Data.Tweet WHERE ID &gt; %domain.GetPreviousLastId()" 
+      idField="IdStr" groupField="IdStr" dataFields="CleanText" metadataColumns="PostDate, PostTime, AuthorID, AuthorCity"/>
+
 </data>
 
 </domain>
 ]]></Data>
 </XData>
+
+<Method name="GetPreviousLastId">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[    quit $g(^TWReader.Data.Tweet.LastID, 0)
+]]></Implementation>
+</Method>
+
+<Method name="ResetLastID">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[    kill ^TWReader.Data.Tweet.LastID
+]]></Implementation>
+</Method>
+
+<Method name="%OnAfterDropData">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pDomainId:%Integer,pDropDictionaries:%Boolean=1,pDropBlackLists:%Boolean=1</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    do ..ResetLastID()
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="%OnAfterBuild">
+<Description><![CDATA[
+<p>Callback invoked at the end of <method>%Build</method>. Subclasses can implement this
+method to execute custom code at the end of a domain build operation.</p>]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pDomainId:%Integer</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim status As %Status = $$$OK
+    #dim maxID As %String
+    try {
+        &SQL(select MAX(ID) into :maxID from TWReader_Data.Tweet)
+        set ^TWReader.Data.Tweet.LastID = maxID
+    } catch (ex) {
+        set status = ex.AsStatus()
+    }
+    return status
+]]></Implementation>
+</Method>
 </Class>
 </Export>

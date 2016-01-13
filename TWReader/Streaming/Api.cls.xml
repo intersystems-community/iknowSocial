@@ -18,6 +18,8 @@
     set status = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(Data, ,.proxyObject)
     goto:$$$ISERR(status) close
     try {
+        //do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(proxyObject)
+#if 0
         #dim smallerObject As %ZEN.proxyObject = ##class(%ZEN.proxyObject).%New()
         set smallerObject.coordinates = proxyObject.coordinates
         set smallerObject.id = proxyObject.id
@@ -34,6 +36,15 @@
         
         // write indented (in a readable form) to the screen
         do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(smallerObject)
+#else
+        #dim username As %String = proxyObject.user."screen_name"
+        #dim text As %String = ##class(TWReader.Data.Tweet).CleanValue(proxyObject.text)
+        #dim lang As %String = proxyObject.lang
+        
+        write "@",username, ":[", lang, "]", text,!
+#endif
+        do ##class(TWReader.Data.Context).SaveTweet(proxyObject)
+        do ..RebuildIknow(0, 0)
     } 
     catch {
         do BACK^%ETN
@@ -92,10 +103,25 @@ Almost the same as CallApiArgs from REST API, but providing streaming callbacks<
 ]]></Implementation>
 </Method>
 
+<Method name="CleanDataExtents">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+    do ##class(TWReader.Data.User).%DeleteExtent()
+    do ##class(TWReader.Data.Tweet).%DeleteExtent()
+    do ##class(TWReader.Data.Trend).%DeleteExtent()
+    do ##class(TWReader.IKnowDomain).%DropData(1,1)
+    //do ##class(TWReader.UIBroker).SaveMorePostsByCoords("0", "100", "46.4846", "30.7326", 1)
+    //do ##class(TWReader.UIBroker).FetchMorePosts(0, 100, "Харькова", 1)
+]]></Implementation>
+</Method>
+
 <Method name="Debug">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>Key:%String</FormalSpec>
+<FormalSpec>Key:%String,ResetData:%Boolean=1,RebuildDomain:%Boolean=1,SentimentAnalysis:%Boolean=0</FormalSpec>
 <Implementation><![CDATA[
+    if ResetData { 
+        do ..CleanDataExtents() 
+    }
     #dim lowKey As %String = $zcvt(Key, "l")
     #dim ukrainanWords As %String = "Ukraine,Украина,ГПУ,АТО"
     #dim russianWords As %String = "Russia,Россия,Российская+Федерация,ВКС"
@@ -130,6 +156,21 @@ Almost the same as CallApiArgs from REST API, but providing streaming callbacks<
         set keys = kazakhWords
     }
     do ..DebugApiCall("/1.1/statuses/filter.json","track="_keys_"&locations="_sw_","_ne)
+    do ..RebuildIknow(RebuildDomain, SentimentAnalysis)
+]]></Implementation>
+</Method>
+
+<Method name="RebuildIknow">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>RebuildDomain:%Boolean,SentimentAnalysis:%Boolean</FormalSpec>
+<Implementation><![CDATA[
+    #dim context As Util.Data.Context = ##class(TWReader.Data.Context).%New(0)
+    if RebuildDomain {
+        do context.Rebuild(0) // no need to reset domain again
+    }
+    if SentimentAnalysis {
+        do context.CalculateEmotionalColoring()
+    }
 ]]></Implementation>
 </Method>
 </Class>

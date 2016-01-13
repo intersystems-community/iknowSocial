@@ -65,7 +65,6 @@
         quit:$$$ISERR(status) status
     }
 #if 1
-
     // FIXME - find a way to calculate original iknow domain definition class to call its %Build
     #dim domainDefClass As %String = ..DomainName2DomainDef(..#DomainName)
     set status = $classmethod(domainDefClass, "%Build", 0)
