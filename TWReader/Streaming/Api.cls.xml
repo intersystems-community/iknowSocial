@@ -38,7 +38,7 @@
         do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(smallerObject)
 #else
         #dim username As %String = proxyObject.user."screen_name"
-        #dim text As %String = ##class(TWReader.Data.Tweet).CleanValue(proxyObject.text)
+        #dim text As %String = ##class(Util.Misc).RegexpReplace(##class(TWReader.Data.Tweet).CleanValue(proxyObject.text), "\r?\n", " ")
         #dim lang As %String = proxyObject.lang
         
         write "@",username, ":[", lang, "]", text,!
@@ -134,6 +134,11 @@ Almost the same as CallApiArgs from REST API, but providing streaming callbacks<
         set ne = "60.241791,30.75886"
         set sw = "59.633801,29.424641"
         set keys = russianWords_",Питер,Санкт-Петербург,С-Петербург,Saint-Peterburgh,Saint-Peterburg,St.Peterburg"
+    } elseif lowKey = "russia" {
+        //set ne = "81.856903,-168.997849"
+        set ne = "81.856903,190.997849"
+        set sw = "41.185902,19.638861"
+        set keys = russianWords
     } elseif lowKey = "kiev" {
         set ne = "50.316879,30.355551"
         set sw = "50.529751,30.581539"
@@ -154,7 +159,20 @@ Almost the same as CallApiArgs from REST API, but providing streaming callbacks<
         set ne = "55.431808,87.312737"
         set sw = "40.566689,46.491859"
         set keys = kazakhWords
+    } elseif lowKey = "almaty" {
+        set ne = "43.397442,77.01651"
+        set sw = "43.179569,76.833511"
+        set keys = kazakhWords
     }
+    // FIXME - ok, Twitter uses geoJSON order (longitude,latitude)
+    // FIXME - but Google uses (latitude,longitude), we recorded them from Google or 
+    // geoplanet-explorer http://isithackday.com/geoplanet-explorer/index.php?start=City
+    // so we need to reverse them back
+    #dim x, y As %Numeric
+#define SwapNums(%string,%x,%y) set $lb(%x,%y) = $lfs(%string,","), %string = $lts($lb(%y,%x),",")
+    $$$SwapNums(ne,x,y)
+    $$$SwapNums(sw,x,y)
+    write "Using query: ", "track="_keys_"&locations="_sw_","_ne,!
     do ..DebugApiCall("/1.1/statuses/filter.json","track="_keys_"&locations="_sw_","_ne)
     do ..RebuildIknow(RebuildDomain, SentimentAnalysis)
 ]]></Implementation>
