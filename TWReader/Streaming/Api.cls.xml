@@ -122,50 +122,63 @@ Almost the same as CallApiArgs from REST API, but providing streaming callbacks<
     if ResetData { 
         do ..CleanDataExtents() 
     }
+    #dim ne,sw As %String = ""
+    #dim woeid As %Numeric
     #dim lowKey As %String = $zcvt(Key, "l")
     #dim ukrainanWords As %String = "Ukraine,Украина,ГПУ,АТО"
     #dim russianWords As %String = "Russia,Россия,Российская+Федерация,ВКС"
     #dim kazakhWords As %String = "Казахстан,Kazakhstan,egovkz,ЦОН,OpenData"
+
     if lowKey = "moscow" {
         set ne = "56.950164,40.285724" // "55.9576,37.967609"
         set sw = "54.660273,35.199055" // "55.4907,37.31926"
+        set woeid = 2122265
         set keys = russianWords_",Москва,Moscow"
     } elseif lowKey = "st.pete" {
         set ne = "60.241791,30.75886"
         set sw = "59.633801,29.424641"
+        set woeid = 2123260
         set keys = russianWords_",Питер,Санкт-Петербург,С-Петербург,Saint-Peterburgh,Saint-Peterburg,St.Peterburg"
     } elseif lowKey = "russia" {
         //set ne = "81.856903,-168.997849"
         set ne = "81.856903,190.997849"
         set sw = "41.185902,19.638861"
+        set woeid = 23424936
         set keys = russianWords
     } elseif lowKey = "kiev" {
         set ne = "50.316879,30.355551"
         set sw = "50.529751,30.581539"
+        set woeid = 924938
         set keys = ukrainanWords_",Kiev,Киев"
     } elseif lowKey = "kharkiv" {
         set ne = "50.067001,36.430191"
         set sw = "49.889118,36.066051"
+        set woeid = 922137
         set keys = ukrainanWords_",Харьков,Kharkiv"
     } elseif lowKey = "lviv" {
         set ne = "49.897499,24.1388"
         set sw = "49.781319,23.924561"
+        set woeid = 924943
         set keys = ukrainanWords_",Львов,Lviv"
     } elseif lowKey = "ukraine" {
         set ne = "52.375359,40.218079"
         set sw = "44.390411,22.128811"
+        set woeid = 23424976
         set keys = ukrainanWords
     } elseif lowKey = "astana" {
         set ne = "51.221821,71.497452"
         set sw = "51.153999,71.378922"
+        set woeid = 2264962
         set keys = kazakhWords_",Астана,Astana"
     } elseif lowKey = "kazakhstan" {
         set ne = "55.431808,87.312737"
         set sw = "40.566689,46.491859"
+        set woeid = 23424871
         set keys = kazakhWords
     } elseif lowKey = "almaty" {
         set ne = "43.397442,77.01651"
         set sw = "43.179569,76.833511"
+        set woeid = 2255777
         set keys = kazakhWords
     }
     // FIXME - ok, Twitter uses geoJSON order (longitude,latitude)
