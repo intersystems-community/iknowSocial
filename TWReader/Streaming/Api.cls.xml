@@ -147,6 +147,10 @@ Almost the same as CallApiArgs from REST API, but providing streaming callbacks<
         set ne = "50.067001,36.430191"
         set sw = "49.889118,36.066051"
         set keys = ukrainanWords_",Харьков,Kharkiv"
+    } elseif lowKey = "lviv" {
+        set ne = "49.897499,24.1388"
+        set sw = "49.781319,23.924561"
+        set keys = ukrainanWords_",Львов,Lviv"
     } elseif lowKey = "ukraine" {
         set ne = "52.375359,40.218079"
         set sw = "44.390411,22.128811"

@@ -206,7 +206,8 @@
     set text = ##class(Util.Misc).RegexpReplace(text, "^RT @\w+:? ?", "")
     set text = ##class(Util.Misc).RegexpReplace(text, "\bRT @\w+:? ?", "\n")
     set text = ##class(Util.Misc).RegexpReplace(text, "\bhttps?:\S+", "")
-    set text = ##class(Util.Misc).RegexpReplace(text, "(\S)([\.,;?!:])(\S)", "$1$2 $3")
+    // set text = ##class(Util.Misc).RegexpReplace(text, "(\S)([\.,;?!:])(\S)", "$1$2 $3") // BUGBUG: it splits 1.5
+    set text = ##class(Util.Misc).RegexpReplace(text, "(\S)([\.,;?!:])([^\d\s])", "$1$2 $3")
     quit text
 ]]></Implementation>
 </Method>
