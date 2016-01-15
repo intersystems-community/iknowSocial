@@ -30,6 +30,9 @@
 <FormalSpec>o:%ZEN.proxyObject,trend:TWReader.Data.Trend=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+    if '$isobject(o) {
+        quit '$$$OK
+    }
     #dim idName As %String = o."id_str"
     #dim tweet As TWReader.Data.Tweet = ##class(TWReader.Data.Tweet).CreateOrOpenId(idName, o)
     set tweet.Trend = trend
@@ -37,8 +40,8 @@
     set idName = oUser."screen_name"
     #dim user As TWReader.Data.User   = ##class(TWReader.Data.User).CreateOrOpenId(idName, oUser)
 
-    set status = tweet.%Save() quit:$$$ISERR(status)
-    set status = user.%Save() quit:$$$ISERR(status)
+    set status = tweet.%Save() quit:$$$ISERR(status) status
+    set status = user.%Save() quit:$$$ISERR(status) status
     quit $$$OK
 ]]></Implementation>
 </Method>

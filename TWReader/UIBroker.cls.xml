@@ -107,7 +107,6 @@ simplified trends panel - list instead of table</Description>
     set woeid = localtionObject.woeid
     set city = localtionObject.name
     set country = localtionObject.country
-    do ##class(TWReader.Rest.Api).GetTrendsByPlaceJSON(.response, woeid)
     do ..FetchTrendsCollection(tableName, woeid, city, country)
 ]]></Implementation>
 </Method>

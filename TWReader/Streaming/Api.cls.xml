@@ -19,32 +19,16 @@
     goto:$$$ISERR(status) close
     try {
         //do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(proxyObject)
-#if 0
-        #dim smallerObject As %ZEN.proxyObject = ##class(%ZEN.proxyObject).%New()
-        set smallerObject.coordinates = proxyObject.coordinates
-        set smallerObject.id = proxyObject.id
-        set smallerObject.lang = proxyObject.lang
-        set smallerObject.place = proxyObject.place
-        set smallerObject.text = proxyObject.text
-        set smallerObject.user = ##class(%ZEN.proxyObject).%New()
-        set smallerObject.user.id = proxyObject.user.id
-        set smallerObject.user.lang = proxyObject.user.lang
-        set smallerObject.user.name = proxyObject.user.name
-        set smallerObject.user.location = proxyObject.user.location
-        set smallerObject.user."time_zone" = proxyObject.user."time_zone"
-        set smallerObject.user."utc_offset" = proxyObject.user."utc_offset"
-        
-        // write indented (in a readable form) to the screen
-        do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(smallerObject)
-#else
-        #dim username As %String = proxyObject.user."screen_name"
-        #dim text As %String = ##class(Util.Misc).RegexpReplace(##class(TWReader.Data.Tweet).CleanValue(proxyObject.text), "\r?\n", " ")
-        #dim lang As %String = proxyObject.lang
-        
-        write "@",username, ":[", lang, "]", text,!
-#endif
-        do ##class(TWReader.Data.Context).SaveTweet(proxyObject)
-        do ..RebuildIknow(0, 0)
+        if $isobject(proxyObject) {
+            #dim username As %String = proxyObject.user."screen_name"
+            #dim text As %String = ##class(Util.Misc).RegexpReplace(##class(TWReader.Data.Tweet).CleanValue(proxyObject.text), "\r?\n", " ")
+            #dim lang As %String = proxyObject.lang
+
+            write "@",username, ":[", lang, "]", text,!
+        }
+        if $$$ISOK(##class(TWReader.Data.Context).SaveTweet(proxyObject)) {
+            do ..RebuildIknow(0, 0)
+        }
     } 
     catch {
         do BACK^%ETN
@@ -112,6 +96,61 @@ Almost the same as CallApiArgs from REST API, but providing streaming callbacks<
     do ##class(TWReader.IKnowDomain).%DropData(1,1)
     //do ##class(TWReader.UIBroker).SaveMorePostsByCoords("0", "100", "46.4846", "30.7326", 1)
     //do ##class(TWReader.UIBroker).FetchMorePosts(0, 100, "Харькова", 1)
+]]></Implementation>
+</Method>
+
+<Method name="InitKeywords">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>keys:%String,*array:%String</FormalSpec>
+<Implementation><![CDATA[
+    for i=1:1:$length(keys,",") {
+        set array($piece(keys,",",i))="***"
+    }
+]]></Implementation>
+</Method>
+
+<Method name="GetInitialTrends">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>woeid:%String,*array:%String</FormalSpec>
+<Implementation><![CDATA[
+    #dim response As %ZEN.proxyObject
+    do ##class(TWReader.Rest.Api).GetTrendsByPlace(.response, woeid)
+    #dim i As %Integer
+    #dim trends As %ListOfObjects = response.GetAt(1).trends
+    for i=1:1:trends.Count() {
+        #dim trend = trends.GetAt(i)
+        set array(trend.name) = trend."tweet_volume"
+    }
+]]></Implementation>
+</Method>
+
+<Method name="GetKeys">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>*array</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    #dim s As %String = ""
+    #dim index As %String = ""
+    do {
+        set index = $order(array(index),1,value)
+        quit:index=""
+        if s'="" { 
+            set s = s_","_index
+        } else {
+            set s = index
+        }
+    } while 1
+    set s = $tr(s," ","+")
+    return s
+]]></Implementation>
+</Method>
+
+<Method name="LogArgs">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>title:%String,sw:%String,ne:%String,*array</FormalSpec>
+<Implementation><![CDATA[
+    set keys = ..GetKeys(.array)
+    write "Using query (", title, ") ", "track="_keys_"&locations="_sw_","_ne,!
 ]]></Implementation>
 </Method>
 
@@ -189,8 +228,13 @@ Almost the same as CallApiArgs from REST API, but providing streaming callbacks<
 #define SwapNums(%string,%x,%y) set $lb(%x,%y) = $lfs(%string,","), %string = $lts($lb(%y,%x),",")
     $$$SwapNums(ne,x,y)
     $$$SwapNums(sw,x,y)
-    write "Using query: ", "track="_keys_"&locations="_sw_","_ne,!
-    do ..DebugApiCall("/1.1/statuses/filter.json","track="_keys_"&locations="_sw_","_ne)
+    #dim keywords 
+    do ..InitKeywords(keys, .keywords)
+    do ..LogArgs("initial arguments", sw, ne, .keywords)
+    do ..GetInitialTrends(woeid, .keywords)
+    do ..LogArgs("arguments with trends merged", sw, ne, .keywords)
+    set keys = ..GetKeys(.keywords)
+    do ..DebugApiCall("/1.1/statuses/filter.json","locations="_sw_","_ne_"&track="_keys)
     do ..RebuildIknow(RebuildDomain, SentimentAnalysis)
 ]]></Implementation>
 </Method>
