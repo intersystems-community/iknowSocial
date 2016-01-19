@@ -21,7 +21,27 @@
   <!-- script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js"></script -->
   <script src="lib/bootstrap-modal.min.js"></script>
 
-<!-- Client JavaScript to validate the values entered by the user -->
+  <script src="lib/jquery.simple.timer.js"></script>
+
+<style>
+.days {
+    float: left;
+    margin-right: 4px;
+}
+.hours {
+    float: left;
+}
+.minutes {
+    float: left;
+}
+.seconds {
+    float: left;
+}
+.clearDiv {
+    clear: both;
+}
+</style>
+
 <script language="JavaScript" type="text/javascript">
 var ws;
 var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls"
@@ -60,15 +80,17 @@ function connect() {
         $("#connected").html("Connection Closed");
     }
 }
-function send(message) {
+function send(command, message) {
     if (ws) {
-        ws.send(message);
+        var op = { cmd: command, val: message };
+        ws.send(JSON.stringify(op));
     }
 
 }
 
 function disconnect() {
     if (ws) {
+        send('exit','');
         ws.close();
     }
 }
@@ -76,6 +98,21 @@ function disconnect() {
 function state(connected) {
     $('#ConnectButton').prop('disabled', connected);
     $('#DisconnectButton').prop('disabled', !connected);
+}
+
+function settimer(value) {
+    //alert(value);
+    var countdown = $('#countdown');
+    countdown.attr('data-seconds-left', value);
+    send('timer', value);
+    countdown.show();
+    countdown.startTimer({
+        onComplete: function(){
+            console.log('Coutdown Completed');
+            countdown.hide();
+        }
+    });
+
 }
 </script>
 
@@ -92,13 +129,17 @@ function state(connected) {
 
 <div id="connected">Not Connected</div>
 
-<div>Connect web-socket: <input id="ConnectButton" class="form-group" type="button" value="connect" onclick="connect();" />
+<div>Connect websocket: <input id="ConnectButton" class="form-group" type="button" value="connect" onclick="connect();" />
 </div>
-<div>Disconnect web-socket: <input id="DisconnectButton" class="form-group" type="button" value="disconnect" onclick="disconnect();" />
+<div>Disconnect websocket: <input id="DisconnectButton" class="form-group" type="button" value="disconnect" onclick="disconnect();" />
+</div>
+<div>Set timer: <input id="SetTimerButton" class="form-group" type="button" value="settimer" onclick="settimer($('#inputValue').val());" />
+    <b><span class="timer" id="countdown" style="display:none" data-seconds-left="60"></span></b>
 </div>
 
 <div id="main">
-<div>Enter Message (Enter 'exit' to quit): <input type="text" name="message" class="form-group" value="" size="80" onchange="send(this.value)" />
+Enter Message <!-- (Enter 'exit' to quit) -->: <input type="text" id="inputValue" name="message" class="form-group" value="" size="40" 
+                                                      onchange="send('echo', this.value); return false" />
 </div>
 
 <div>Response from Cach&eacute; Server ... <span class="well well-sm" id="output"></span>

@@ -4,42 +4,180 @@
 <Super>%CSP.WebSocket</Super>
 <TimeCreated>63936,41816.454774</TimeCreated>
 
-<Method name="OnPreServer">
+<Parameter name="Timeout">
+<Description>
+How long to wait for user when connection established</Description>
+<Default>3600</Default>
+</Parameter>
+
+<Parameter name="BufferSize">
+<Description>
+Buffer size in bytes</Description>
+<Default>8192</Default>
+</Parameter>
+
+<Method name="Read">
+<Description>
+Reads up to len characters from the client.
+if the call is successful the status (sc) will be returned as $$$OK, otherwise an error code of $$$CSPWebSocketTimeout 
+indicates a timeout and $$$CSPWebSocketClosed indicates that the client has terminated the WebSocket.
+Converts results into json
+Closes connection if received incorrect json</Description>
+<FormalSpec><![CDATA[&len:%Integer=32656,&sc:%Status,timeout:%Integer=86400]]></FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    set json = ##super(len, .sc, timeout)
+    do:$$$ISERR(sc) ..EndServer()
+    set st = ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(json,,.obj,1)
+    do:$$$ISERR(st) ..EndServer()
+    quit obj
+]]></Implementation>
+</Method>
+
+<Method name="Write">
+<Description><![CDATA[
+Write to the client.
+if <var>data</var> is object - outputs JSON.
+if <var>data</var> is string - wraps it as JSON { "Data" : data }.]]></Description>
+<FormalSpec>data:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    Quit $$$OK
+<Implementation><![CDATA[
+    if $isobject(data) {
+        if data.%IsA("%ZEN.proxyObject") {
+            set data = ..OutputToStr(data, "%ToJSON")
+        } else {
+            set data = ..OutputToStr("%ZEN.Auxiliary.jsonProvider", "%ObjectToJSON", data)
+        }
+    } else {
+        //#include %ZEN.Utils
+        set data = "{""data"":"""_$Replace(data,"\'","'")_"""}"
+    }
+    quit ##super(data)
+]]></Implementation>
+</Method>
+
+<Method name="OutputToStr">
+<Description><![CDATA[
+Executes actions and returns device output <br>
+pObj - OREF or class<br>
+pMethod - instance or class method to execute respectively<br>
+pArgs - additional arguments]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>obj,method,args...</FormalSpec>
+<ProcedureBlock>0</ProcedureBlock>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    Set str=""
+
+    //Redirect IO to the current routine - makes use of the labels defined below
+    Use $io::("^"_$ZNAME)
+    
+    //Enable redirection
+    Do ##class(%Device).ReDirectIO(1)
+    
+    if $isobject(obj) {
+        Do $Method(obj,method,args...)
+    } elseif $$$comClassDefined(obj) {
+        Do $ClassMethod(obj,method,args...)
+    }
+    
+    //Disable redirection
+    Do ##class(%Device).ReDirectIO(0)
+
+    Quit str      
+
+    //Labels that allow for IO redirection
+    //Read Character - we Don't care about reading
+rchr(c)      quit
+    //Read a string - we Don't care about reading
+rstr(sz,to)  quit
+    //Write a character - call the output label
+wchr(s)      Do output($char(s))  quit
+    //Write a form feed - call the output label
+wff()        Do output($char(12))  quit
+    //Write a newline - call the output label
+wnl()        Do output($char(13,10))  quit
+    //Write a string - call the output label
+wstr(s)      Do output(s)  quit
+    //Write a tab - call the output label
+wtab(s)      Do output($char(9))  quit
+    //Output label - this is where you would handle what you actually want to Do.
+    //  in our case, we want to Write to str
+output(s)    Set str=str_s   quit
+]]></Implementation>
+</Method>
+
+<Method name="Action">
+<Description><![CDATA[
+Execute singular action
+<var>obj</var> is an object with Action property and additional arguments in Arguments property]]></Description>
+<FormalSpec>obj:%ZEN.proxyObject</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim action As %String = obj.cmd
+    #dim status As %Status = $$$OK
+    if action = "echo" {
+        set status = ..Write(obj.val)
+    } elseif action = "timer" {
+        #dim seconds As %Numeric = obj.val
+        do $system.Alarm.Set(seconds)
+        set status = ..Write("Enabled timer for "_seconds_" secs")
+    } elseif action = "exit" {
+        quit '$$$OK
+    } else {
+        set status = ..Write("Unknown action")
+    }
+    quit status
+]]></Implementation>
+</Method>
+
+<Method name="ClientLoop">
+<Implementation><![CDATA[
+    for  {
+        #dim status As %Status = $$$OK
+        #dim data As %String = ..Read(, .status, ..#Timeout)
+        set status = ..Action(data)
+        if $$$ISERR(status) {
+            set status = ..Write("Error "_$System.Status.GetErrorText(status))
+            quit
+        }
+    }
 ]]></Implementation>
 </Method>
 
 <Method name="Server">
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    Set $ZT="Error"
-    Set timeout=10
-    Set status=..Write("Welcome to Cache WebSocket. NameSpace: "_$NameSpace)
-    For  {
-        Set len=32656
-        Set data=..Read(.len, .status, timeout)
-        If $$$ISERR(status),$$$GETERRORCODE(status) = $$$CSPWebSocketClosed Quit
-        If $$$ISERR(status),$$$GETERRORCODE(status) = $$$CSPWebSocketTimeout {
-           Set data="Timeout after "_timeout_" seconds"_" occurred on "_$ZDate(+$Horolog,2)_" at "_$ZTime($Piece($Horolog,",",2),3)
-           Set status=..Write(data)
+#if 0
+    set $ZT="Error"
+    set timeout=10
+    set status=..Write("Welcome to Cache WebSocket. NameSpace: "_$NameSpace)
+    for  {
+        set len=32656
+        set data=..Read(.len, .status, timeout)
+        if $$$ISERR(status),$$$GETERRORCODE(status) = $$$CSPWebSocketClosed quit
+        if $$$ISERR(status),$$$GETERRORCODE(status) = $$$CSPWebSocketTimeout {
+           set data="Timeout after "_timeout_" seconds"_" occurred on "_$ZDate(+$Horolog,2)_" at "_$ZTime($Piece($Horolog,",",2),3)
+           set status=..Write(data)
         }
         else {
-            If data="exit" Quit
-            Set data="'"_data_"'"_" (length="_len_") recieved on "_$ZDate(+$Horolog,2)_" at "_$ZTime($Piece($Horolog,",",2),3)_" NameSpace="_$NameSpace
-            Set status=..Write(data)
+            if data="exit" quit
+            set data="'"_data_"'"_" (length="_len_") recieved on "_$ZDate(+$Horolog,2)_" at "_$ZTime($Piece($Horolog,",",2),3)_" NameSpace="_$NameSpace
+            set status=..Write(data)
         }
     }
-    Set status=..EndServer()
-    Quit $$$OK
+    set status=..EndServer()
+    quit $$$OK
 Error // Error
-    Quit $$$OK
-]]></Implementation>
-</Method>
+    quit $$$OK
+    
+#else
+        set status = ..Write("Server start at "_$ZDT($H))
+        do ..ClientLoop()
+        set status = ..EndServer()
+        quit $$$OK
 
-<Method name="OnPostServer">
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    Quit $$$OK
+#endif
 ]]></Implementation>
 </Method>
 </Class>
