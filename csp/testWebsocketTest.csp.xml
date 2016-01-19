@@ -24,7 +24,7 @@
 <!-- Client JavaScript to validate the values entered by the user -->
 <script language="JavaScript" type="text/javascript">
 var ws;
-var wsserver = "/csp/vkfb/TWReader.WebSocket.Test.cls"
+var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls"
 
 if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) {
     WebSocket = MozWebSocket;
@@ -33,22 +33,20 @@ if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined'))
 function init() {
     ws = new WebSocket(((window.location.protocol == "https:") ? "wss:" : "ws:") + "//" + window.location.host + wsserver);
     ws.onopen = function(event) {
-        $("#main").show(100);
         $("#connected").html("Connected to WebSocket server: <b>" + decodeURIComponent(wsserver) + "</b>");
     };
 
     ws.onmessage = function(event) {
-        document.getElementById("output").innerHTML = "<b>" + event.data + "</b>";
+        $("#output").html("<b>" + event.data + "</b>");
     };
 
     ws.onerror = function(event) {
-        document.getElementById("connected").innerHTML = "Connection Error - Check that the web server supports web sockets";
+        $("#connected").html("Connection Error - Check that the web server supports web sockets");
     };
 
     ws.onclose = function(event) {
         ws = null;
-        document.getElementById("main").style.visibility = "hidden";
-        document.getElementById("connected").innerHTML = "Connection Closed";
+        $("#connected").html("Connection Closed");
     }
 }
 
@@ -58,6 +56,14 @@ function send(message) {
     }
 
 }
+
+function disconnect() {
+    if (ws) {
+        ws.close();
+    }
+}
+
+
 </script>
 
 </head>
@@ -73,11 +79,14 @@ function send(message) {
 
 <div id="connected">Not Connected</div>
 
-<div id="main" style="display:none">
-<div>Enter Message (Enter 'exit' to quit): <input type="text" name="message" class="form-group" value="" size="80" onchange="send(this.value)"/>
+<div id="main">
+<div>Enter Message (Enter 'exit' to quit): <input type="text" name="message" class="form-group" value="" size="80" onchange="send(this.value)" />
 </div>
 
-<div>Response from Cache Server ... <span class="well well-sm" id="output"></span>
+<div>Response from Cach&eacute; Server ... <span class="well well-sm" id="output"></span>
+</div>
+
+<div>Disconnect web-soscket: <input id="DisconnectButton" class="form-group" type="button" value="disconnect" onclick="disconnect();" />
 </div>
 
 </div>
