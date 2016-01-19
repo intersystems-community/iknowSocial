@@ -4,10 +4,34 @@
 <Super>%RegisteredObject,Util.Http.IChunkCallback</Super>
 <TimeCreated>63932,59399.284888</TimeCreated>
 
+<Parameter name="SupportedLanguages">
+<Default>,ru,ua,en,fr</Default>
+</Parameter>
+
+<Method name="Relevant">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>place:%String,lang:%String</FormalSpec>
+<Implementation><![CDATA[
+    // 1. TODO - to implement place to geo translation to match only relevant places (cities, countries)
+    // 2. match tweet language - only iknow enabled are of interest for us
+    #dim known As %String = $lfs(..#SupportedLanguages,",")
+    if $listfind(known, lang) {
+        return $$$OK
+    }
+    return '$$$OK
+]]></Implementation>
+</Method>
+
 <Method name="%OnHttpReceive">
 <FormalSpec>Data:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+    // FIXME - some callbaks require merging of neighbourhood calss, and were ppartial JSON
+    // dunno how to make them to merge easily
+    // those cases will indicate themselves ass strange undefined properties in the proxyObject
+    // after parse: i.e. required property "user" will be not defined in such case
+    // or timestampt or anything other, the same odd
+    
     #dim status As %Status = $$$OK
     set oldIO = $IO use 0
     #dim proxyObject As %ZEN.proxyObject
@@ -15,17 +39,25 @@
     goto:$$$ISERR(status) close
     try {
         if $isobject(proxyObject) {
-            #dim username As %String = proxyObject.user."screen_name"
+            #dim user As %ZEN.proxyObject = proxyObject.user
+            #dim username As %String = $select($isobject(user):user."screen_name", 1:"")
             #dim text As %String = ##class(Util.Misc).RegexpReplace(##class(TWReader.Data.Tweet).CleanValue(proxyObject.text), "\r?\n", " ")
             #dim lang As %String = proxyObject.lang
-
-            write "@",username, ":[", lang, "]", text,!
-        }
-        if $$$ISOK(##class(TWReader.Data.Context).SaveTweet(proxyObject)) {
-            do ..RebuildIknow(0, 0)
+            #dim place As %String = proxyObject.place
+            if place = "" && $isobject(proxyObject.user) {
+                set place = proxyObject.user.place
+            }
+            #dim isReleant As %Boolean = ..Relevant($get(place), $get(lang))
+            write "@",username, "[", lang, ":", $select(isReleant:"Y",1:"N"),"]", text,!
+            if isReleant {
+                if $$$ISOK(##class(TWReader.Data.Context).SaveTweet(proxyObject)) {
+                    do ..RebuildIknow(0, 0)
+                }
+            }
         }
     } 
     catch {
+        write "*** exception ***:", $zerror,!
         do BACK^%ETN
     }
 close

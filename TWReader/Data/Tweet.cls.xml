@@ -49,6 +49,7 @@
 
 <Property name="CalculatedPlace">
 <Type>%String</Type>
+<Calculated>1</Calculated>
 <SqlComputeCode> set {*} = ##class(TWReader.Data.Tweet).CalculatePlace({ID}) </SqlComputeCode>
 <SqlComputed>1</SqlComputed>
 <Transient>1</Transient>
@@ -72,6 +73,7 @@
 
 <Property name="CleanText">
 <Type>Util.UnlimitedString</Type>
+<Calculated>1</Calculated>
 <SqlComputeCode> set {*} = ##class(TWReader.Data.Tweet).CleanValue({Text}) </SqlComputeCode>
 <SqlComputed>1</SqlComputed>
 <Transient>1</Transient>
@@ -197,6 +199,14 @@
 ]]></Implementation>
 </Method>
 
+<Method name="CleanTextGet">
+<Description>
+getter for .CleanText property</Description>
+<ReturnType>Util.UnlimitedString</ReturnType>
+<Implementation><![CDATA[    return ..CleanValue(..Text)
+]]></Implementation>
+</Method>
+
 <Method name="CleanValue">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>value:Util.UnlimitedString</FormalSpec>
@@ -229,17 +239,25 @@
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
     #dim tweet As TWReader.Data.Tweet = ..%OpenId(ID)
-    #dim place As %String 
     if $isobject(tweet) {
-        set place = tweet.Place
-        if place="" {
-            #dim user As TWReader.Data.User = ##class(TWReader.Data.User).%OpenId(tweet.User)
-            set place = user.Location
-        }
-        quit place
+        return tweet.CalculatedPlace
     } else {
-        quit ""
+        return ""
     }
+]]></Implementation>
+</Method>
+
+<Method name="CalculatedPlaceGet">
+<Description>
+getter for .CalculatedPlace property</Description>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    #dim place As %String = ..Place
+    if place="" {
+        #dim user As TWReader.Data.User = ##class(TWReader.Data.User).%OpenId(..User)
+        set place = user.Location
+    }
+    return place
 ]]></Implementation>
 </Method>
 
@@ -250,6 +268,7 @@
 <FormalSpec>twitterTime:%String</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
+    quit:twitterTime="" ""
     #dim mmm as %String
     #dim d as %String
     #dim yyyy as %String
