@@ -31,8 +31,18 @@ if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined'))
 }
 
 function init() {
+    state(false);
+    connect();
+}
+
+function connect() {
+    if (ws) {
+        return;
+    }
     ws = new WebSocket(((window.location.protocol == "https:") ? "wss:" : "ws:") + "//" + window.location.host + wsserver);
+
     ws.onopen = function(event) {
+        state(true);
         $("#connected").html("Connected to WebSocket server: <b>" + decodeURIComponent(wsserver) + "</b>");
     };
 
@@ -46,10 +56,10 @@ function init() {
 
     ws.onclose = function(event) {
         ws = null;
+        state(false);
         $("#connected").html("Connection Closed");
     }
 }
-
 function send(message) {
     if (ws) {
         ws.send(message);
@@ -63,7 +73,10 @@ function disconnect() {
     }
 }
 
-
+function state(connected) {
+    $('#ConnectButton').prop('disabled', connected);
+    $('#DisconnectButton').prop('disabled', !connected);
+}
 </script>
 
 </head>
@@ -79,6 +92,11 @@ function disconnect() {
 
 <div id="connected">Not Connected</div>
 
+<div>Connect web-socket: <input id="ConnectButton" class="form-group" type="button" value="connect" onclick="connect();" />
+</div>
+<div>Disconnect web-socket: <input id="DisconnectButton" class="form-group" type="button" value="disconnect" onclick="disconnect();" />
+</div>
+
 <div id="main">
 <div>Enter Message (Enter 'exit' to quit): <input type="text" name="message" class="form-group" value="" size="80" onchange="send(this.value)" />
 </div>
@@ -86,8 +104,6 @@ function disconnect() {
 <div>Response from Cach&eacute; Server ... <span class="well well-sm" id="output"></span>
 </div>
 
-<div>Disconnect web-soscket: <input id="DisconnectButton" class="form-group" type="button" value="disconnect" onclick="disconnect();" />
-</div>
 
 </div>
 
