@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2016-01-15 16:37:46.31448" Target="##class(TWReader.Streaming.Api).Debug(&quot;kharkiv&quot;)" TargetType="0">
+<Project name="VKReader" LastModified="2016-01-19 11:51:33.474677" Target="##class(TWReader.Streaming.Api).Debug(&quot;kharkiv&quot;)" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
@@ -29,6 +29,7 @@
     <ProjectItem name="csp/vkfb/twitterApiStatus.CSP" type="CSP"></ProjectItem>
     <ProjectItem name="csp/vkfb/twitterRegional.CSP" type="CSP"></ProjectItem>
     <ProjectItem name="csp/vkfb/twitterRegionalRactive.CSP" type="CSP"></ProjectItem>
+    <ProjectItem name="csp/vkfb/testWebsocketTest.csp" type="CSP"></ProjectItem>
   </Items>
 </Project>
 </Export>

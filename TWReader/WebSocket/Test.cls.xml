@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.WebSocket.Test">
+<Super>%CSP.WebSocket</Super>
+<TimeCreated>63936,41816.454774</TimeCreated>
+
+<Method name="OnPreServer">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="Server">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    Set $ZT="Error"
+    Set timeout=10
+    Set status=..Write("Welcome to Cache WebSocket. NameSpace: "_$NameSpace)
+    For  {
+        Set len=32656
+        Set data=..Read(.len, .status, timeout)
+        If $$$ISERR(status),$$$GETERRORCODE(status) = $$$CSPWebSocketClosed Quit
+        If $$$ISERR(status),$$$GETERRORCODE(status) = $$$CSPWebSocketTimeout {
+           Set data="Timeout after "_timeout_" seconds"_" occurred on "_$ZDate(+$Horolog,2)_" at "_$ZTime($Piece($Horolog,",",2),3)
+           Set status=..Write(data)
+        }
+        else {
+            If data="exit" Quit
+            Set data="'"_data_"'"_" (length="_len_") recieved on "_$ZDate(+$Horolog,2)_" at "_$ZTime($Piece($Horolog,",",2),3)_" NameSpace="_$NameSpace
+            Set status=..Write(data)
+        }
+    }
+    Set status=..EndServer()
+    Quit $$$OK
+Error // Error
+    Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="OnPostServer">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    Quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>

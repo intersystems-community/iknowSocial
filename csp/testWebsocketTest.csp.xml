@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="testWebsocketTest.csp" application="/csp/vkfb/" default="1"><![CDATA[
+<html>
+<head>
+  <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" -->
+  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <!-- link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/css/bootstrap-modal.min.css" -->
+  <link rel="stylesheet" href="lib/bootstrap-modal.min.css">
+
+  <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css" -->
+  <link rel="stylesheet" href="lib/bootstrap-theme.min.css">
+
+
+  <!-- script src="https://code.jquery.com/jquery-1.11.2.min.js"></script -->
+  <script src="lib/jquery-1.11.2.min.js"></script>
+  <!-- script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script -->
+  <script src="lib/jquery-ui.min.js"></script>
+  <!-- script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script -->
+  <script src="lib/bootstrap.min.js"></script>
+  <!-- script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js"></script -->
+  <script src="lib/bootstrap-modal.min.js"></script>
+
+<!-- Client JavaScript to validate the values entered by the user -->
+<script language="JavaScript" type="text/javascript">
+var ws;
+var wsserver = "/csp/vkfb/TWReader.WebSocket.Test.cls"
+
+if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) {
+    WebSocket = MozWebSocket;
+}
+
+function init() {
+    ws = new WebSocket(((window.location.protocol == "https:") ? "wss:" : "ws:") + "//" + window.location.host + wsserver);
+    ws.onopen = function(event) {
+        $("#main").show(100);
+        $("#connected").html("Connected to WebSocket server: <b>" + decodeURIComponent(wsserver) + "</b>");
+    };
+
+    ws.onmessage = function(event) {
+        document.getElementById("output").innerHTML = "<b>" + event.data + "</b>";
+    };
+
+    ws.onerror = function(event) {
+        document.getElementById("connected").innerHTML = "Connection Error - Check that the web server supports web sockets";
+    };
+
+    ws.onclose = function(event) {
+        ws = null;
+        document.getElementById("main").style.visibility = "hidden";
+        document.getElementById("connected").innerHTML = "Connection Closed";
+    }
+}
+
+function send(message) {
+    if (ws) {
+        ws.send(message);
+    }
+
+}
+</script>
+
+</head>
+
+<body onload="init();">
+
+<div class="container">
+
+
+<div class="page-header">
+    <h2>WebSocket Echo Demonstration</h2>
+</div>
+
+<div id="connected">Not Connected</div>
+
+<div id="main" style="display:none">
+<div>Enter Message (Enter 'exit' to quit): <input type="text" name="message" class="form-group" value="" size="80" onchange="send(this.value)"/>
+</div>
+
+<div>Response from Cache Server ... <span class="well well-sm" id="output"></span>
+</div>
+
+</div>
+
+</div>
+</body>
+</html>
+]]></CSP>
+</Export>
