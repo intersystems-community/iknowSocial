@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.WebSocket.Chunks">
+<Super>%RegisteredObject</Super>
+<TimeCreated>63936,66793.420637</TimeCreated>
+
+<Parameter name="GlobalName">
+<Description>
+this is similar to ^TWReader.Data.Tweet.LastID used for incremental
+iknow domain updates. But his time it's for returning last tweets JSON 
+data to the client - we need to save last saved tweet, to continue since then</Description>
+<Type>%String</Type>
+<Default>^TWReader.Data.Tweet.WindowID</Default>
+</Parameter>
+
+<Method name="GetWindowId">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Integer</ReturnType>
+<SqlProc>1</SqlProc>
+<Implementation><![CDATA[    quit $get(@..#GlobalName, 0)
+]]></Implementation>
+</Method>
+
+<Method name="ResetWindowID">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[    kill @..#GlobalName
+]]></Implementation>
+</Method>
+
+<Method name="OnAfterDropData">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    do ..ResetWindowID()
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="UpdateWindowID">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>ID:%String</FormalSpec>
+<Implementation><![CDATA[    set @..#GlobalName = ID
+]]></Implementation>
+</Method>
+
+<Method name="UpdateMaxWindowID">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim status As %Status = $$$OK
+    #dim maxID As %String
+    try {
+        &SQL(select MAX(ID) into :maxID from TWReader_Data.Tweet)
+        do ..UpdateWindowID(maxID)
+    } catch (ex) {
+        set status = ex.AsStatus()
+    }
+    return status
+]]></Implementation>
+</Method>
+
+<Method name="DrawJsonFromSQL">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>sinceID:%String</FormalSpec>
+<Implementation><![CDATA[
+    set sql = "SELECT id as id, user as user, CleanText as text, Coordinates as coords from TWReader_Data.Tweet " _
+              "WHERE ID > TWReader_WebSocket.Chunks_GetWindowId()"
+    do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
+]]></Implementation>
+</Method>
+</Class>
+</Export>
