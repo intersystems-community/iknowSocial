@@ -51,7 +51,7 @@
 <Method name="GetPreviousLastId">
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Integer</ReturnType>
-<Implementation><![CDATA[    quit $g(^TWReader.Data.Tweet.LastID, 0)
+<Implementation><![CDATA[    quit $get(^TWReader.Data.Tweet.LastID, 0)
 ]]></Implementation>
 </Method>
 

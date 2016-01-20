@@ -56,6 +56,27 @@ if <var>data</var> is string - wraps it as JSON { "Data" : data }.]]></Descripti
 ]]></Implementation>
 </Method>
 
+<Method name="WriteSql">
+<FormalSpec>sql:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim status As %Status = $$$OK
+    #dim stmt As %SQL.Statement = ##class(%SQL.Statement).%New()
+    set status = stmt.%Prepare(sql)
+    quit:$$$ISERR(status) status
+    #dim rset As %SQL.StatementResult = stmt.%Execute()
+
+    #dim data As %String
+    while rset.%Next(.status) {
+        set data = ..OutputToStr("%ZEN.Auxiliary.jsonProvider", "%ObjectToJSON", rset)
+        set ^tweets.log($i(^tweets.log)) = data
+        set status = ##class(%CSP.WebSocket)$this.Write(data)
+        quit:$$$ISERR(status)
+    }
+    quit status
+]]></Implementation>
+</Method>
+
 <Method name="OutputToStr">
 <Description><![CDATA[
 Executes actions and returns device output <br>
@@ -116,16 +137,26 @@ Execute singular action
 <Implementation><![CDATA[
     #dim action As %String = obj.cmd
     #dim status As %Status = $$$OK
-    if action = "echo" {
-        set status = ..Write(obj.val)
-    } elseif action = "timer" {
-        #dim seconds As %Numeric = obj.val
-        do $system.Alarm.Set(seconds)
-        set status = ..Write("Enabled timer for "_seconds_" secs")
-    } elseif action = "exit" {
-        quit '$$$OK
-    } else {
-        set status = ..Write("Unknown action")
+    try {
+        if action = "echo" {
+            set status = ..Write(obj.val)
+        } elseif action = "timer" {
+            #dim seconds As %Numeric = obj.val
+            do $system.Alarm.Set(seconds)
+            set status = ..Write("Enabled timer for "_seconds_" secs")
+        } elseif action = "tweets" {
+            set sql = "select id as id, ""user"" as ""user"", CleanText as text "_
+                      "from TWReader_Data.Tweet "_
+                      "where ID > TWReader_WebSocket.Chunks_GetWindowId()"
+            do BACK^%ETN
+            set status = ..WriteSql(sql)
+        } elseif action = "exit" {
+            return '$$$OK
+        } else {
+            set status = ..Write("Unknown action")
+        }
+    } catch {
+        do BACK^%ETN
     }
     quit status
 ]]></Implementation>
@@ -148,36 +179,10 @@ Execute singular action
 <Method name="Server">
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-#if 0
-    set $ZT="Error"
-    set timeout=10
-    set status=..Write("Welcome to Cache WebSocket. NameSpace: "_$NameSpace)
-    for  {
-        set len=32656
-        set data=..Read(.len, .status, timeout)
-        if $$$ISERR(status),$$$GETERRORCODE(status) = $$$CSPWebSocketClosed quit
-        if $$$ISERR(status),$$$GETERRORCODE(status) = $$$CSPWebSocketTimeout {
-           set data="Timeout after "_timeout_" seconds"_" occurred on "_$ZDate(+$Horolog,2)_" at "_$ZTime($Piece($Horolog,",",2),3)
-           set status=..Write(data)
-        }
-        else {
-            if data="exit" quit
-            set data="'"_data_"'"_" (length="_len_") recieved on "_$ZDate(+$Horolog,2)_" at "_$ZTime($Piece($Horolog,",",2),3)_" NameSpace="_$NameSpace
-            set status=..Write(data)
-        }
-    }
-    set status=..EndServer()
+    set status = ..Write("Server start at "_$ZDT($H))
+    do ..ClientLoop()
+    set status = ..EndServer()
     quit $$$OK
-Error // Error
-    quit $$$OK
-    
-#else
-        set status = ..Write("Server start at "_$ZDT($H))
-        do ..ClientLoop()
-        set status = ..EndServer()
-        quit $$$OK
-
-#endif
 ]]></Implementation>
 </Method>
 </Class>

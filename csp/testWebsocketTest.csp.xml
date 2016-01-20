@@ -45,6 +45,7 @@
 <script language="JavaScript" type="text/javascript">
 var ws;
 var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls"
+var tweets = [];
 
 if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) {
     WebSocket = MozWebSocket;
@@ -87,7 +88,16 @@ function send(command, message) {
     }
 
 }
-
+function gettweets() {
+    if (ws) {
+        ws.onmessage = function(event) {
+            var obj = JSON.parse(event.data);
+            tweets.push(obj);
+            $('#stream').append('<p>' + obj.text + '</p>');
+        };
+        send('tweets', '');
+    }
+}
 function disconnect() {
     if (ws) {
         send('exit','');
@@ -133,11 +143,13 @@ function settimer(value) {
 </div>
 <div>Disconnect websocket: <input id="DisconnectButton" class="form-group" type="button" value="disconnect" onclick="disconnect();" />
 </div>
-<div>Set timer: <input id="SetTimerButton" class="form-group" type="button" value="settimer" onclick="settimer($('#inputValue').val());" />
+<!-- <div>Set timer: <input id="SetTimerButton" class="form-group" type="button" value="settimer" onclick="settimer($('#inputValue').val());" />
     <b><span class="timer" id="countdown" style="display:none" data-seconds-left="60"></span></b>
+</div> -->
+<div>Get tweets: <input id="GetTweetsButton" class="form-group" type="button" value="gettweets" onclick="gettweets();" />
 </div>
 
-<div id="main">
+<div id="main" class="hidden">
 Enter Message <!-- (Enter 'exit' to quit) -->: <input type="text" id="inputValue" name="message" class="form-group" value="" size="40" 
                                                       onchange="send('echo', this.value); return false" />
 </div>
@@ -145,6 +157,8 @@ Enter Message <!-- (Enter 'exit' to quit) -->: <input type="text" id="inputValue
 <div>Response from Cach&eacute; Server ... <span class="well well-sm" id="output"></span>
 </div>
 
+<div class="well well-lg" id="stream">
+</div>
 
 </div>
 

@@ -255,7 +255,9 @@ getter for .CalculatedPlace property</Description>
     #dim place As %String = ..Place
     if place="" {
         #dim user As TWReader.Data.User = ##class(TWReader.Data.User).%OpenId(..User)
-        set place = user.Location
+        if $isobject(user) {
+            set place = user.Location
+        }
     }
     return place
 ]]></Implementation>
