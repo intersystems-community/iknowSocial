@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="testWebsocketTest.csp" application="/csp/vkfb/" default="1"><![CDATA[
+<CSP name="testWebsocketVList.csp" application="/csp/vkfb/" default="1"><![CDATA[
 <html>
 <head>
   <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" -->
@@ -22,6 +22,7 @@
   <script src="lib/bootstrap-modal.min.js"></script>
 
   <script src="lib/jquery.simple.timer.js"></script>
+  <script src="lib/vlist.js"></script>
 
 <style>
 .days {
@@ -46,10 +47,38 @@
 var ws;
 var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls"
 var tweets = [];
+var vlist;
 
 if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) {
     WebSocket = MozWebSocket;
 }
+
+function generatorFn(row) {
+    //el.innerHTML = "<p>ITEM " + row + "</p>";
+    var obj = tweets[row];
+    var text = '';
+    var username = '';
+    if (typeof(obj) !== 'undefined') {
+        text = obj.text;
+        username = obj.user;
+    } 
+    var el = document.createElement("div");
+    el.innerHTML = '<b>' + username + '</b>:&nbsp;' + text;
+    return el;
+}
+
+
+$(document).ready(function() {
+    vlist = new VirtualList({
+        h: 400, //window.innerHeight, // FIXME
+        itemHeight: 20, // FIXME
+        totalRows: 0, // 100000,
+        generatorFn: generatorFn 
+    });
+
+    vlist.container.classList.add("container");
+    $('#stream').append($(vlist.container));
+})
 
 function init() {
     state(false);
@@ -92,8 +121,13 @@ function gettweets() {
     if (ws) {
         ws.onmessage = function(event) {
             var obj = JSON.parse(event.data);
-            tweets.push(obj);
-            $('#stream').append('<p>' + obj.text + '</p>');
+            //tweets.push(obj);
+            tweets.unshift(obj);
+            vlist.totalRows = tweets.length;
+            //$(vlist).trigger('resize');
+            vlist._renderChunk(vlist.container, 0);
+            //$(vlist).hide().show(0);
+            //$('#stream').append('<p>' + obj.text + '</p>');
         };
         send('tweets', '');
     }
@@ -153,11 +187,14 @@ function settimer(value) {
 
     <div>Response from Cach&eacute; Server ... <span class="well well-sm" id="output"></span></div>
 
-    <div class="well well-lg" id="stream"></div>
+    <div class="container" id="stream"></div>
 
 </div>
 
 </body>
+<script>
+  
+</script>
 </html>
 ]]></CSP>
 </Export>

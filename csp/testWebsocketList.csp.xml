@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<CSP name="testWebsocketTest.csp" application="/csp/vkfb/" default="1"><![CDATA[
+<CSP name="testWebsocketList.csp" application="/csp/vkfb/" default="1"><![CDATA[
 <html>
 <head>
   <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" -->
@@ -22,6 +22,8 @@
   <script src="lib/bootstrap-modal.min.js"></script>
 
   <script src="lib/jquery.simple.timer.js"></script>
+  <!-- script src='http://cdn.ractivejs.org/latest/ractive.min.js'></script -->
+  <script src='lib/ractive.min.js'></script>
 
 <style>
 .days {
@@ -42,13 +44,39 @@
 }
 </style>
 
+<script id='tweets-template' type='text/ractive'>
+    <div class="flex-module-inner">
+        <ul class="list-unstyled">
+        {{#tweets }}
+            <li class="trend-item js-trend-item  ">
+            <kbd class="btn-success">{{user}}</kbd> &nbsp; {{text}}
+            </li>
+        {{/tweets}}
+        </ul>
+    </div>
+</script>
 <script language="JavaScript" type="text/javascript">
 var ws;
 var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls"
 var tweets = [];
+var vlist;
 
 if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) {
     WebSocket = MozWebSocket;
+}
+
+function generatorFn(row) {
+    //el.innerHTML = "<p>ITEM " + row + "</p>";
+    var obj = tweets[row];
+    var text = '';
+    var username = '';
+    if (typeof(obj) !== 'undefined') {
+        text = obj.text;
+        username = obj.user;
+    } 
+    var el = document.createElement("div");
+    el.innerHTML = '<b>' + username + '</b>:&nbsp;' + text;
+    return el;
 }
 
 function init() {
@@ -64,21 +92,26 @@ function connect() {
 
     ws.onopen = function(event) {
         state(true);
-        $("#connected").html("Connected to WebSocket server: <b>" + decodeURIComponent(wsserver) + "</b>");
+        //$("#connected").html("Connected to WebSocket server: <b>" + decodeURIComponent(wsserver) + "</b>");
+        console.log("Connected to WebSocket server: <b>" + decodeURIComponent(wsserver) + "</b>");
+        gettweets();
     };
 
     ws.onmessage = function(event) {
-        $("#output").html("<b>" + event.data + "</b>");
+        //$("#output").html("<b>" + event.data + "</b>");
+        console.log("<b>" + event.data + "</b>");
     };
 
     ws.onerror = function(event) {
-        $("#connected").html("Connection Error - Check that the web server supports web sockets");
+        //$("#connected").html("Connection Error - Check that the web server supports web sockets");
+        alert("Connection Error - Check that the web server supports web sockets");
     };
 
     ws.onclose = function(event) {
         ws = null;
         state(false);
-        $("#connected").html("Connection Closed");
+        //$("#connected").html("Connection Closed");
+        console.log("Connection Closed");
     }
 }
 function send(command, message) {
@@ -88,12 +121,18 @@ function send(command, message) {
     }
 
 }
+
+function updateRactive(tweets, maxN) {
+    ractiveTweets.set('tweets', tweets.slice(0, maxN - 1));
+}
+
 function gettweets() {
     if (ws) {
         ws.onmessage = function(event) {
             var obj = JSON.parse(event.data);
-            tweets.push(obj);
-            $('#stream').append('<p>' + obj.text + '</p>');
+            //tweets.push(obj);
+            tweets.unshift(obj);
+            updateRactive(tweets, 20);
         };
         send('tweets', '');
     }
@@ -124,6 +163,8 @@ function settimer(value) {
     });
 
 }
+
+
 </script>
 
 </head>
@@ -137,27 +178,39 @@ function settimer(value) {
         <h2>WebSocket Echo Demonstration</h2>
     </div>
 
-    <div id="connected">Not Connected</div>
+    <!-- <div id="connected">Not Connected</div>
 
     <div>Connect websocket: <input id="ConnectButton" class="form-group" type="button" value="connect" onclick="connect();" /></div>
     <div>Disconnect websocket: <input id="DisconnectButton" class="form-group" type="button" value="disconnect" onclick="disconnect();" /></div>
+    -->
     <!-- <div>Set timer: <input id="SetTimerButton" class="form-group" type="button" value="settimer" onclick="settimer($('#inputValue').val());" />
         <b><span class="timer" id="countdown" style="display:none" data-seconds-left="60"></span></b>
     </div> -->
-    <div>Get tweets: <input id="GetTweetsButton" class="form-group" type="button" value="gettweets" onclick="gettweets();" /></div>
+    <!--<div>Get tweets: <input id="GetTweetsButton" class="form-group" type="button" value="gettweets" onclick="gettweets();" /></div>
 
     <div id="main" class="hidden">
-    Enter Message <!-- (Enter 'exit' to quit) -->: <input type="text" id="inputValue" name="message" class="form-group" value="" size="40" 
-                                                        onchange="send('echo', this.value); return false" />
-    </div>
+    Enter Message : <input type="text" id="inputValue" name="message" class="form-group" value="" size="40" 
+                           onchange="send('echo', this.value); return false" />
+    </div>-->
 
-    <div>Response from Cach&eacute; Server ... <span class="well well-sm" id="output"></span></div>
+    <!--<div>Response from Cach&eacute; Server ... <span class="well well-sm" id="output"></span></div>-->
 
-    <div class="well well-lg" id="stream"></div>
+    <div id="tweets-container"></div>
 
 </div>
 
 </body>
+
+<script>
+var ractiveTweets = new Ractive({
+    el: '#tweets-container',
+    template: '#tweets-template',
+    data: {
+        tweets: tweets
+    },
+});
+  
+</script>
 </html>
 ]]></CSP>
 </Export>
