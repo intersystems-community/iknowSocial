@@ -21,7 +21,6 @@
   <!-- script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js"></script -->
   <script src="lib/bootstrap-modal.min.js"></script>
 
-  <script src="lib/jquery.simple.timer.js"></script>
   <!-- script src='http://cdn.ractivejs.org/latest/ractive.min.js'></script -->
   <script src='lib/ractive.min.js'></script>
 
@@ -49,12 +48,13 @@
         <ul class="list-unstyled">
         {{#tweets }}
             <li class="trend-item js-trend-item  ">
-            <kbd class="btn-success">{{user}}</kbd> &nbsp; {{text}}
+            <kbd>{{user}}</kbd> &nbsp; {{text}}
             </li>
         {{/tweets}}
         </ul>
     </div>
 </script>
+
 <script language="JavaScript" type="text/javascript">
 var ws;
 var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls"
@@ -65,22 +65,7 @@ if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined'))
     WebSocket = MozWebSocket;
 }
 
-function generatorFn(row) {
-    //el.innerHTML = "<p>ITEM " + row + "</p>";
-    var obj = tweets[row];
-    var text = '';
-    var username = '';
-    if (typeof(obj) !== 'undefined') {
-        text = obj.text;
-        username = obj.user;
-    } 
-    var el = document.createElement("div");
-    el.innerHTML = '<b>' + username + '</b>:&nbsp;' + text;
-    return el;
-}
-
 function init() {
-    state(false);
     connect();
 }
 
@@ -91,7 +76,6 @@ function connect() {
     ws = new WebSocket(((window.location.protocol == "https:") ? "wss:" : "ws:") + "//" + window.location.host + wsserver);
 
     ws.onopen = function(event) {
-        state(true);
         //$("#connected").html("Connected to WebSocket server: <b>" + decodeURIComponent(wsserver) + "</b>");
         console.log("Connected to WebSocket server: <b>" + decodeURIComponent(wsserver) + "</b>");
         gettweets();
@@ -109,7 +93,6 @@ function connect() {
 
     ws.onclose = function(event) {
         ws = null;
-        state(false);
         //$("#connected").html("Connection Closed");
         console.log("Connection Closed");
     }
@@ -144,27 +127,6 @@ function disconnect() {
     }
 }
 
-function state(connected) {
-    $('#ConnectButton').prop('disabled', connected);
-    $('#DisconnectButton').prop('disabled', !connected);
-}
-
-function settimer(value) {
-    //alert(value);
-    var countdown = $('#countdown');
-    countdown.attr('data-seconds-left', value);
-    send('timer', value);
-    countdown.show();
-    countdown.startTimer({
-        onComplete: function(){
-            console.log('Coutdown Completed');
-            countdown.hide();
-        }
-    });
-
-}
-
-
 </script>
 
 </head>
@@ -180,20 +142,9 @@ function settimer(value) {
 
     <!-- <div id="connected">Not Connected</div>
 
-    <div>Connect websocket: <input id="ConnectButton" class="form-group" type="button" value="connect" onclick="connect();" /></div>
-    <div>Disconnect websocket: <input id="DisconnectButton" class="form-group" type="button" value="disconnect" onclick="disconnect();" /></div>
     -->
-    <!-- <div>Set timer: <input id="SetTimerButton" class="form-group" type="button" value="settimer" onclick="settimer($('#inputValue').val());" />
-        <b><span class="timer" id="countdown" style="display:none" data-seconds-left="60"></span></b>
-    </div> -->
     <!--<div>Get tweets: <input id="GetTweetsButton" class="form-group" type="button" value="gettweets" onclick="gettweets();" /></div>
-
-    <div id="main" class="hidden">
-    Enter Message : <input type="text" id="inputValue" name="message" class="form-group" value="" size="40" 
-                           onchange="send('echo', this.value); return false" />
     </div>-->
-
-    <!--<div>Response from Cach&eacute; Server ... <span class="well well-sm" id="output"></span></div>-->
 
     <div id="tweets-container"></div>
 

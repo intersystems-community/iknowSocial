@@ -148,7 +148,6 @@ Execute singular action
             set sql = "select id as id, ""user"" as ""user"", CleanText as text "_
                       "from TWReader_Data.Tweet "_
                       "where ID > TWReader_WebSocket.Chunks_GetWindowId()"
-            do BACK^%ETN
             set status = ..WriteSql(sql)
         } elseif action = "exit" {
             return '$$$OK
