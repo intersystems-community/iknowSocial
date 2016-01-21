@@ -24,25 +24,6 @@
   <!-- script src='http://cdn.ractivejs.org/latest/ractive.min.js'></script -->
   <script src='lib/ractive.min.js'></script>
 
-<style>
-.days {
-    float: left;
-    margin-right: 4px;
-}
-.hours {
-    float: left;
-}
-.minutes {
-    float: left;
-}
-.seconds {
-    float: left;
-}
-.clearDiv {
-    clear: both;
-}
-</style>
-
 <script id='tweets-template' type='text/ractive'>
     <div class="flex-module-inner">
         <ul class="list-unstyled">
