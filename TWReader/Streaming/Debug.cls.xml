@@ -75,6 +75,7 @@ close
     do ##class(TWReader.IKnowDomain).%DropData(1,1)
     //do ##class(TWReader.UIBroker).SaveMorePostsByCoords("0", "100", "46.4846", "30.7326", 1)
     //do ##class(TWReader.UIBroker).FetchMorePosts(0, 100, "Харькова", 1)
+    do ##class(Misc.SentimentMarker).ApproveMarkersFromFile("C:\Users\Timur\Documents\Intersystems\src\VKFB\data\ru\2.txt",1)
 ]]></Implementation>
 </Method>
 
