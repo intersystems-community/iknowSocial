@@ -4,9 +4,10 @@
 <html>
 <head>
   <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" -->
-  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
   <!-- link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/css/bootstrap-modal.min.css" -->
   <link rel="stylesheet" href="lib/bootstrap-modal.min.css">
+  <!-- <link rel="stylesheet" href="lib/twitter-css/embed-tweet.css" /> -->
 
   <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css" -->
   <link rel="stylesheet" href="lib/bootstrap-theme.min.css">
@@ -17,22 +18,97 @@
   <!-- script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script -->
   <script src="lib/jquery-ui.min.js"></script>
   <!-- script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script -->
-  <script src="lib/bootstrap.min.js"></script>
+  <script src="lib/bootstrap/js/bootstrap.min.js"></script>
   <!-- script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js"></script -->
   <script src="lib/bootstrap-modal.min.js"></script>
 
   <!-- script src='http://cdn.ractivejs.org/latest/ractive.min.js'></script -->
   <script src='lib/ractive.min.js'></script>
+  <style type="text/css">
+  .tweets-container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow-y: hidden;
+  }
+  .list-unstyled {
+      overflow-y: hidden;
+  }
+  .flex-module-inner {
+    flex-grow: 1;    
+  }
+  .fadeout {
+    position: relative; 
+    bottom: 4em;
+    height: 4em;
+    background: -webkit-linear-gradient(
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 1) 100%
+    ); 
+    background-image: -moz-linear-gradient(
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 1) 100%
+    );
+    background-image: -o-linear-gradient(
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 1) 100%
+    );
+    background-image: linear-gradient(
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 1) 100%
+    );
+    background-image: -ms-linear-gradient(
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 1) 100%
+    );
+  }
+  /* sentiment visualization */
+kbd .sentiment-neg5 {
+    background: #F8696B !important;
+}
+kbd .sentiment-neg4 {
+    background: #F9826F !important;
+}
+kbd .sentiment-neg3 {
+    background: #FA9D75 !important;
+}
+kbd .sentiment-neg2 {
+    background: #FCB77A !important;
+}
+kbd .sentiment-neg1 {
+    background: #FDD17F !important;
+}
+kbd .sentiment-neutral {
+    /* border-left: 4px solid #FFEB84 !important; */
+    /* background: #e1e8ed !important; */
+}
+kbd .sentiment-pos1 {
+    background: #E0E383 !important;
+}
+kbd .sentiment-pos2 {
+    background: #C1DA81 !important;
+}
+kbd .sentiment-pos3 {
+    background: #A2D07F !important;
+}
+kbd .sentiment-pos4 {
+    background: #83C77D !important;
+}
+kbd .sentiment-pos5 {
+    background: #63BE7B !important;
+}
+  </style>
 
 <script id='tweets-template' type='text/ractive'>
     <div class="flex-module-inner">
         <ul class="list-unstyled">
         {{#tweets }}
             <li class="trend-item js-trend-item  ">
-            <kbd>{{user}}</kbd> &nbsp; {{text}}
+            <kbd class='{{ getSentimentStyle(score) }}' >{{user}}</kbd> &nbsp; {{text}}
             </li>
         {{/tweets}}
         </ul>
+        <div class="fadeout"></div>
     </div>
 </script>
 
@@ -41,6 +117,27 @@ var ws;
 var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls"
 var tweets = [];
 var vlist;
+var maxN = 30;
+
+var sentimentStyles = {
+        "-5": "sentiment-neg5",
+        "-4": "sentiment-neg4",
+        "-3": "sentiment-neg3",
+        "-2": "sentiment-neg2",
+        "-1": "sentiment-neg1",
+        "0": "sentiment-neutral",
+        "1": "sentiment-pos1",
+        "2": "sentiment-pos2",
+        "3": "sentiment-pos3",
+        "4": "sentiment-pos4",
+        "5": "sentiment-pos5"
+    };
+
+function getSentimentStyle(score) {
+    score = Math.round(score);
+    score = score > 5 ? 5 : (score < -5 ? -5 : score);
+    return sentimentStyles[score];
+}
 
 if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) {
     WebSocket = MozWebSocket;
@@ -48,12 +145,28 @@ if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined'))
 
 function init() {
     connect();
+    $('#btn-connect').on('click', function() {
+        if (!ws) {
+            connect();
+        } else {
+            getmoretweets();
+        }
+    });
+    
+    $('#btn-disconnect').on('click', function() {
+        disconnect();
+    });
+    
+    $('#btn-dettach').on('click', function() {
+        // detach(); // FIXME - TODO
+    });
 }
 
 function connect() {
     if (ws) {
         return;
     }
+    tweets = [];
     ws = new WebSocket(((window.location.protocol == "https:") ? "wss:" : "ws:") + "//" + window.location.host + wsserver);
 
     ws.onopen = function(event) {
@@ -78,6 +191,7 @@ function connect() {
         console.log("Connection Closed");
     }
 }
+
 function send(command, message) {
     if (ws) {
         var op = { cmd: command, val: message };
@@ -96,7 +210,18 @@ function gettweets() {
             var obj = JSON.parse(event.data);
             //tweets.push(obj);
             tweets.unshift(obj);
-            updateRactive(tweets, 20);
+            updateRactive(tweets, maxN);
+        };
+        send('tweetsall', '');
+    }
+}
+function getmoretweets() {
+    if (ws) {
+        ws.onmessage = function(event) {
+            var obj = JSON.parse(event.data);
+            //tweets.push(obj);
+            tweets.unshift(obj);
+            updateRactive(tweets, maxN);
         };
         send('tweets', '');
     }
@@ -118,7 +243,12 @@ function disconnect() {
 
 
     <div class="page-header">
-        <h2>WebSocket Echo Demonstration</h2>
+        <h2>Cach&eacute; Processed Twitter Stream Demo</h2>
+        <div class="btn-group btn-group-xs" role="group" aria-label="...">
+            <button type="button" id="btn-connect"    class="btn btn-success"><span class="glyphicon glyphicon-play"></span>&nbsp;Connect</button>
+            <button type="button" id="btn-detach"     class="btn btn-warning"><span class="glyphicon glyphicon-pause"></span>&nbsp;Detach</button>
+            <button type="button" id="btn-disconnect" class="btn btn-danger"><span  class="glyphicon glyphicon-stop"></span>&nbsp;Disconnect</button>
+        </div>
     </div>
 
     <!-- <div id="connected">Not Connected</div>
@@ -138,7 +268,8 @@ var ractiveTweets = new Ractive({
     el: '#tweets-container',
     template: '#tweets-template',
     data: {
-        tweets: tweets
+        tweets: tweets,
+        getSentimentStyle: getSentimentStyle
     },
 });
   

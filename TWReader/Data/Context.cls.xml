@@ -37,11 +37,12 @@
     #dim tweet As TWReader.Data.Tweet = ##class(TWReader.Data.Tweet).CreateOrOpenId(idName, o)
     set tweet.Trend = trend
     #dim oUser = o.user
-    set idName = oUser."screen_name"
-    #dim user As TWReader.Data.User   = ##class(TWReader.Data.User).CreateOrOpenId(idName, oUser)
-
+    if $isobject(oUser) {
+        set idName = oUser."screen_name"
+        #dim user As TWReader.Data.User   = ##class(TWReader.Data.User).CreateOrOpenId(idName, oUser)
+        set status = user.%Save() quit:$$$ISERR(status) status
+    }
     set status = tweet.%Save() quit:$$$ISERR(status) status
-    set status = user.%Save() quit:$$$ISERR(status) status
     quit $$$OK
 ]]></Implementation>
 </Method>

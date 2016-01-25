@@ -67,12 +67,14 @@ if <var>data</var> is string - wraps it as JSON { "Data" : data }.]]></Descripti
     #dim rset As %SQL.StatementResult = stmt.%Execute()
 
     #dim data As %String
+    #dim maxID As %String
     while rset.%Next(.status) {
         set data = ..OutputToStr("%ZEN.Auxiliary.jsonProvider", "%ObjectToJSON", rset)
-        set ^tweets.log($i(^tweets.log)) = data
         set status = ##class(%CSP.WebSocket)$this.Write(data)
+        set maxID = rset.ID
         quit:$$$ISERR(status)
     }
+    do ##class(TWReader.WebSocket.Chunks).UpdateWindowID(rset.ID)
     quit status
 ]]></Implementation>
 </Method>
@@ -128,6 +130,27 @@ output(s)    Set str=str_s   quit
 ]]></Implementation>
 </Method>
 
+<Method name="FetchAll">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set sql = "select id as id, ""user"" as ""user"", CleanText as text, SentimentScore As score "_
+    //set sql = "select id as id, ""user"" as ""user"", CleanText as text "_
+          "from TWReader_Data.Tweet"
+    quit ..WriteSql(sql)
+]]></Implementation>
+</Method>
+
+<Method name="FetchMore">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set sql = "select id as id, ""user"" as ""user"", CleanText as text, SentimentScore As score "_
+    //set sql = "select id as id, ""user"" as ""user"", CleanText as text "_
+          "from TWReader_Data.Tweet "_
+          "where ID > TWReader_WebSocket.Chunks_GetWindowId()"
+    quit ..WriteSql(sql)
+]]></Implementation>
+</Method>
+
 <Method name="Action">
 <Description><![CDATA[
 Execute singular action
@@ -144,11 +167,10 @@ Execute singular action
             #dim seconds As %Numeric = obj.val
             do $system.Alarm.Set(seconds)
             set status = ..Write("Enabled timer for "_seconds_" secs")
+        } elseif action = "tweetsall" {
+            set status = ..FetchAll()
         } elseif action = "tweets" {
-            set sql = "select id as id, ""user"" as ""user"", CleanText as text "_
-                      "from TWReader_Data.Tweet "_
-                      "where ID > TWReader_WebSocket.Chunks_GetWindowId()"
-            set status = ..WriteSql(sql)
+            set status = ..FetchMore()
         } elseif action = "exit" {
             return '$$$OK
         } else {
