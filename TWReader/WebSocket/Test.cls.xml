@@ -130,6 +130,11 @@ output(s)    Set str=str_s   quit
 ]]></Implementation>
 </Method>
 
+<Method name="StartFetch">
+<Implementation><![CDATA[    do ##class(TWReader.Streaming.Debug).DebugJob("lviv")
+]]></Implementation>
+</Method>
+
 <Method name="FetchAll">
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
@@ -168,6 +173,7 @@ Execute singular action
             do $system.Alarm.Set(seconds)
             set status = ..Write("Enabled timer for "_seconds_" secs")
         } elseif action = "tweetsall" {
+            do ..StartFetch()
             set status = ..FetchAll()
         } elseif action = "tweets" {
             set status = ..FetchMore()

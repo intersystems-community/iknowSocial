@@ -62,6 +62,9 @@
     }
 close
     use oldIO
+    if ..IsPendingStop() {
+        ztrap "TERMINATE"
+    }
     return $$$OK
 ]]></Implementation>
 </Method>
@@ -131,6 +134,57 @@ close
 <Implementation><![CDATA[
     set keys = ..GetKeys(.array)
     write "Using query (", title, ") ", "track="_keys_"&locations="_sw_","_ne,!
+]]></Implementation>
+</Method>
+
+<Method name="IsLocked">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>gloRef:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return $data(^$LOCK(gloRef))
+]]></Implementation>
+</Method>
+
+<Method name="IsPendingStop">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return ..IsLocked($name(^TWReader.Job("PendingStop")))
+]]></Implementation>
+</Method>
+
+<Method name="IsRunning">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[    return ..IsLocked($name(^TWReader.Job("Running")))
+]]></Implementation>
+</Method>
+
+<Method name="DebugJob">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Key:%String="lviv",ResetData:%Boolean=1,RebuildDomain:%Boolean=1,SentimentAnalysis:%Boolean=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    // check there is no another background job running
+    //lock +^TWReader.Job("Running"):0
+    //if '$test {
+    if ..IsRunning() {
+        quit '$$$OK
+    }
+    lock +^TWReader.Job("Running")#"E"
+    
+    // clear pending stop lock, if there is any
+    lock -^TWReader.Job("PendingStop")
+    job ..Debug(Key, ResetData, RebuildDomain, SentimentAnalysis)
+]]></Implementation>
+</Method>
+
+<Method name="CleanupLocks">
+<Description>
+clear background job locks</Description>
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+    lock -^TWReader.Job("PendingStop"):0
+    lock -^TWReader.Job("Running"):0
 ]]></Implementation>
 </Method>
 
@@ -217,6 +271,7 @@ close
     #dim debugObject As TWReader.Streaming.Debug = ..%New()
     do ##class(TWReader.Streaming.Api).DebugApiCall("/1.1/statuses/filter.json","locations="_sw_","_ne_"&track="_keys, debugObject)
     do ..RebuildIknow(RebuildDomain, SentimentAnalysis)
+    do ..CleanupLocks()
 ]]></Implementation>
 </Method>
 
