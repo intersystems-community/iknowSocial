@@ -40,7 +40,7 @@
   .fadeout {
     position: relative; 
     bottom: 4em;
-    height: 8em;
+    height: 3em;
     background: -webkit-linear-gradient(
         rgba(255, 255, 255, 0) 0%,
         rgba(255, 255, 255, 1) 100%
@@ -116,6 +116,7 @@ kbd .sentiment-pos5 {
 var ws;
 var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls"
 var tweets = [];
+var tweetsSlice = [];
 var vlist;
 var maxN = 30;
 
@@ -200,18 +201,27 @@ function send(command, message) {
 
 }
 
-function updateRactive(tweets, maxN) {
-    ractiveTweets.set('tweets', tweets.slice(0, maxN - 1));
+function updateWholeRactive(tweets, maxN) {
+    tweetsSlice = tweets.slice(0, maxN - 1)
+    ractiveTweets.set('tweets', tweetsSlice);
+}
+
+function updateSingleRactive(tweet) {
+    if (tweetsSlice.length >= maxN) {
+        tweetsSlice.pop();
+    }
+    tweetsSlice.unshift(tweet);
+    ractiveTweets.set('tweets', tweetsSlice);
 }
 
 function isPlainData(json) {
     return (json.data !== undefined);
 }
 function handleSimpleCommands(data) {
-    console.log('simple command: ' + data);
+    //console.log('simple command: ' + data);
     if (/\bEOL\b/.test(data)) {
         window.setTimeout(function() {
-            window.getmoretweets();
+            getmoretweets();
         }, 500);
     }
 }
@@ -222,7 +232,7 @@ function gettweets() {
             //tweets.push(obj);
             if (!isPlainData(obj)) {
                 tweets.unshift(obj);
-                updateRactive(tweets, maxN);
+                updateWholeRactive(tweets, maxN);
             } else {
                 handleSimpleCommands(obj.data);
             }
@@ -237,7 +247,7 @@ function getmoretweets() {
             //tweets.push(obj);
             if (!isPlainData(obj)) {
                 tweets.unshift(obj);
-                updateRactive(tweets, maxN);
+                updateSingleRactive(obj);
             } else {
                 handleSimpleCommands(obj.data);
             }
@@ -245,7 +255,7 @@ function getmoretweets() {
         send('tweets', '');
     }
 }
-window.getmoretweets = getmoretweets;
+//window.getmoretweets = getmoretweets;
 
 function disconnect() {
     if (ws) {

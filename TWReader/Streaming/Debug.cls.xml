@@ -51,7 +51,7 @@
             write "@",username, "[", lang, ":", $select(isReleant:"Y",1:"N"),"]", text,!
             if isReleant {
                 if $$$ISOK(##class(TWReader.Data.Context).SaveTweet(proxyObject)) {
-                    do ..RebuildIknow(0, 0)
+                    do ..RebuildIknow(1, 0)
                 }
             }
         }
@@ -269,8 +269,8 @@ clear background job locks</Description>
     do ..LogArgs("arguments with trends merged", sw, ne, .keywords)
     set keys = ..GetKeys(.keywords)
     #dim debugObject As TWReader.Streaming.Debug = ..%New()
-    do ##class(TWReader.Streaming.Api).DebugApiCall("/1.1/statuses/filter.json","locations="_sw_","_ne_"&track="_keys, debugObject)
     do ..RebuildIknow(RebuildDomain, SentimentAnalysis)
+    do ##class(TWReader.Streaming.Api).DebugApiCall("/1.1/statuses/filter.json","locations="_sw_","_ne_"&track="_keys, debugObject)
     do ..CleanupLocks()
 ]]></Implementation>
 </Method>
