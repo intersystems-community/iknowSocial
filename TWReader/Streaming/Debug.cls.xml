@@ -30,11 +30,11 @@ Parameter SupportedLanguages = ",ru,ua,en,fr";</Description>
 <FormalSpec>Data:%String</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    // FIXME - some callbaks require merging of neighbourhood calss, and were ppartial JSON
+    // FIXME - some callbaks require merging of neighbourhood calls, and were partial JSON
     // dunno how to make them to merge easily
-    // those cases will indicate themselves ass strange undefined properties in the proxyObject
+    // those cases will indicate themselves as strange undefined properties in the proxyObject
     // after parse: i.e. required property "user" will be not defined in such case
-    // or timestampt or anything other, the same odd
+    // or timestampt or anything other strange thing missing
     
     #dim status As %Status = $$$OK
     set oldIO = $IO use 0
