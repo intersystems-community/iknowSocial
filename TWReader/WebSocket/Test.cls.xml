@@ -130,6 +130,12 @@ output(s)    Set str=str_s   quit
 ]]></Implementation>
 </Method>
 
+<Method name="OnPostServer">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    quit ##class(TWReader.Streaming.Debug).SetPendingStop()
+]]></Implementation>
+</Method>
+
 <Method name="StartFetch">
 <Implementation><![CDATA[    do ##class(TWReader.Streaming.Debug).DebugJob("lviv")
 ]]></Implementation>

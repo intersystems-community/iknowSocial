@@ -5,7 +5,11 @@
 <TimeCreated>63932,59399.284888</TimeCreated>
 
 <Parameter name="SupportedLanguages">
-<Default>,ru,ua,en,fr</Default>
+<Description>
+FIXME - we do not handle anything beyond Russian and Ukrainian. Beware! Enable
+all the rest languages if you need to!
+Parameter SupportedLanguages = ",ru,ua,en,fr";</Description>
+<Default>,ru,ua</Default>
 </Parameter>
 
 <Method name="Relevant">
@@ -149,6 +153,15 @@ close
 <ClassMethod>1</ClassMethod>
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[    return ..IsLocked($name(^TWReader.Job("PendingStop")))
+]]></Implementation>
+</Method>
+
+<Method name="SetPendingStop">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    lock ^TWReader.Job("PendingStop")
+    quit $$$OK
 ]]></Implementation>
 </Method>
 

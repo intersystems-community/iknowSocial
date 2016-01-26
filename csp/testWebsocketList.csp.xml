@@ -63,39 +63,39 @@
     );
   }
   /* sentiment visualization */
-kbd .sentiment-neg5 {
-    background: #F8696B ;
+kbd.sentiment-neg5 {
+    background-color: #F8696B !important;
 }
-kbd .sentiment-neg4 {
-    background: #F9826F ;
+kbd.sentiment-neg4 {
+    background-color: #F9826F !important;
 }
-kbd .sentiment-neg3 {
-    background: #FA9D75 ;
+kbd.sentiment-neg3 {
+    background-color: #FA9D75 !important;
 }
-kbd .sentiment-neg2 {
-    background: #FCB77A ;
+kbd.sentiment-neg2 {
+    background-color: #FCB77A !important;
 }
-kbd .sentiment-neg1 {
-    background: #FDD17F ;
+kbd.sentiment-neg1 {
+    background-color: #FDD17F !important;
 }
-kbd .sentiment-neutral {
+kbd.sentiment-neutral {
     /* border-left: 4px solid #FFEB84 ; */
-    /* background: #e1e8ed ; */
+    /* background-color: #e1e8ed !important; */
 }
-kbd .sentiment-pos1 {
-    background: #E0E383 ;
+kbd.sentiment-pos1 {
+    background-color: #E0E383 !important;
 }
-kbd .sentiment-pos2 {
-    background: #C1DA81 ;
+kbd.sentiment-pos2 {
+    background-color: #C1DA81 !important;
 }
-kbd .sentiment-pos3 {
-    background: #A2D07F ;
+kbd.sentiment-pos3 {
+    background-color: #A2D07F !important;
 }
-kbd .sentiment-pos4 {
-    background: #83C77D ;
+kbd.sentiment-pos4 {
+    background-color: #83C77D !important;
 }
-kbd .sentiment-pos5 {
-    background: #63BE7B ;
+kbd.sentiment-pos5 {
+    background-color: #63BE7B !important;
 }
   </style>
 
@@ -116,6 +116,7 @@ kbd .sentiment-pos5 {
 var ws;
 var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls"
 var tweets = [];
+var uniqueTweets = {};
 var tweetsSlice = [];
 var vlist;
 var maxN = 30;
@@ -207,9 +208,15 @@ function updateWholeRactive(tweets, maxN) {
 }
 
 function updateSingleRactive(tweet) {
+    var id = tweet.id;
+    if (uniqueTweets.hasOwnProperty(id)) {
+        console.log('Duplicated tweet id:' + id + ', text:' + tweet.text);
+        return;
+    }
     if (tweetsSlice.length >= maxN) {
         tweetsSlice.pop();
     }
+    uniqueTweets[id] = 1;
     tweetsSlice.unshift(tweet);
     ractiveTweets.set('tweets', tweetsSlice);
 }
@@ -220,6 +227,7 @@ function isPlainData(json) {
 function handleSimpleCommands(data) {
     //console.log('simple command: ' + data);
     if (/\bEOL\b/.test(data)) {
+        console.log('end of tweets chunk: ' + tweets.length);
         window.setTimeout(function() {
             getmoretweets();
         }, 500);
@@ -237,6 +245,7 @@ function gettweets() {
                 handleSimpleCommands(obj.data);
             }
         };
+        console.log('initiated tweetsall message');
         send('tweetsall', '');
     }
 }
