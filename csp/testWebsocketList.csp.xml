@@ -26,7 +26,7 @@
   <script src='lib/ractive.min.js'></script>
   <style type="text/css">
   .tweets-container {
-      height: 100%;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       overflow-y: hidden;
@@ -40,7 +40,7 @@
   .fadeout {
     position: relative; 
     bottom: 4em;
-    height: 4em;
+    height: 8em;
     background: -webkit-linear-gradient(
         rgba(255, 255, 255, 0) 0%,
         rgba(255, 255, 255, 1) 100%
@@ -64,38 +64,38 @@
   }
   /* sentiment visualization */
 kbd .sentiment-neg5 {
-    background: #F8696B !important;
+    background: #F8696B ;
 }
 kbd .sentiment-neg4 {
-    background: #F9826F !important;
+    background: #F9826F ;
 }
 kbd .sentiment-neg3 {
-    background: #FA9D75 !important;
+    background: #FA9D75 ;
 }
 kbd .sentiment-neg2 {
-    background: #FCB77A !important;
+    background: #FCB77A ;
 }
 kbd .sentiment-neg1 {
-    background: #FDD17F !important;
+    background: #FDD17F ;
 }
 kbd .sentiment-neutral {
-    /* border-left: 4px solid #FFEB84 !important; */
-    /* background: #e1e8ed !important; */
+    /* border-left: 4px solid #FFEB84 ; */
+    /* background: #e1e8ed ; */
 }
 kbd .sentiment-pos1 {
-    background: #E0E383 !important;
+    background: #E0E383 ;
 }
 kbd .sentiment-pos2 {
-    background: #C1DA81 !important;
+    background: #C1DA81 ;
 }
 kbd .sentiment-pos3 {
-    background: #A2D07F !important;
+    background: #A2D07F ;
 }
 kbd .sentiment-pos4 {
-    background: #83C77D !important;
+    background: #83C77D ;
 }
 kbd .sentiment-pos5 {
-    background: #63BE7B !important;
+    background: #63BE7B ;
 }
   </style>
 
@@ -204,13 +204,28 @@ function updateRactive(tweets, maxN) {
     ractiveTweets.set('tweets', tweets.slice(0, maxN - 1));
 }
 
+function isPlainData(json) {
+    return (json.data !== undefined);
+}
+function handleSimpleCommands(data) {
+    console.log('simple command: ' + data);
+    if (/\bEOL\b/.test(data)) {
+        window.setTimeout(function() {
+            window.getmoretweets();
+        }, 500);
+    }
+}
 function gettweets() {
     if (ws) {
         ws.onmessage = function(event) {
             var obj = JSON.parse(event.data);
             //tweets.push(obj);
-            tweets.unshift(obj);
-            updateRactive(tweets, maxN);
+            if (!isPlainData(obj)) {
+                tweets.unshift(obj);
+                updateRactive(tweets, maxN);
+            } else {
+                handleSimpleCommands(obj.data);
+            }
         };
         send('tweetsall', '');
     }
@@ -220,12 +235,18 @@ function getmoretweets() {
         ws.onmessage = function(event) {
             var obj = JSON.parse(event.data);
             //tweets.push(obj);
-            tweets.unshift(obj);
-            updateRactive(tweets, maxN);
+            if (!isPlainData(obj)) {
+                tweets.unshift(obj);
+                updateRactive(tweets, maxN);
+            } else {
+                handleSimpleCommands(obj.data);
+            }
         };
         send('tweets', '');
     }
 }
+window.getmoretweets = getmoretweets;
+
 function disconnect() {
     if (ws) {
         send('exit','');
@@ -240,8 +261,6 @@ function disconnect() {
 <body onload="init();">
 
 <div class="container">
-
-
     <div class="page-header">
         <h2>Cach&eacute; Processed Twitter Stream Demo</h2>
         <div class="btn-group btn-group-xs" role="group" aria-label="...">
@@ -250,13 +269,7 @@ function disconnect() {
             <button type="button" id="btn-disconnect" class="btn btn-danger"><span  class="glyphicon glyphicon-stop"></span>&nbsp;Disconnect</button>
         </div>
     </div>
-
-    <!-- <div id="connected">Not Connected</div>
-
-    -->
-    <!--<div>Get tweets: <input id="GetTweetsButton" class="form-group" type="button" value="gettweets" onclick="gettweets();" /></div>
-    </div>-->
-
+    
     <div id="tweets-container"></div>
 
 </div>
