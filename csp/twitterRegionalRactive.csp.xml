@@ -71,6 +71,7 @@
                 <li><a href="#" data-woeid="924938" data-country="Ukraine" >Kyiv</a></li>
                 <li><a href="#" data-woeid="922137" data-country="Ukraine" >Kharkiv</a></li>
                 <li><a href="#" data-woeid="929398" data-country="Ukraine" >Odesa</a></li>
+                <li><a href="#" data-woeid="924943" data-country="Ukraine" >Lviv</a></li>
                 <li class="active"><a href="#" data-woeid="23424976">Whole Ukraine</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#" data-woeid="2264962" data-country="Kazakhstan" >Astana</a></li>
@@ -105,7 +106,7 @@
 
 <script language="JavaScript">
 
-var hardcodedTrends = ['egovkz', 'ЦОН', 'OpenData'].map(function (s) { return { sourceId: s, fixed: true}; });
+var hardcodedTrends = []; //['egovkz', 'ЦОН', 'OpenData'].map(function (s) { return { sourceId: s, fixed: true}; });
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;

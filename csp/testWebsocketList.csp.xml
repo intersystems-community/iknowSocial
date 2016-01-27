@@ -213,6 +213,11 @@ function updateSingleRactive(tweet) {
         console.log('Duplicated tweet id:' + id + ', text:' + tweet.text);
         return;
     }
+    if (!tweet.text || !tweet.user)
+    {
+        console.log('Empty tweet id:' + id);
+        return;
+    }
     if (tweetsSlice.length >= maxN) {
         tweetsSlice.pop();
     }

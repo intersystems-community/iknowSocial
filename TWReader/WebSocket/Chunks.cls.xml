@@ -63,7 +63,7 @@ data to the client - we need to save last saved tweet, to continue since then</D
 <ClassMethod>1</ClassMethod>
 <FormalSpec>sinceID:%String</FormalSpec>
 <Implementation><![CDATA[
-    set sql = "SELECT id as id, user as user, CleanText as text, Coordinates as coords from TWReader_Data.Tweet " _
+    set sql = "SELECT id as id, ""user"" as ""user"", CleanText as text, Coordinates as coords from TWReader_Data.Tweet " _
               "WHERE ID > TWReader_WebSocket.Chunks_GetWindowId()"
     do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,sql)
 ]]></Implementation>

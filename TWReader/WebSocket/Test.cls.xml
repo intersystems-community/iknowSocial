@@ -67,14 +67,14 @@ if <var>data</var> is string - wraps it as JSON { "Data" : data }.]]></Descripti
     #dim rset As %SQL.StatementResult = stmt.%Execute()
 
     #dim data As %String
-    #dim maxID As %String
+    #dim maxID As %String = ""
     while rset.%Next(.status) {
         quit:$$$ISERR(status)
         set data = ..OutputToStr("%ZEN.Auxiliary.jsonProvider", "%ObjectToJSON", rset)
         set status = ##class(%CSP.WebSocket)$this.Write(data)
         set maxID = rset.ID
     }
-    do ##class(TWReader.WebSocket.Chunks).UpdateWindowID(rset.ID)
+    do:maxID'="" ##class(TWReader.WebSocket.Chunks).UpdateWindowID(maxID)
     quit status
 ]]></Implementation>
 </Method>
@@ -130,14 +130,14 @@ output(s)    Set str=str_s   quit
 ]]></Implementation>
 </Method>
 
-<Method name="OnPostServer">
+<Method name="%OnClose">
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[    quit ##class(TWReader.Streaming.Debug).SetPendingStop()
 ]]></Implementation>
 </Method>
 
 <Method name="StartFetch">
-<Implementation><![CDATA[    do ##class(TWReader.Streaming.Debug).DebugJob("lviv")
+<Implementation><![CDATA[    do ##class(TWReader.Streaming.Debug).DebugJob("kiev")
 ]]></Implementation>
 </Method>
 

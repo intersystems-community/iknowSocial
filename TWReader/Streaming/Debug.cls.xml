@@ -8,14 +8,18 @@
 <Description>
 FIXME - we do not handle anything beyond Russian and Ukrainian. Beware! Enable
 all the rest languages if you need to!
-Parameter SupportedLanguages = ",ru,ua,en,fr";</Description>
-<Default>,ru,ua</Default>
+Parameter SupportedLanguages = ",ru,uk,en,fr";</Description>
+<Default>,ru,uk</Default>
 </Parameter>
 
 <Method name="Relevant">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>place:%String,lang:%String</FormalSpec>
 <Implementation><![CDATA[
+#if 0
+    /// everything is relevant unless we are asking only for the geo
+    return $$$OK
+#else
     // 1. TODO - to implement place to geo translation to match only relevant places (cities, countries)
     // 2. match tweet language - only iknow enabled are of interest for us
     #dim known As %String = $lfs(..#SupportedLanguages,",")
@@ -23,6 +27,7 @@ Parameter SupportedLanguages = ",ru,ua,en,fr";</Description>
         return $$$OK
     }
     return '$$$OK
+#endif
 ]]></Implementation>
 </Method>
 
@@ -80,6 +85,7 @@ close
     do ##class(TWReader.Data.Tweet).%DeleteExtent()
     do ##class(TWReader.Data.Trend).%DeleteExtent()
     do ##class(TWReader.IKnowDomain).%DropData(1,1)
+    do ##class(TWReader.WebSocket.Chunks).OnAfterDropData()
     //do ##class(TWReader.UIBroker).SaveMorePostsByCoords("0", "100", "46.4846", "30.7326", 1)
     //do ##class(TWReader.UIBroker).FetchMorePosts(0, 100, "Харькова", 1)
     do ##class(Misc.SentimentMarker).ApproveMarkersFromFile("C:\Users\Timur\Documents\Intersystems\src\VKFB\data\ru\2.txt",1)
@@ -232,8 +238,8 @@ clear background job locks</Description>
         set woeid = 23424936
         set keys = russianWords
     } elseif lowKey = "kiev" {
-        set ne = "50.316879,30.355551"
-        set sw = "50.529751,30.581539"
+        set ne = "50.529751,30.581539"
+        set sw = "50.316879,30.355551"
         set woeid = 924938
         set keys = ukrainanWords_",Kiev,Киев"
     } elseif lowKey = "kharkiv" {
@@ -278,12 +284,19 @@ clear background job locks</Description>
     #dim keywords 
     do ..InitKeywords(keys, .keywords)
     do ..LogArgs("initial arguments", sw, ne, .keywords)
+#if 0
     do ..GetInitialTrends(woeid, .keywords)
     do ..LogArgs("arguments with trends merged", sw, ne, .keywords)
+#endif
     set keys = ..GetKeys(.keywords)
     #dim debugObject As TWReader.Streaming.Debug = ..%New()
     do ..RebuildIknow(RebuildDomain, SentimentAnalysis)
+#if 0
+    // disable tracking keywords for a moment
+    do ##class(TWReader.Streaming.Api).DebugApiCall("/1.1/statuses/filter.json","locations="_sw_","_ne, debugObject)
+#else
     do ##class(TWReader.Streaming.Api).DebugApiCall("/1.1/statuses/filter.json","locations="_sw_","_ne_"&track="_keys, debugObject)
+#endif
     do ..CleanupLocks()
 ]]></Implementation>
 </Method>
