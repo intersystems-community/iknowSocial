@@ -197,6 +197,12 @@ Execute singular action
             set status = ..Write("Unknown action")
         }
     } catch {
+        // TODO - if there are multiple errors they might impact general 
+        // application performance, reducing whole bandwidth.
+        // Twitter is stict about it and might interrupt streaming channel,
+        // so if you have seen slowdown, and interrupted streaming data, then
+        // 1st check ^%ERN reports - there are may be thousands of errors reported
+        // ***  you have to solve reported errors first  ***
         do BACK^%ETN
     }
     quit status
