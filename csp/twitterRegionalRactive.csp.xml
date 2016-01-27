@@ -55,8 +55,8 @@
         <!-- button role="button" class="btn btn-primary" type="button" id="select-geo" data-toggle="modal">
             Select Geo location<span id="select-geo-location" class="badge">...</span>
         </button -->
-        <div class="btn-group" id="select-menu">
-            <button type="button" class="btn btn-default btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <div class="btn-group btn-group-xs" id="select-menu">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Select Geo location<span id="select-geo-location" class="badge">...</span>
             </button>
             <ul class="dropdown-menu">
@@ -113,15 +113,15 @@ function getRandomInt(min, max) {
 }
 var sentimentStyles = {
         "-5": "sentiment-neg5",
-        "-4": "sentiment-neg4",
-        "-3": "sentiment-neg3",
-        "-2": "sentiment-neg2",
-        "-1": "sentiment-neg1",
+        "-4": "sentiment-neg5",
+        "-3": "sentiment-neg4",
+        "-2": "sentiment-neg3",
+        "-1": "sentiment-neg2",
         "0": "sentiment-neutral",
-        "1": "sentiment-pos1",
-        "2": "sentiment-pos2",
-        "3": "sentiment-pos3",
-        "4": "sentiment-pos4",
+        "1": "sentiment-pos2",
+        "2": "sentiment-pos3",
+        "3": "sentiment-pos4",
+        "4": "sentiment-pos5",
         "5": "sentiment-pos5"
     };
 function getRandomSentimentStyle() {
@@ -129,7 +129,10 @@ function getRandomSentimentStyle() {
     return sentimentStyles[randomInt];
 }
 function getSentimentStyle(score) {
-    score = Math.round(score);
+    if (!score) {
+        return sentimentStyles[0];
+    }
+    score = score < 0 ? Math.floor(score) : Math.ceil(score);
     score = score > 5 ? 5 : (score < -5 ? -5 : score);
     return sentimentStyles[score];
 }

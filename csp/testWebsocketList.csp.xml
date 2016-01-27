@@ -38,9 +38,10 @@
     flex-grow: 1;    
   }
   .fadeout {
-    position: relative; 
-    bottom: 4em;
-    height: 3em;
+    /* position: relative; */
+    position: fixed;
+    bottom: 3em;
+    height: 6em;
     z-index: 5;
     background: -webkit-linear-gradient(
         rgba(255, 255, 255, 0) 0%,
@@ -112,9 +113,9 @@ kbd.sentiment-pos5 {
 
     bottom: 4em;
     right: 4em;
-    min-height: 12em;
-    min-width: 12em;
-    padding:1em;
+    min-height: 10em;
+    min-width: 11em;
+    padding: 1em;
 
     /* http://css3gen.com/box-shadow/ */
     -webkit-box-shadow: 1px 1px 12px 2px rgba(50, 50, 50, 0.68);
@@ -151,22 +152,55 @@ var maxN = 30;
 
 var sentimentStyles = {
         "-5": "sentiment-neg5",
-        "-4": "sentiment-neg4",
-        "-3": "sentiment-neg3",
-        "-2": "sentiment-neg2",
-        "-1": "sentiment-neg1",
+        "-4": "sentiment-neg5",
+        "-3": "sentiment-neg4",
+        "-2": "sentiment-neg3",
+        "-1": "sentiment-neg2",
         "0": "sentiment-neutral",
-        "1": "sentiment-pos1",
-        "2": "sentiment-pos2",
-        "3": "sentiment-pos3",
-        "4": "sentiment-pos4",
+        "1": "sentiment-pos2",
+        "2": "sentiment-pos3",
+        "3": "sentiment-pos4",
+        "4": "sentiment-pos5",
         "5": "sentiment-pos5"
     };
 
 function getSentimentStyle(score) {
-    score = Math.round(score);
+    if (!score) {
+        return sentimentStyles[0];
+    }
+    score = score < 0 ? Math.floor(score) : Math.ceil(score);
     score = score > 5 ? 5 : (score < -5 ? -5 : score);
     return sentimentStyles[score];
+}
+
+var positiveCount = 0, negativeCount = 0, neutralCount = 0;
+
+function countSentimentScores() {
+    for (var i in tweets) {
+        var tweet = tweets[i];
+        countSingleScore(tweet, false);
+    }
+    updateCounters();
+}
+
+function countSingleScore(tweet, redraw) {
+    var score = tweet.score;
+    if (score > 0) {
+        positiveCount++;
+    } else if (score < 0) {
+        negativeCount++;
+    } else {
+        neutralCount++;
+    }
+    if (redraw) { 
+        updateCounters();
+    }
+}
+
+function updateCounters() {
+    $('#likes-number').text(positiveCount);
+    $('#dislikes-number').text(negativeCount);
+    $('#neutral-number').text(neutralCount);
 }
 
 if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) {
@@ -174,7 +208,7 @@ if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined'))
 }
 
 function init() {
-    connect();
+    //connect();
     $('#btn-connect').on('click', function() {
         if (!ws) {
             connect();
@@ -233,6 +267,7 @@ function send(command, message) {
 function updateWholeRactive(tweets, maxN) {
     tweetsSlice = tweets.slice(0, maxN - 1)
     ractiveTweets.set('tweets', tweetsSlice);
+    countSentimentScores();
 }
 
 function updateSingleRactive(tweet) {
@@ -252,6 +287,7 @@ function updateSingleRactive(tweet) {
     uniqueTweets[id] = 1;
     tweetsSlice.unshift(tweet);
     ractiveTweets.set('tweets', tweetsSlice);
+    countSingleScore(tweet, true);
 }
 
 function isPlainData(json) {
@@ -320,15 +356,44 @@ function disconnect() {
             <button type="button" id="btn-detach"     class="btn btn-warning"><span class="glyphicon glyphicon-pause"></span>&nbsp;Detach</button>
             <button type="button" id="btn-disconnect" class="btn btn-danger"><span  class="glyphicon glyphicon-stop"></span>&nbsp;Disconnect</button>
         </div>
+        
+        <div class="btn-group  btn-group-xs" id="select-menu">
+            <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Selected Geo <span id="select-geo-location" class="badge">Kiev</span>
+            </button>
+            <ul class="dropdown-menu">
+                <!-- See woeid explorer @ http://isithackday.com/geoplanet-explorer/index.php -->
+                <li><a href="#" data-woeid="2122265" data-country="Russia" >Moscow</a></li>
+                <li><a href="#" data-woeid="2123260" data-country="Russia" >Saint-Petersburg</a></li>
+                <li><a href="#" data-woeid="2121267" data-country="Russia" >Kazan</a></li>
+                <!-- li><a href="#" data-woeid="2124298" data-country="Russia" >Volgograd</a></li>
+                <li><a href="#" data-woeid="2124288" data-country="Russia" >Vladivostock</a></li -->
+                <li class="active"><a href="#" data-woeid="23424936">Whole Russia</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" data-woeid="924938" data-country="Ukraine" >Kyiv</a></li>
+                <li><a href="#" data-woeid="922137" data-country="Ukraine" >Kharkiv</a></li>
+                <li><a href="#" data-woeid="929398" data-country="Ukraine" >Odesa</a></li>
+                <li><a href="#" data-woeid="924943" data-country="Ukraine" >Lviv</a></li>
+                <li class="active"><a href="#" data-woeid="23424976">Whole Ukraine</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" data-woeid="2264962" data-country="Kazakhstan" >Astana</a></li>
+                <li><a href="#" data-woeid="2255777" data-country="Kazakhstan" >Almaty</a></li>
+                <!-- li><a href="#" data-woeid="2261214" data-country="Kazakhstan" >Qaraghandy</a></li -->
+                <li class="active"><a href="#" data-woeid="23424871">Whole Kazakhstan</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" id="select-geo">Select map location<span id="select-geo-location" class="badge">...</span></a></li>
+            </ul>
+        </div>
+
     </div>
     <div id="tweets-stats"><h4>Sentiment Analysis Stats:</h4>
     <dl class="dl-horizontal">
-<!--    <p><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;Likes: <mark id="likes-number">NNNN</mark></p>
-    <p><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;Dislikes: <mark id="dislikes-number">MMMM</mark></p>
-    <p><span class="glyphicon glyphicon-asterisk"></span>&nbsp;Neutral (unknown): <mark id="neutral-number">SSSS</mark></p> -->
-    <dt class="text-success"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;Likes:</dt><dd id="likes-number" class="text-success">NNNN</dd>
-    <dt class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;Dislikes:</dt><dd id="dislikes-number" class="text-danger">MMMM</dd>
-    <dt><span class="glyphicon glyphicon-asterisk"></span>&nbsp;Unknown:</dt><dd id="neutral-number">SSSS</dd>
+        <dt class="text-success"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;Likes:</dt>
+            <dd id="likes-number" class="text-success"></dd>
+        <dt class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;Dislikes:</dt>
+            <dd id="dislikes-number" class="text-danger"></dd>
+        <dt><span class="glyphicon glyphicon-asterisk"></span>&nbsp;Unknown:</dt>
+            <dd id="neutral-number"></dd>
     </dl>
     </div>
     
