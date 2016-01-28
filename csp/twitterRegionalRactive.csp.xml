@@ -48,7 +48,7 @@
 <style type="text/css">
 
 .shadow-panel {
-    min-width: 11em;
+    min-width: 18em;
     padding: 1em;
 
     /* http://colorzilla.com/gradient-editor/#ffffff+0,f1f1f1+49,e1e1e1+52,f6f6f6+100 */
