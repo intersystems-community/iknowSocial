@@ -100,9 +100,9 @@ kbd.sentiment-pos5 {
     background-color: #63BE7B !important;
 }
 
-#tweets-stats {
-    position: fixed;
-    z-index: 10;
+.shadow-panel {
+    min-width: 18em;
+    padding: 1em;
 
     /* http://colorzilla.com/gradient-editor/#ffffff+0,f1f1f1+49,e1e1e1+52,f6f6f6+100 */
     background: #ffffff; /* Old browsers */
@@ -110,12 +110,6 @@ kbd.sentiment-pos5 {
     background: -webkit-linear-gradient(top,  #ffffff 0%,#f1f1f1 49%,#e1e1e1 52%,#f6f6f6 100%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(to bottom,  #ffffff 0%,#f1f1f1 49%,#e1e1e1 52%,#f6f6f6 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
-
-    bottom: 4em;
-    right: 4em;
-    min-height: 10em;
-    min-width: 11em;
-    padding: 1em;
 
     /* http://css3gen.com/box-shadow/ */
     -webkit-box-shadow: 1px 1px 12px 2px rgba(50, 50, 50, 0.68);
@@ -126,8 +120,44 @@ kbd.sentiment-pos5 {
     -o-transition:-o-transform .15s linear;
     -webkit-transition:-webkit-transform .15s linear;
 }
-  </style>
 
+#tweets-stats {
+    position: fixed;
+    z-index: 10;
+
+
+    bottom: 4em;
+    right: 4em;
+    min-height: 10em;
+    /*min-width: 11em; */
+    padding: 1em;
+}
+#trends-container {
+    position: fixed;
+    z-index: 9;
+
+
+    top: 10em;
+    right: 4em;
+    min-height: 10em;
+    /*min-width: 11em; */
+    padding: 1em;
+}
+</style>
+
+<script id='trends-template' type='text/ractive'>
+<div class="Trends module trends">
+    <ul class="trend-items js-trends list-unstyled" id="trends-table">
+    {{#trendsCollection }}
+        <li class="trend-item js-trend-item  ">
+        <a class="js-nav trend-name" href="#" data-fixed="{{fixed}}">{{sourceId}}
+        <span class="{{ fixed ? 'glyphicon glyphicon-asterisk' : ''}}" aria-hidden="true"></span>
+        </a>
+        </li>
+    {{/trendsCollection}}
+    </ul>
+</div>
+</script>
 <script id='tweets-template' type='text/ractive'>
     <div class="flex-module-inner">
         <ul class="list-unstyled">
@@ -149,6 +179,13 @@ var uniqueTweets = {};
 var tweetsSlice = [];
 var vlist;
 var maxN = 30;
+
+var hardcodedTrends = [
+    '#ФреддиФолловитТоммо',
+    '#Арбузов',
+    '#Рада',
+    '#ТвиттерскиеВЖизни'
+].map(function (s) { return { sourceId: s, fixed: true}; });
 
 var sentimentStyles = {
         "-5": "sentiment-neg5",
@@ -386,17 +423,20 @@ function disconnect() {
         </div>
 
     </div>
-    <div id="tweets-stats"><h4>Sentiment Analysis Stats:</h4>
-    <dl class="dl-horizontal">
-        <dt class="text-success"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;Likes:</dt>
-            <dd id="likes-number" class="text-success"></dd>
-        <dt class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;Dislikes:</dt>
-            <dd id="dislikes-number" class="text-danger"></dd>
-        <dt><span class="glyphicon glyphicon-asterisk"></span>&nbsp;Unknown:</dt>
-            <dd id="neutral-number"></dd>
-    </dl>
+    <div id="trends-container" class="shadow-panel">
     </div>
-    
+    <div id="tweets-stats" class="shadow-panel">
+        <h4>Sentiment Analysis Stats:</h4>
+        <dl class="dl-horizontal">
+            <dt class="text-success"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;Likes:</dt>
+                <dd id="likes-number" class="text-success"></dd>
+            <dt class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;Dislikes:</dt>
+                <dd id="dislikes-number" class="text-danger"></dd>
+            <dt><span class="glyphicon glyphicon-asterisk"></span>&nbsp;Unknown:</dt>
+                <dd id="neutral-number"></dd>
+        </dl>
+    </div>
+
     <div id="tweets-container"></div>
 
 </div>
@@ -404,15 +444,32 @@ function disconnect() {
 </body>
 
 <script>
-var ractiveTweets = new Ractive({
-    el: '#tweets-container',
-    template: '#tweets-template',
-    data: {
-        tweets: tweets,
-        getSentimentStyle: getSentimentStyle
-    },
-});
-  
+    var trendsCollection = [];
+    var ractiveTweets = new Ractive({
+        el: '#tweets-container',
+        template: '#tweets-template',
+        data: {
+            tweets: tweets,
+            getSentimentStyle: getSentimentStyle
+        },
+    });
+
+    var ractiveTrends = new Ractive({
+        el: '#trends-container',
+        template: '#trends-template',
+        data: {
+            trendsCollection: trendsCollection,
+        },
+    });
+
+    // FIXME - get rid of hardcoded
+    $(document).ready(function() {
+        updateTrends(hardcodedTrends);
+    })
+    function updateTrends(trends) {
+        ractiveTrends.set('trendsCollection', trends);
+    }
+
 </script>
 </html>
 ]]></CSP>

@@ -5,7 +5,7 @@
 <head>
   <title>Twitter Regional Analysis</title>
   <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" -->
-  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
   <!-- link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/css/bootstrap-modal.min.css" -->
   <link rel="stylesheet" href="lib/bootstrap-modal.min.css">
   <!-- blatantly copied from twitter -->
@@ -44,7 +44,42 @@
   <script src='lib/ractive.min.js'></script>
 
   <script src="custom.js"></script>
-  
+
+<style type="text/css">
+
+.shadow-panel {
+    min-width: 11em;
+    padding: 1em;
+
+    /* http://colorzilla.com/gradient-editor/#ffffff+0,f1f1f1+49,e1e1e1+52,f6f6f6+100 */
+    background: #ffffff; /* Old browsers */
+    background: -moz-linear-gradient(top,  #ffffff 0%, #f1f1f1 49%, #e1e1e1 52%, #f6f6f6 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #ffffff 0%,#f1f1f1 49%,#e1e1e1 52%,#f6f6f6 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #ffffff 0%,#f1f1f1 49%,#e1e1e1 52%,#f6f6f6 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
+
+    /* http://css3gen.com/box-shadow/ */
+    -webkit-box-shadow: 1px 1px 12px 2px rgba(50, 50, 50, 0.68);
+    -moz-box-shadow:    1px 1px 12px 2px rgba(50, 50, 50, 0.68);
+    box-shadow:         1px 1px 12px 2px rgba(50, 50, 50, 0.68);
+
+    -moz-transition:-moz-transform .15s linear;
+    -o-transition:-o-transform .15s linear;
+    -webkit-transition:-webkit-transform .15s linear;
+}
+
+#tweets-stats {
+    position: fixed;
+    z-index: 10;
+
+
+    bottom: 4em;
+    right: 4em;
+    min-height: 10em;
+    /*min-width: 11em; */
+    padding: 1em;
+}
+</style>  
 
 </head>
 <body>
@@ -104,6 +139,19 @@
 
     <div id="tweets-container" class="col-md-9"></div>
 
+    <div id="tweets-stats" class="shadow-panel">
+        <h4>Sentiment Analysis Stats:</h4>
+        <dl class="dl-horizontal">
+            <dt class="text-success"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;Likes:</dt>
+                <dd id="likes-number" class="text-success"></dd>
+            <dt class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;Dislikes:</dt>
+                <dd id="dislikes-number" class="text-danger"></dd>
+            <dt><span class="glyphicon glyphicon-asterisk"></span>&nbsp;Unknown:</dt>
+                <dd id="neutral-number"></dd>
+        </dl>
+    </div>
+
+
 <script language="JavaScript">
 
 var hardcodedTrends = []; //['egovkz', 'ЦОН', 'OpenData'].map(function (s) { return { sourceId: s, fixed: true}; });
@@ -135,6 +183,38 @@ function getSentimentStyle(score) {
     score = score < 0 ? Math.floor(score) : Math.ceil(score);
     score = score > 5 ? 5 : (score < -5 ? -5 : score);
     return sentimentStyles[score];
+}
+
+var positiveCount = 0, negativeCount = 0, neutralCount = 0;
+
+function countSentimentScores(tweets) {
+    positiveCount = negativeCount = neutralCount = 0;
+    
+    for (var i in tweets) {
+        var tweet = tweets[i];
+        countSingleScore(tweet, false);
+    }
+    updateCounters();
+}
+
+function countSingleScore(tweet, redraw) {
+    var score = +tweet.SentimentScore;
+    if (score > 0) {
+        positiveCount++;
+    } else if (score < 0) {
+        negativeCount++;
+    } else {
+        neutralCount++;
+    }
+    if (redraw) { 
+        updateCounters();
+    }
+}
+
+function updateCounters() {
+    $('#likes-number').text(positiveCount);
+    $('#dislikes-number').text(negativeCount);
+    $('#neutral-number').text(neutralCount);
 }
 
 </script>
@@ -323,6 +403,7 @@ function getSentimentStyle(score) {
         
         function updateCollection(collection) {
             ractiveTweets.set('collection', collection);
+            countSentimentScores(collection);
         }
         
         function updateTrends(trends) {
