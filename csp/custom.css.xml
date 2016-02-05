@@ -78,5 +78,21 @@ table td div {
     outline: 0px none;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
 }
+
+
+/* iknow entities highlighting */
+.lightgray {
+  background-color: lightgray;
+}
+.negation {
+    color: red;
+}
+.term {
+    color: green;
+    font-weight:bold;
+}
+.sentence {
+    font-weight:bold;
+}
 ]]></CSP>
 </Export>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
 <Class name="Misc.DomainSentimentScore">
+<IncludeCode>%IKPublic</IncludeCode>
 <Super>%RegisteredObject</Super>
 <TimeCreated>63524,66706.279868</TimeCreated>
 
@@ -16,7 +17,6 @@
 <Implementation><![CDATA[
     set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+value))
     quit status
-
 ]]></Implementation>
 </Method>
 
@@ -30,7 +30,6 @@
     set status = ##class(%iKnow.Queries.MetadataAPI).SetValue(domainId, ..#EmotionalColoringField, externalId, (+current) + (+value))
     //do $system.Status.DisplayError(status)
     quit status
-
 ]]></Implementation>
 </Method>
 
@@ -88,7 +87,6 @@
         set k1 = k1 + 1     
     }   // for
     quit $$$OK
-
 ]]></Implementation>
 </Method>
 
@@ -129,7 +127,6 @@
         set i = i + 1
     }
     return $$$OK
-
 ]]></Implementation>
 </Method>
 
@@ -159,7 +156,46 @@
     } 
     
     quit status
+]]></Implementation>
+</Method>
 
+<UDLText name="T">
+<Content><![CDATA[
+// FIXME - move elsewhere to the better place
+
+]]></Content>
+</UDLText>
+
+<Method name="GetHighlightedSource">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>domName:%String,sourceId:%Integer,entity:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    // FIXME - check domain existence if (##class(%iKnow.Domain).Exists(domName)) 
+    #dim domainId As %Integer = ##class(%iKnow.Domain).GetOrCreateId(domName)
+    #Dim tHighlight, resultSent, sourceStr, data as %String
+    #Dim iSent as %Integer
+
+    Set tHighlight("ATTRIBUTE",$$$IKATTNEGATION)="<span class='negation'>"
+    Set tHighlight("ATTRIBUTEWORDS",$$$IKATTNEGATION)="<u>"
+    If entity'="" {
+        If $ListValid(entity) {
+            For iList=1:1:$ListLength(entity) {
+                Set tHighlight("ENTITY",$list(entity,iList))="<span class='term'>"
+            }
+        } else {
+            Set tHighlight("ENTITY",entity)="<span class='term'>"
+        }
+    }
+    Set sourceStr=""
+    Do ##class(%iKnow.Queries.SentenceAPI).GetBySource(.resultSent, domainId, sourceId, 0)
+    Set iSent=""
+    For {
+        Set iSent=$Order(resultSent(iSent),1,data) If iSent="" Quit
+        Set sourceStr=sourceStr_$Select(sourceStr="":"",1:"<br>")
+        Set sourceStr=sourceStr_$zcvt($zcvt(##class(%iKnow.Queries.SentenceAPI).GetHighlighted(domainId, $list(data,1), .tHighlight),"o","UTF8"),"o","JSON")
+    }
+    Quit $tr(sourceStr,"""[]","")
 ]]></Implementation>
 </Method>
 </Class>
