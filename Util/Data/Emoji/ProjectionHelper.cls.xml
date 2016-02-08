@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.Data.Emoji.ProjectionHelper">
+<Super>%Projection.AbstractProjection</Super>
+<TimeCreated>63953,84658.364508</TimeCreated>
+
+<Method name="CreateProjection">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[className:%String,&parameters:%String,modified:%String,qStruct]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim tClass As %Dictionary.CompiledClass = ##class(%Dictionary.CompiledClass).%OpenId(className)
+    quit:tClass.Abstract $$$OK
+    
+    return $classmethod(className, "%OnClassCompile")
+]]></Implementation>
+</Method>
+
+<Method name="EndCompile">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>qStruct</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    return $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="RemoveProjection">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[className:%String,&parameters:%String,recompile:%Boolean,modified:%String,qStruct]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[    return $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>
