@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.Setup">
+<IncludeCode>%sySecurity</IncludeCode>
+<Super>%RegisteredObject</Super>
+<TimeCreated>63958,6929.267107</TimeCreated>
+
+<Parameter name="RestApp">
+<Type>%String</Type>
+<Default>rest</Default>
+</Parameter>
+
+<Parameter name="RestDispatcher">
+<Type>%String</Type>
+<Default>TWReader.Rest.Handler</Default>
+</Parameter>
+
+<Method name="CreateWebApp">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>CspApplication:%String,DispatchClass:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim Namespace As %String = $namespace
+    new $namespace set $namespace = "%sys"
+    #dim security As %String = ""
+    do ##class(Security.System).GetInstallationSecuritySetting(.security)
+    
+    #dim cspProperties As %String
+    set cspProperties("AutheEnabled")   = $select(security="None":$$$AutheUnauthenticated, 1:$$$AutheCache)
+    set cspProperties("NameSpace")      = Namespace
+    set cspProperties("IsNameSpaceDefault") = 0
+    set cspProperties("DispatchClass") = DispatchClass
+    set tSC = ##class(Security.Applications).Create(CspApplication, .cspProperties)
+
+    quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="%OnSetup">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    do ..CreateWebApp($system.CSP.GetDefaultApp($namespace)_"/"_..#RestApp,..#RestDispatcher)
+    
+    quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Project name="VKReader" LastModified="2016-02-06 00:44:38.333339" Target="##class(Util.Data.Emoji.Loader).%OnClassCompile()" TargetType="0">
+<Project name="VKReader" LastModified="2016-02-10 02:08:13.462781" Target="##class(TWReader.Rest.Handler).GetTop(&quot;TWReaderRus&quot;,10)" TargetType="0">
   <Items>
     <ProjectItem name="HTMLReader" type="PKG"></ProjectItem>
     <ProjectItem name="Misc" type="PKG"></ProjectItem>
@@ -34,8 +34,10 @@
     <ProjectItem name="csp/vkfb/twitterRegionalRactive.CSP" type="CSP"></ProjectItem>
   </Items>
   <BreakPoints>
-    <BreakPoint Routine="TWReader.Streaming.Debug.CLS" Offset="%OnHttpReceive+26"></BreakPoint>
     <BreakPoint Routine="Util.Data.Emoji.Loader.1.INT" Offset="7"></BreakPoint>
+    <BreakPoint Routine="TWReader.Streaming.Debug.CLS" Offset="%OnHttpReceive+26"></BreakPoint>
+    <BreakPoint Routine="TWReader.Rest.Api.CLS" Offset="DebugApiCall+1"></BreakPoint>
+    <BreakPoint Routine="TWReader.Rest.Handler.CLS" Offset="GetTop+1"></BreakPoint>
   </BreakPoints>
 </Project>
 </Export>

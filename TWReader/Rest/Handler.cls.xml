@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="TWReader.Rest.Handler">
+<IncludeCode>%IKPublic</IncludeCode>
+<Super>%CSP.REST</Super>
+<TimeCreated>63957,66107.801703</TimeCreated>
+
+<XData name="UrlMap">
+<Data><![CDATA[
+<Routes>
+
+<Route Url="/Domain/:domain/GetTop/:maxSize" Method="GET" Call="GetTop"/>
+<Route Url="/Domain/:domain/GetSimilar/:entity" Method="GET" Call="GetSimilar"/>
+<Route Url="/Domain/:domain/Sources/:entity" Method="GET" Call="GetSources"/>
+
+</Routes>
+]]></Data>
+</XData>
+
+<Method name="GetTop">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pDomain:%String,nMaximum:%Integer</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim status As %Status = $$$OK
+
+    try {
+        #dim objDomain As %iKnow.Domain = ##class(%iKnow.Domain).Open(pDomain)
+        #dim domainId As %Integer = objDomain.Id
+
+        if '$isobject(objDomain) {
+            return objDomain
+        }
+        set query ="select * from %iKnow_Queries.EntityQAPI_GetTop("_domainId_", 1, "_$get(nMaximum, 10)_")"
+        #dim utf8 As %String = ""
+        if ($data(%request)) {
+          set %response.CharSet     = ##class(%SYS.NLS.Table).GetCSPTable()
+          set %response.ContentType = "application/json"
+          set utf8 = "u"
+        }
+        do ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL(,query,"tw"_utf8)
+    
+    } catch (e) {
+        set status = e.AsStatus()
+    }
+    quit status
+]]></Implementation>
+</Method>
+</Class>
+</Export>
