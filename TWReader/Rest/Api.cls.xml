@@ -161,7 +161,7 @@ Handy utility to debug Twitter API calls for any Twitter API
 It assumes to use builtin Twitter application signature (see <class>Util.Requests.Authorizer</class>
 for more details about application signature)]]></Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>apiUrl:%String="/1.1/trends/closest.json",apiParams:%String,callback</FormalSpec>
+<FormalSpec>apiUrl:%String="/1.1/trends/closest.json",apiParams:%String,callback=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     #dim array as %ArrayOfDataTypes = ##class(%ArrayOfDataTypes).%New()
@@ -172,13 +172,12 @@ for more details about application signature)]]></Description>
         if $length(apiUrl, "?")>1 {
             set $lb(apiUrl, apiParams) = $lfs(apiUrl, "?")
         }
-    } else {
-        for i=1:1:$length(apiParams,"&") {
-            set param = $piece(apiParams,"&", i)
-            #dim arg As %String     = $piece(param,"=",1)
-            #dim value As %String   = $piece(param,"=",*)
-            do array.SetAt(value, arg)
-        }
+    }
+    for i=1:1:$length(apiParams,"&") {
+        set param = $piece(apiParams,"&", i)
+        #dim arg As %String     = $piece(param,"=",1)
+        #dim value As %String   = $piece(param,"=",*)
+        do array.SetAt(value, arg)
     }
     #dim jsonContent As %String
     #dim status As %Status = ..CallApiArgs(..#ApiServer, apiUrl, array, .jsonContent, callback)
