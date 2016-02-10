@@ -16,7 +16,6 @@ Misc.pkg
 TWReader.Verbose.inc
 TWReader.pkg
 TwitterReader.pkg
-Util.Data.IKnowDefines.inc
 Util.pkg
 VKReader.pkg
 VKReader.prj
