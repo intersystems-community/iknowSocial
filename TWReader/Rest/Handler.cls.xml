@@ -86,7 +86,7 @@
 <FormalSpec>nMaximum:%Integer=10</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    #dim query As %String = "select top "_nMaximum_" ID, ""User"", CleanText, SentimentScore from Twreader_Data.Tweet order by ID desc"
+    #dim query As %String = "select top "_nMaximum_" ID, ""User"" as ""user"", CleanText as text, SentimentScore as score from Twreader_Data.Tweet order by ID desc"
     quit ..ExecQuery(query)
 ]]></Implementation>
 </Method>

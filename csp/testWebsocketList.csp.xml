@@ -248,12 +248,12 @@ if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined'))
 function init() {
     //connect();
     
+    // load prior trends
     $.ajax({
-        url: restserver + 'Domain/TWReaderRus/GetTop/10'
+        url: restserver + 'Domain/TWReaderRus/GetTop/' + Math.round(maxN/2)
     }).then(function(data) {
 
         //console.log(data.children);
-        
         updateTrends(data.children.map(
                         function (o) { 
                             return { 
@@ -263,6 +263,16 @@ function init() {
                             }; 
                         }));
     });
+
+    // load last tweets from prio sessions
+    $.ajax({
+        url: restserver + 'Domain/GetLastTweets/' + maxN
+    }).then(function(data) {
+        console.log(data.children);
+        tweets = data.children;
+        updateWholeRactive(tweets, maxN);
+    });
+
     $('#btn-connect').on('click', function() {
         if (!ws) {
             connect();
