@@ -26,13 +26,15 @@
     do ##class(Security.System).GetInstallationSecuritySetting(.security)
     
     #dim cspProperties As %String
-    set cspProperties("AutheEnabled")   = $select(security="None":$$$AutheUnauthenticated, 1:$$$AutheCache)
-    set cspProperties("NameSpace")      = Namespace
+    set cspProperties("AutheEnabled")       = $select(security="None": $$$AutheUnauthenticated, 1: $$$AutheCache)
+    set cspProperties("NameSpace")          = Namespace
     set cspProperties("IsNameSpaceDefault") = 0
-    set cspProperties("DispatchClass") = DispatchClass
-    set tSC = ##class(Security.Applications).Create(CspApplication, .cspProperties)
-
-    quit $$$OK
+    set cspProperties("DispatchClass")      = DispatchClass
+    #dim status As %Status = $$$OK
+    if ('##class(Security.Applications).Exists(CspApplication)) {
+        set status = ##class(Security.Applications).Create(CspApplication, .cspProperties)
+    }
+    quit status
 ]]></Implementation>
 </Method>
 

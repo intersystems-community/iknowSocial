@@ -173,7 +173,8 @@ kbd.sentiment-pos5 {
 
 <script language="JavaScript" type="text/javascript">
 var ws;
-var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls"
+var wsserver = "#($system.CSP.GetDefaultApp($namespace))#/TWReader.WebSocket.Test.cls";
+var restserver = "#($system.CSP.GetDefaultApp($namespace))#/rest/";
 var tweets = [];
 var uniqueTweets = {};
 var tweetsSlice = [];
@@ -246,6 +247,22 @@ if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined'))
 
 function init() {
     //connect();
+    
+    $.ajax({
+        url: restserver + 'Domain/TWReaderRus/GetTop/10'
+    }).then(function(data) {
+
+        //console.log(data.children);
+        
+        updateTrends(data.children.map(
+                        function (o) { 
+                            return { 
+                                sourceId: o.entity, 
+                                fixed: false, 
+                                volume: o.frequency
+                            }; 
+                        }));
+    });
     $('#btn-connect').on('click', function() {
         if (!ws) {
             connect();

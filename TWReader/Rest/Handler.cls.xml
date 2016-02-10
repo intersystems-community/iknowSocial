@@ -11,7 +11,8 @@
 
 <Route Url="/Domain/:domain/GetTop/:maxSize" Method="GET" Call="GetTopConcepts"/>
 <Route Url="/Domain/:domain/GetTopRel/:maxSize" Method="GET" Call="GetTopRelations"/>
-<Route Url="/Domain/GetLastTweetsBrief/:maxSize" Method="GET" Call="GetLastTweetsBrief"/>
+<Route Url="/Domain/GetLastTweets/:maxSize" Method="GET" Call="GetLastTweetsBrief"/>
+<Route Url="/Domain/GetLastTweetsFull/:maxSize" Method="GET" Call="GetLastTweetsFull"/>
 
 </Routes>
 ]]></Data>
