@@ -12,7 +12,7 @@
 <Route Url="/Domain/:domain/GetTop/:maxSize" Method="GET" Call="GetTopConcepts"/>
 <Route Url="/Domain/:domain/GetTopRel/:maxSize" Method="GET" Call="GetTopRelations"/>
 <Route Url="/Domain/GetLastTweets/:maxSize" Method="GET" Call="GetLastTweetsBrief"/>
-<Route Url="/Domain/GetLastTweetsFull/:maxSize" Method="GET" Call="GetLastTweetsFull"/>
+<Route Url="/Domain/GetTrendTweets/:trend/:maxSize" Method="GET" Call="GetTrendTweets"/>
 
 </Routes>
 ]]></Data>
@@ -88,6 +88,20 @@
 <Implementation><![CDATA[
     #dim query As %String = "select top "_nMaximum_" ID, ""User"" as ""user"", CleanText as text, SentimentScore as score from Twreader_Data.Tweet order by ID desc"
     quit ..ExecQuery(query)
+]]></Implementation>
+</Method>
+
+<Method name="GetTrendTweets">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>query:%String,nMaximum:%Integer=100</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set sql = "SELECT top "_ nMaximum _ " T.ID, T.Coordinates, T.CreatedAt, T.FavoriteCount, T.Lang, T.Place, " _
+              "T.Retweeted, T.RetweetCount, T.Source, T.Text, " _
+              "U.ScreenName, U.Name As FullName, T.CalculatedPlace As Location, U.ProfileImageUrl, T.SentimentScore " _
+              "FROM TWReader_Data.Tweet T, TWReader_Data.""User"" U " _
+              "WHERE T.""User"" = U.screenname and %sqlupper(trend) = %sqlupper('" _ query _"')"
+    quit ..ExecQuery(sql)
 ]]></Implementation>
 </Method>
 </Class>
