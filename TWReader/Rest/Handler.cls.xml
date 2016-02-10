@@ -11,7 +11,7 @@
 
 <Route Url="/Domain/:domain/GetTop/:maxSize" Method="GET" Call="GetTopConcepts"/>
 <Route Url="/Domain/:domain/GetTopRel/:maxSize" Method="GET" Call="GetTopRelations"/>
-<Route Url="/Domain/GetLastTweets/:maxSize" Method="GET" Call="GetLastTweets"/>
+<Route Url="/Domain/GetLastTweetsBrief/:maxSize" Method="GET" Call="GetLastTweetsBrief"/>
 
 </Routes>
 ]]></Data>
@@ -80,12 +80,12 @@
 ]]></Implementation>
 </Method>
 
-<Method name="GetLastTweets">
+<Method name="GetLastTweetsBrief">
 <ClassMethod>1</ClassMethod>
 <FormalSpec>nMaximum:%Integer=10</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    #dim query As %String = "select top "_nMaximum_" id, ""user"", cleantext, sentimentscore from twreader_data.tweet order by id desc"
+    #dim query As %String = "select top "_nMaximum_" ID, ""User"", CleanText, SentimentScore from Twreader_Data.Tweet order by ID desc"
     quit ..ExecQuery(query)
 ]]></Implementation>
 </Method>
