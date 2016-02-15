@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<CSP name="twitterRegionalRest.CSP" application="/csp/vkfb/" default="1"><![CDATA[
+<html>
+<head>
+  <title>Twitter Regional Analysis</title>
+  <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" -->
+  <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
+  <!-- link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/css/bootstrap-modal.min.css" -->
+  <link rel="stylesheet" href="lib/bootstrap-modal.min.css">
+  <!-- blatantly copied from twitter -->
+  <!-- link rel="stylesheet" href="lib/twitter-css/twitter_core.bundle.css" />
+  <link rel="stylesheet" href="lib/twitter-css/twitter_more_1.bundle.css" />
+  <link rel="stylesheet" href="lib/twitter-css/twitter_more_2.bundle.css" / -->
+  <link rel="stylesheet" href="lib/twitter-css/embed-tweet.css" />
+
+  <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css" -->
+  <link rel="stylesheet" href="lib/bootstrap-theme.min.css">
+  <!-- link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" -->
+  <!-- link rel="stylesheet" href="lib/jquery-ui.css" -->
+  <!-- link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" / -->
+  <link rel="stylesheet" href="lib/leaflet.css" />
+
+  <link rel="stylesheet" href="custom.css" />
+
+  <!-- script src="https://code.jquery.com/jquery-1.11.2.min.js"></script -->
+  <script src="lib/jquery-1.11.2.min.js"></script>
+  <!-- script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script -->
+  <script src="lib/jquery-ui.min.js"></script>
+  <!-- script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script -->
+  <script src="lib/bootstrap.min.js"></script>
+  <!-- script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modal.min.js"></script -->
+  <script src="lib/bootstrap-modal.min.js"></script>
+  <!-- script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.2.6/js/bootstrap-modalmanager.min.js"></script -->
+  <script src="lib/bootstrap-modalmanager.min.js"></script>
+  <!-- script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script -->
+  <script src="lib/leaflet.js"></script>
+
+ 
+  <!-- link rel="stylesheet" href="//cdn.jsdelivr.net/leaflet.esri.geocoder/1.0.2/esri-leaflet-geocoder.css" -->
+  <link rel="stylesheet" href="lib/esri-leaflet-geocoder.css">
+
+  <!-- script src='http://cdn.ractivejs.org/latest/ractive.min.js'></script -->
+  <script src='lib/ractive.min.js'></script>
+
+  <script src="custom.js"></script>
+
+<style type="text/css">
+
+.shadow-panel {
+    min-width: 18em;
+    padding: 1em;
+
+    /* http://colorzilla.com/gradient-editor/#ffffff+0,f1f1f1+49,e1e1e1+52,f6f6f6+100 */
+    background: #ffffff; /* Old browsers */
+    background: -moz-linear-gradient(top,  #ffffff 0%, #f1f1f1 49%, #e1e1e1 52%, #f6f6f6 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #ffffff 0%,#f1f1f1 49%,#e1e1e1 52%,#f6f6f6 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #ffffff 0%,#f1f1f1 49%,#e1e1e1 52%,#f6f6f6 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
+
+    /* http://css3gen.com/box-shadow/ */
+    -webkit-box-shadow: 1px 1px 12px 2px rgba(50, 50, 50, 0.68);
+    -moz-box-shadow:    1px 1px 12px 2px rgba(50, 50, 50, 0.68);
+    box-shadow:         1px 1px 12px 2px rgba(50, 50, 50, 0.68);
+
+    -moz-transition:-moz-transform .15s linear;
+    -o-transition:-o-transform .15s linear;
+    -webkit-transition:-webkit-transform .15s linear;
+}
+
+#tweets-stats {
+    position: fixed;
+    z-index: 10;
+
+
+    bottom: 4em;
+    right: 4em;
+    min-height: 10em;
+    /*min-width: 11em; */
+    padding: 1em;
+}
+</style>  
+
+</head>
+<body>
+
+<div class="container">
+
+    <div id="left-pane" class="col-md-3">
+        <!-- button role="button" class="btn btn-primary" type="button" id="select-geo" data-toggle="modal">
+            Select Geo location<span id="select-geo-location" class="badge">...</span>
+        </button -->
+        <div class="btn-group btn-group-xs" id="select-menu">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Geo location<span id="select-geo-location" class="badge">...</span>
+            </button>
+            <ul class="dropdown-menu">
+                <!-- See woeid explorer @ http://isithackday.com/geoplanet-explorer/index.php -->
+                <li><a href="#" data-woeid="2122265" data-country="Russia" >Moscow</a></li>
+                <li><a href="#" data-woeid="2123260" data-country="Russia" >Saint-Petersburg</a></li>
+                <li><a href="#" data-woeid="2121267" data-country="Russia" >Kazan</a></li>
+                <!-- li><a href="#" data-woeid="2124298" data-country="Russia" >Volgograd</a></li>
+                <li><a href="#" data-woeid="2124288" data-country="Russia" >Vladivostock</a></li -->
+                <li class="active"><a href="#" data-woeid="23424936">Whole Russia</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" data-woeid="924938" data-country="Ukraine" >Kyiv</a></li>
+                <li><a href="#" data-woeid="922137" data-country="Ukraine" >Kharkiv</a></li>
+                <li><a href="#" data-woeid="929398" data-country="Ukraine" >Odesa</a></li>
+                <li><a href="#" data-woeid="924943" data-country="Ukraine" >Lviv</a></li>
+                <li class="active"><a href="#" data-woeid="23424976">Whole Ukraine</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" data-woeid="2264962" data-country="Kazakhstan" >Astana</a></li>
+                <li><a href="#" data-woeid="2255777" data-country="Kazakhstan" >Almaty</a></li>
+                <!-- li><a href="#" data-woeid="2261214" data-country="Kazakhstan" >Qaraghandy</a></li -->
+                <li class="active"><a href="#" data-woeid="23424871">Whole Kazakhstan</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" id="select-geo">Select map location<span id="select-geo-location" class="badge">...</span></a></li>
+            </ul>
+        </div>
+             
+        <div id="myModal" class="modal fade highlight" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                    <h3 id="myModalLabel">Select Geo Location For Trends</h3>
+                </div>
+                <div class="modal-body">
+                    <p><div id="map" style="height:60vh"></div></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-primary btn-danger">OK</button>
+                </div>
+            </div>
+        </div> 
+
+        <div id="trends-container"></div>
+    </div>
+
+    <div id="tweets-container" class="col-md-9"></div>
+
+    <div id="tweets-stats" class="shadow-panel">
+        <h4>Sentiment Analysis Stats:</h4>
+        <dl class="dl-horizontal">
+            <dt class="text-success"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;Likes:</dt>
+                <dd id="likes-number" class="text-success"></dd>
+            <dt class="text-danger"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;Dislikes:</dt>
+                <dd id="dislikes-number" class="text-danger"></dd>
+            <dt><span class="glyphicon glyphicon-asterisk"></span>&nbsp;Unknown:</dt>
+                <dd id="neutral-number"></dd>
+        </dl>
+    </div>
+
+
+<script language="JavaScript">
+
+var restserver = "#($system.CSP.GetDefaultApp($namespace))#/rest/";
+
+var hardcodedTrends = []; //['egovkz', 'ЦОН', 'OpenData'].map(function (s) { return { sourceId: s, fixed: true}; });
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+var sentimentStyles = {
+        "-5": "sentiment-neg5",
+        "-4": "sentiment-neg5",
+        "-3": "sentiment-neg4",
+        "-2": "sentiment-neg3",
+        "-1": "sentiment-neg2",
+        "0": "sentiment-neutral",
+        "1": "sentiment-pos2",
+        "2": "sentiment-pos3",
+        "3": "sentiment-pos4",
+        "4": "sentiment-pos5",
+        "5": "sentiment-pos5"
+    };
+function getRandomSentimentStyle() {
+    var randomInt = getRandomInt(-5, 5)
+    return sentimentStyles[randomInt];
+}
+function getSentimentStyle(score) {
+    if (!score) {
+        return sentimentStyles[0];
+    }
+    score = score < 0 ? Math.floor(score) : Math.ceil(score);
+    score = score > 5 ? 5 : (score < -5 ? -5 : score);
+    return sentimentStyles[score];
+}
+
+var positiveCount = 0, negativeCount = 0, neutralCount = 0;
+
+function countSentimentScores(tweets) {
+    positiveCount = negativeCount = neutralCount = 0;
+    
+    for (var i in tweets) {
+        var tweet = tweets[i];
+        countSingleScore(tweet, false);
+    }
+    updateCounters();
+}
+
+function countSingleScore(tweet, redraw) {
+    var score = +tweet.SentimentScore;
+    if (score > 0) {
+        positiveCount++;
+    } else if (score < 0) {
+        negativeCount++;
+    } else {
+        neutralCount++;
+    }
+    if (redraw) { 
+        updateCounters();
+    }
+}
+
+function updateCounters() {
+    $('#likes-number').text(positiveCount);
+    $('#dislikes-number').text(negativeCount);
+    $('#neutral-number').text(neutralCount);
+}
+
+</script>
+
+<script id='trends-template' type='text/ractive'>
+<div class="Trends module trends">
+    <div class="trends-inner flex-module trends-container">
+        <div class="flex-module-inner">
+            <ul class="trend-items js-trends" id="trends-table">
+            {{#trendsCollection }}
+                <li class="trend-item js-trend-item  ">
+                <a class="js-nav trend-name" href="#" data-fixed="{{fixed}}">{{name}}
+                <span class="{{ fixed ? 'glyphicon glyphicon-asterisk' : ''}}" aria-hidden="true"></span>
+                </a>
+                </li>
+            {{/trendsCollection}}
+            </ul>
+        </div>
+    </div>
+</div>
+</script>
+<script id='tweet-template' type='text/ractive'>
+<div class="EmbeddedTweet js-clickToOpenTarget" id="twitter-widget-0" >
+    {{#collection }}
+        <blockquote class="Tweet" class='{{ getSentimentStyle(SentimentScore) }}' cite="https://twitter.com/{{ScreenName}}/status/{{ID}}" 
+                    data-tweet-id="{{ID}}" data-scribe="section:subject">
+            <div class="Tweet-header u-cf">
+                <div class="Tweet-author u-textTruncate" data-scribe="component:author">
+                    <a class="Tweet-authorLink Identity u-linkBlend" data-scribe="element:user_link" href="https://twitter.com/{{ScreenName}}" 
+                       aria-label="{{FullName}} (screen name: {{ScreenName}})">
+                        <span class="Tweet-authorAvatar Identity-avatar">
+                        <img class="Avatar u-photo" data-scribe="element:avatar" alt="" 
+                             data-src-2x="{{ProfileImageUrl}}" 
+                             src="{{ProfileImageUrl}}">
+                        </span>
+                        <span class="Tweet-authorName Identity-name p-name customisable-highlight" data-scribe="element:name">{{FullName}}</span>
+                        <span class="Tweet-authorScreenName Identity-screenName p-nickname" data-scribe="element:screen_name">@{{ScreenName}}</span>
+                        <span class="Tweet-tweetLocation">{{Location}}</span>
+                    </a>
+                </div>
+            </div>
+            <div class="Tweet-body e-entry-content" data-scribe="component:tweet">
+                <p class="Tweet-text e-entry-title" dir="ltr">{{Text}}</p>
+                <span class="Tweet-metadata dateline">
+                    <a class="u-linkBlend u-url customisable-highlight long-permalink" data-datetime="{{CreatedAt}}" 
+                       data-scribe="element:full_timestamp" href="https://twitter.com/{{ScreenName}}/status/{{ID}}">
+                    <time class="dt-updated" datetime="{{ CreatedAt }}" pubdate="" title="{{ timePosted(CreatedAt) }}">{{ humanTime(CreatedAt)}}</time></a>
+                </span>
+                <ul class="Tweet-actions" data-scribe="component:actions" role="menu" aria-label="Tweet actions">
+                    <li class="Tweet-action">
+                        <a class="TweetAction TweetAction--reply web-intent" href="https://twitter.com/intent/tweet?in_reply_to={{ID}}" 
+                           data-scribe="element:reply">
+                            <div class="Icon Icon--reply TweetAction-icon" aria-label="Reply" title="Reply" role="img"></div>
+                        </a>
+                    </li>
+                    <li class="Tweet-action">
+                        <a class="TweetAction TweetAction--retweet web-intent" href="https://twitter.com/intent/retweet?tweet_id={{ID}}" 
+                           data-scribe="element:retweet">
+                            <div class="Icon Icon--retweet TweetAction-icon" aria-label="Retweet" title="Retweet" role="img"></div>
+                            <span class="TweetAction-stat" data-scribe="element:retweet_count" aria-hidden="true">{{RetweetCount}}</span>
+                        </a>
+                    </li>
+                    <li class="Tweet-action">
+                        <a class="TweetAction TweetAction--heart web-intent" href="https://twitter.com/intent/like?tweet_id={{ID}}" 
+                           data-scribe="element:heart">
+                            <div class="Icon Icon--heart TweetAction-icon" aria-label="Like" title="Like" role="img"></div>
+                            <span class="TweetAction-stat" data-scribe="element:heart_count" aria-hidden="true">{{FavoriteCount}}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </blockquote>
+        {{/collection}}
+</div>
+</script>
+  
+</div> <!-- contaiiner -->
+    
+    <!-- script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script -->
+    <script src="//cdn.jsdelivr.net/leaflet.esri/1.0.0/esri-leaflet.js"></script>
+    <script src="//cdn.jsdelivr.net/leaflet.esri.geocoder/1.0.2/esri-leaflet-geocoder.js"></script>
+    <script language="JavaScript">
+
+        var map = L.map('map'); 
+        map.setView([49, 32], 6);
+        // NB! use http://leaflet-extras.github.io/leaflet-providers/preview/ for tile provider demo
+        //L.tileLayer('http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', { // BUGBUG - has no Astana
+        //L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
+            maxZoom: 18,
+            zoom: 6,
+            attribution: false,
+            detectRetina: true
+        }).addTo(map);
+        //map.locate({setView: true, maxZoom: 16});
+
+        var searchControl = L.esri.Geocoding.Controls.geosearch().addTo(map);
+
+        var results = L.layerGroup().addTo(map);
+
+        searchControl.on('results', function(data) {
+            results.clearLayers();
+            for (var i = data.results.length - 1; i >= 0; i--) {
+                results.addLayer(L.marker(data.results[i].latlng));
+            }
+        });
+  
+        var marker;
+        var lastPosition;
+
+        map.on('click', function(e) {
+            if( !marker ) {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+            lastPosition = e.latlng;
+            console.log(lastPosition)
+        });
+        $('#select-menu ul li a').on('click', function() {
+            var woeid = $(this).attr('data-woeid');
+            var place = $(this).text();
+            var country = $(this).attr('data-country');
+            console.log(place + ',' + country + ' = ' + woeid);
+            if (woeid) {
+                $.ajax({
+                    url: restserver + 'Trends/' + woeid
+                }).then(function(data) {
+                    trends = hardcodedTrends + trends.concat(data[0].trends);
+                    updatePlace(place, country);
+                    updateTrends(trends);
+                }); 
+
+            }
+        });
+        $('#select-geo').on('click', function() {
+            $('#myModal').modal('toggle');
+        });
+        $('#myModal').on('shown',function(){
+            L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container);
+        });
+
+        $('#myModal').on('hidden',function(){
+            $("#trends-table").removeClass('hidden');
+            #call(TWReader.UIBroker.DrawTrendsEx("['sourceId']","#trends-table", lastPosition.lat, lastPosition.lng))#
+
+            if( marker ) {
+                map.removeLayer(marker);
+                marker = null;
+            }
+        });
+
+        var collection = [];
+        var trendsCollection = [];
+        var ractiveTweets = new Ractive({
+            el: '#tweets-container',
+            template: '#tweet-template',
+            data: {
+                collection: collection,
+                humanTime: function(dateTime) {
+                    //return '5:51 PM - 3 Dec 2015';
+                    return dateTime;
+                },
+                timePosted: function(dateTime) {
+                    return ('Time posted: ' + dateTime);
+                },
+                getSentimentStyle: function(score) {
+                    return getSentimentStyle(score);
+                }
+            },
+        });
+
+        var ractiveTrends = new Ractive({
+            el: '#trends-container',
+            template: '#trends-template',
+            data: {
+                trendsCollection: trendsCollection,
+            },
+        });
+        
+        var clearIknowDomain = false;
+        var maximumNumberOfTweets = 100;
+        
+        function fetchAllTrendsData() {
+            #call(TWReader.UIBroker.AddMorePostsByCoords(clearIknowDomain, maximumNumberOfTweets, lastPosition.lat, lastPosition.lng, true))# 
+        }
+        // used in return value by TWReader.UIBroker.AddMorePostsWithinContext
+        function updatePager(maxCount) {
+            console.log(maxCount);
+        }
+
+        function fetchTrendSources(query) {
+            #call(TWReader.UIBroker.FetchMorePosts(clearIknowDomain, maximumNumberOfTweets, query))# 
+        }
+        
+        function updateCollection(collection) {
+            ractiveTweets.set('collection', collection);
+            countSentimentScores(collection);
+        }
+        
+        function updateTrends(trends) {
+            ractiveTrends.set('trendsCollection', trends);
+        }
+
+        function showSourcesQuery(query) {
+            #call(TWReader.UIBroker.ShowFullSourceById(query))#
+        }
+
+        function showSentimentCounters() {
+            #call(TWReader.UIBroker.ShowEC())#
+        }
+
+        function updatePlace(place, country) {
+            if (typeof(country) !== 'undefined' && country !== 'undefined' && country.length > 0) { // FIXME - 
+                place = place + ',' + country
+            }
+            $("#select-geo-location").text(place);
+        }
+
+        $(document).on("click", "#trends-table .trend-name", function () {
+           fetchTrendSources($(this).text())
+        });
+
+        /* $(document).on("click", ".trend-name", function () {
+            showSourcesQuery($(this).text())
+        }); */
+
+  </script>
+</body>
+</html>
+]]></CSP>
+</Export>

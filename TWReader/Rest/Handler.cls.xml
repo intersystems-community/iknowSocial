@@ -13,6 +13,7 @@
 <Route Url="/Domain/:domain/GetTopRel/:maxSize" Method="GET" Call="GetTopRelations"/>
 <Route Url="/Domain/GetLastTweets/:maxSize" Method="GET" Call="GetLastTweetsBrief"/>
 <Route Url="/Domain/GetTrendTweets/:trend/:maxSize" Method="GET" Call="GetTrendTweets"/>
+<Route Url="/Trends/:woeid" Method="GET" Call="GetTrends"/>
 
 </Routes>
 ]]></Data>
@@ -102,6 +103,27 @@
               "FROM TWReader_Data.Tweet T, TWReader_Data.""User"" U " _
               "WHERE T.""User"" = U.screenname and %sqlupper(trend) = %sqlupper('" _ query _"')"
     quit ..ExecQuery(sql)
+]]></Implementation>
+</Method>
+
+<Method name="GetTrends">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>woeid:%String</FormalSpec>
+<Implementation><![CDATA[
+    #dim status As %Status = $$$OK
+    try {
+
+        #dim response As %String = ""
+        #dim %status As %Status = ##class(TWReader.Rest.Api).GetTrendsByPlaceJSON(.response, woeid)
+        if ($data(%request)) {
+          set %response.CharSet     = ##class(%SYS.NLS.Table).GetCSPTable()
+          set %response.ContentType = "application/json"
+        }
+        write response,!
+    } catch (e) {
+        set status = e.AsStatus()
+    }
+    quit status
 ]]></Implementation>
 </Method>
 </Class>
