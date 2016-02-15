@@ -265,5 +265,20 @@ Runs all tests across the project.</Description>
     quit status
 ]]></Implementation>
 </Method>
+
+<Projection name="AutoInstall">
+<Type>Util.ProjectionHelper</Type>
+<Internal>1</Internal>
+</Projection>
+
+<Method name="%OnClassCompile">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<ForceGenerate>1</ForceGenerate>
+<Implementation><![CDATA[
+    write !, "Install All SSL configurations:",!
+    do ..InstallAll()
+]]></Implementation>
+</Method>
 </Class>
 </Export>

@@ -6,7 +6,7 @@
 <TimeCreated>63953,85587.824919</TimeCreated>
 
 <Projection name="EmojiProjectionHelper">
-<Type>Util.Data.Emoji.ProjectionHelper</Type>
+<Type>Util.ProjectionHelper</Type>
 <Internal>1</Internal>
 </Projection>
 
@@ -31,7 +31,7 @@
         set o.UnicodeBlock   = unicodeBlock
         set status = o.%Save()
         quit:$$$ISERR(status)
-        write o.CodePoint, "  ", o.UnicodeChar, "  ", o.UnicodeName, "  ", o.UnicodeBlock,!
+        //write o.CodePoint, "  ", o.UnicodeChar, "  ", o.UnicodeName, "  ", o.UnicodeBlock,!
     }
 ]]></Implementation>
 </Method>
@@ -59,6 +59,7 @@
     if '$IsObject(xdata) || '$IsObject(data) {
         return %objlasterror 
     }
+    write !,"Loading EmojiTable:",!
     do ..LoadStream(data)
     quit $$$OK
 ]]></Implementation>

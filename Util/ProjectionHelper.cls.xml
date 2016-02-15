@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="Util.Data.Emoji.ProjectionHelper">
+<Class name="Util.ProjectionHelper">
 <Super>%Projection.AbstractProjection</Super>
 <TimeCreated>63953,84658.364508</TimeCreated>
 
@@ -13,6 +13,7 @@
     quit:tClass.Abstract $$$OK
     
     return $classmethod(className, "%OnClassCompile")
+
 ]]></Implementation>
 </Method>
 
@@ -20,7 +21,9 @@
 <ClassMethod>1</ClassMethod>
 <FormalSpec>qStruct</FormalSpec>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return $$$OK
+<Implementation><![CDATA[
+    return $$$OK
+
 ]]></Implementation>
 </Method>
 
@@ -28,7 +31,9 @@
 <ClassMethod>1</ClassMethod>
 <FormalSpec><![CDATA[className:%String,&parameters:%String,recompile:%Boolean,modified:%String,qStruct]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[    return $$$OK
+<Implementation><![CDATA[
+    return $$$OK
+
 ]]></Implementation>
 </Method>
 </Class>

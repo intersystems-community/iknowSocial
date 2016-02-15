@@ -78,7 +78,7 @@ Call Twitter API given <var>api</var> urls and arguments. Return JSON data into 
             set url = url _ "/" _ api
         }
     }
-    #dim authorizer As Util.Requests.Authorizer = ##class(Util.Requests.Authorizer).%New()
+    #dim authorizer As TWReader.Authorizer = ##class(TWReader.Authorizer).%New()
     #dim authHeader as %String = authorizer.GetAuthHeader("get", url, arrayArgs)
     set responseText = ""
     quit ##class(Util.Requests.RequestSender).SendHttpRequest(apiServer, api, arrayArgs, .responseText, $$$HTTPLOGLEVEL, authHeader)
@@ -158,7 +158,7 @@ Call Twitter API given <var>api</var> urls and arguments. Return JSON data into 
 <Description><![CDATA[
 Handy utility to debug Twitter API calls for any Twitter API 
 <a href="https://dev.twitter.com/rest/public" target="_blank">https://dev.twitter.com/rest/public</a>
-It assumes to use builtin Twitter application signature (see <class>Util.Requests.Authorizer</class>
+It assumes to use builtin Twitter application signature (see <class>TWReader.Authorizer</class>
 for more details about application signature)]]></Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>apiUrl:%String="/1.1/trends/closest.json",apiParams:%String,callback=""</FormalSpec>

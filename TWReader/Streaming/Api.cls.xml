@@ -89,7 +89,7 @@ Almost the same as CallApiArgs from REST API, but providing streaming callbacks<
             set url = url _ "/" _ api
         }
     }
-    #dim authorizer As Util.Requests.Authorizer = ##class(Util.Requests.Authorizer).%New()
+    #dim authorizer As TWReader.Authorizer = ##class(Util.Requests.Authorizer).%New()
     #dim authHeader as %String = authorizer.GetAuthHeader("get", url, arrayArgs)
 
     if '$isobject(callback) {

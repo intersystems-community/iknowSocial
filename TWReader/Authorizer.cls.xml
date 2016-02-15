@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-<Class name="Util.Requests.Authorizer">
+<Class name="TWReader.Authorizer">
 <Description>
 This is read-only Twitter application - it can not POST, only GET</Description>
 <IncludeCode>TWReader.Verbose</IncludeCode>
