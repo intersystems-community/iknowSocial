@@ -14,6 +14,7 @@
 <Route Url="/Domain/GetLastTweets/:maxSize" Method="GET" Call="GetLastTweetsBrief"/>
 <Route Url="/Domain/GetTrendTweets/:trend/:maxSize" Method="GET" Call="GetTrendTweets"/>
 <Route Url="/Trends/:woeid" Method="GET" Call="GetTrends"/>
+<Route Url="/TrendsGeo/:lat/:long" Method="GET" Call="GetTrendsGeo"/>
 
 </Routes>
 ]]></Data>
@@ -108,22 +109,47 @@
 
 <Method name="GetTrends">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>woeid:%String</FormalSpec>
+<FormalSpec>woeid:%String,city:%String="",country:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     #dim status As %Status = $$$OK
     try {
 
-        #dim response As %String = ""
-        #dim %status As %Status = ##class(TWReader.Rest.Api).GetTrendsByPlaceJSON(.response, woeid)
+        #dim utf8 As %String = ""
+        #dim response As %ZEN.proxyObject
+        #dim %status As %Status = ##class(TWReader.Rest.Api).GetTrendsByPlace(.response, woeid)
+        set response = response.GetAt(1)
+        
         if ($data(%request)) {
           set %response.CharSet     = ##class(%SYS.NLS.Table).GetCSPTable()
           set %response.ContentType = "application/json"
+          set utf8                  = "u"
         }
-        write response,!
+        if (city'="") {
+            set response.city = city
+        }
+        if (country'="") {
+            set response.country = country
+        }
+        set status = ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(response,,,utf8)
     } catch (e) {
         set status = e.AsStatus()
     }
     quit status
+]]></Implementation>
+</Method>
+
+<Method name="GetTrendsGeo">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>lat:%String,long:%String</FormalSpec>
+<Implementation><![CDATA[
+    #dim place As %ZEN.proxyObject
+    do ##class(TWReader.Rest.Api).GetPlaceByCoords(.place, lat, long)
+    #dim localtionObject As %ZEN.proxyObject = place.GetAt(1)
+    #dim woeid As %String = localtionObject.woeid
+    #dim city As %String = localtionObject.name
+    #dim country As %String = localtionObject.country
+    quit ..GetTrends(woeid, city, country)
 ]]></Implementation>
 </Method>
 </Class>

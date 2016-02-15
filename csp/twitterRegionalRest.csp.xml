@@ -338,16 +338,17 @@ function updateCounters() {
             var woeid = $(this).attr('data-woeid');
             var place = $(this).text();
             var country = $(this).attr('data-country');
-            console.log(place + ',' + country + ' = ' + woeid);
+            //console.log(place + ',' + country + ' = ' + woeid);
             if (woeid) {
                 $.ajax({
                     url: restserver + 'Trends/' + woeid
                 }).then(function(data) {
-                    trends = hardcodedTrends + trends.concat(data[0].trends);
+                    trends = hardcodedTrends;
+                    trends = trends.concat(data.trends);
                     updatePlace(place, country);
                     updateTrends(trends);
-                }); 
 
+                }); 
             }
         });
         $('#select-geo').on('click', function() {
@@ -359,7 +360,18 @@ function updateCounters() {
 
         $('#myModal').on('hidden',function(){
             $("#trends-table").removeClass('hidden');
-            #call(TWReader.UIBroker.DrawTrendsEx("['sourceId']","#trends-table", lastPosition.lat, lastPosition.lng))#
+            //#call(TWReader.UIBroker.DrawTrendsEx("['sourceId']","#trends-table", lastPosition.lat, lastPosition.lng))#
+
+            if (lastPosition) {
+                $.ajax({
+                    url: restserver + 'TrendsGeo/' + lastPosition.lat + '/' + lastPosition.lng
+                }).then(function(data) {
+                    trends = hardcodedTrends;
+                    trends = trends.concat(data.trends);
+                    updatePlace(data.city, data.country);
+                    updateTrends(trends);
+                }); 
+            }
 
             if( marker ) {
                 map.removeLayer(marker);
@@ -419,9 +431,6 @@ function updateCounters() {
             ractiveTrends.set('trendsCollection', trends);
         }
 
-        function showSourcesQuery(query) {
-            #call(TWReader.UIBroker.ShowFullSourceById(query))#
-        }
 
         function showSentimentCounters() {
             #call(TWReader.UIBroker.ShowEC())#
@@ -438,9 +447,6 @@ function updateCounters() {
            fetchTrendSources($(this).text())
         });
 
-        /* $(document).on("click", ".trend-name", function () {
-            showSourcesQuery($(this).text())
-        }); */
 
   </script>
 </body>

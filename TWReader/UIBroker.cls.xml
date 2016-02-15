@@ -117,6 +117,7 @@ internal entry for fetching trends collectiotable</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>tableName:%String="#trends-table",placeWoeid:%String,city:%String,country:%String=""</FormalSpec>
 <Implementation><![CDATA[
+#if 0
     do ##class(TWReader.Rest.Api).GetTrendsByPlaceJSON(.response, placeWoeid)
 
     set response = $replace(response,"[{","{",1,1)
@@ -129,6 +130,7 @@ internal entry for fetching trends collectiotable</Description>
         updatePlace('#(city)#','#(country)#');
         updateTrends(trends);
     >
+#endif
 ]]></Implementation>
 </Method>
 
