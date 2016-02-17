@@ -360,7 +360,6 @@ function updateCounters() {
 
         $('#myModal').on('hidden',function(){
             $("#trends-table").removeClass('hidden');
-            //#call(TWReader.UIBroker.DrawTrendsEx("['sourceId']","#trends-table", lastPosition.lat, lastPosition.lng))#
 
             if (lastPosition) {
                 $.ajax({

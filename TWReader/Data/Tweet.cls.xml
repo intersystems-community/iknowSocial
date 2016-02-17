@@ -218,7 +218,8 @@ getter for .CleanText property</Description>
     set text = ##class(Util.Misc).RegexpReplace(text, "\bhttps?:\S+", "")
     // set text = ##class(Util.Misc).RegexpReplace(text, "(\S)([\.,;?!:])(\S)", "$1$2 $3") // BUGBUG: it splits 1.5
     set text = ##class(Util.Misc).RegexpReplace(text, "(\S)([\.,;?!:])([^\d\s])", "$1$2 $3")
-    set text = ##class(Util.Misc).RegexpReplace(text, "#([\S]+)\s", "#$1, ")
+    //set text = ##class(Util.Misc).RegexpReplace(text, "#([\S]+)\s", "#$1, ")
+    set text = ##class(Util.Misc).RegexpReplace(text, "#([\S]+)\s", "# $1 ")
     set text = ##class(Util.Misc).RegexpReplace(text, "(.)\.?\n", "$1. ")
     quit text
 ]]></Implementation>

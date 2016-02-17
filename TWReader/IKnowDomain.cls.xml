@@ -8,7 +8,7 @@
 <XMLNamespace>http://www.intersystems.com/iknow</XMLNamespace>
 <Data><![CDATA[
 <domain name="TWReaderRus">
-<configuration name="TWReaderRus" detectLanguage="true" languages="ru,uk,en"/>
+<configuration name="TWReaderRus" detectLanguage="true" languages="ru,uk,en" userDictionary="udhashtags"/>
 <parameter name="$$$IKPSTEMMING" value="1" />
 
 <metadata>
@@ -43,6 +43,10 @@
       idField="IdStr" groupField="IdStr" dataFields="CleanText" metadataColumns="PostDate, PostTime, AuthorID, AuthorCity"/>
 
 </data>
+<userDictionary name="udhashtags" description="hash tags" >
+    <udentry rewriteFrom="#" assignLabel="UDRelation" />
+</userDictionary>
+
 
 </domain>
 ]]></Data>
@@ -68,6 +72,19 @@
 <Implementation><![CDATA[
     do ..ResetLastID()
     quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="%OnBeforeBuild">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pDomainId:%Integer</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+#if 0
+    #dim userdict As %iKnow.UserDictionary = ##class(%iKnow.UserDictionary).CreateTransient()
+    do userdict.AddAttribute("#","UDRelation")
+#endif
+    return $$$OK
 ]]></Implementation>
 </Method>
 
