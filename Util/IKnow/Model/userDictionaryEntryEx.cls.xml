@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.IKnow.Model.userDictionaryEntryEx">
+<Description>
+Simple extension to %iKnow.Model.userDictionaryEntry tag definition to enable UDRelation</Description>
+<Super>%iKnow.Model.userDictionaryEntry</Super>
+<TimeCreated>63964,63060.794484</TimeCreated>
+
+<Parameter name="XMLNAME">
+<Default>udentry</Default>
+</Parameter>
+
+<Property name="assignLabel">
+<Description><![CDATA[
+Label to assign to <property>rewriteFrom</property>]]></Description>
+<Type>%String</Type>
+<Parameter name="VALUELIST" value=",UDNegation,UDPosSentiment,UDNegSentiment,UDRelation"/>
+<Parameter name="XMLPROJECTION" value="ATTRIBUTE"/>
+</Property>
+</Class>
+</Export>
